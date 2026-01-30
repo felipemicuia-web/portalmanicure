@@ -1,131 +1,75 @@
-@import url("https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600;700&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Source+Serif+Pro:wght@400;600;700&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Definition of the design system - Galaxy Theme */
 
 @layer base {
   :root {
-    --background: 60 4% 95%;
-    --foreground: 24 9% 10%;
+    --background: 240 15% 5%;
+    --foreground: 240 10% 95%;
 
-    --card: 60 9% 97%;
-    --card-foreground: 24 9% 10%;
+    --card: 240 12% 8%;
+    --card-foreground: 240 10% 95%;
 
-    --popover: 20 5% 90%;
-    --popover-foreground: 24 9% 10%;
+    --popover: 240 15% 12%;
+    --popover-foreground: 240 10% 95%;
 
-    --primary: 37 92% 50%;
-    --primary-foreground: 47 100% 96%;
+    --primary: 263 70% 58%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 24 5% 44%;
-    --secondary-foreground: 60 9% 97%;
+    --secondary: 187 70% 53%;
+    --secondary-foreground: 240 15% 5%;
 
-    --muted: 23 5% 82%;
-    --muted-foreground: 24 9% 10%;
+    --muted: 240 10% 20%;
+    --muted-foreground: 240 10% 70%;
 
-    --accent: 47 100% 96%;
-    --accent-foreground: 37 92% 50%;
+    --accent: 45 96% 53%;
+    --accent-foreground: 240 15% 5%;
 
-    --destructive: 0 72% 50%;
-    --destructive-foreground: 0 85% 97%;
+    --destructive: 0 72% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 23 5% 82%;
-    --input: 23 5% 82%;
-    --ring: 37 92% 50%;
+    --border: 240 10% 20%;
+    --input: 240 10% 15%;
+    --ring: 263 70% 58%;
 
-    --radius: 1rem;
+    --radius: 0.875rem;
 
-    --sidebar-background: 350 20% 97%;
-    --sidebar-foreground: 24 9% 10%;
-    --sidebar-primary: 37 92% 50%;
-    --sidebar-primary-foreground: 47 100% 96%;
-    --sidebar-accent: 24 5% 44%;
-    --sidebar-accent-foreground: 60 9% 97%;
-    --sidebar-border: 23 5% 82%;
-    --sidebar-ring: 37 92% 50%;
+    --sidebar-background: 240 12% 8%;
+    --sidebar-foreground: 240 10% 95%;
+    --sidebar-primary: 263 70% 58%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 187 70% 53%;
+    --sidebar-accent-foreground: 240 15% 5%;
+    --sidebar-border: 240 10% 20%;
+    --sidebar-ring: 263 70% 58%;
 
-    /* Custom gradients - Manicure theme */
-    --gradient-primary: linear-gradient(135deg, hsl(340 65% 55%) 0%, hsl(320 60% 60%) 100%);
-    --gradient-accent: linear-gradient(135deg, hsl(25 80% 65%) 0%, hsl(340 50% 70%) 100%);
-    --gradient-hero: linear-gradient(135deg, hsl(350 30% 97%) 0%, hsl(340 40% 92%) 50%, hsl(25 30% 95%) 100%);
-    --chart-1: 45 96% 64%;
-    --chart-2: 47 95% 53%;
-    --chart-3: 43 96% 56%;
-    --chart-4: 37 92% 50%;
-    --chart-5: 24 5% 44%;
-    --sidebar: 60 9% 97%;
-    --font-sans: 'Source Sans Pro', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
-    --font-serif: 'Source Serif Pro', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
-    --font-mono: 'Source Code Pro', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
-    --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
-    --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
-    --shadow-sm: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
-    --shadow: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
-    --shadow-md: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 2px 4px -1px hsl(0 0% 0% / 0.1);
-    --shadow-lg: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 4px 6px -1px hsl(0 0% 0% / 0.1);
-    --shadow-xl: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 8px 10px -1px hsl(0 0% 0% / 0.1);
-    --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
+    --chart-1: 263 70% 58%;
+    --chart-2: 187 70% 53%;
+    --chart-3: 45 96% 53%;
+    --chart-4: 142 70% 45%;
+    --chart-5: 0 72% 60%;
+    --sidebar: 240 12% 8%;
+
+    --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+    
+    --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.15);
+    --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.15);
+    --shadow-sm: 0 1px 3px 0px hsl(0 0% 0% / 0.2), 0 1px 2px -1px hsl(0 0% 0% / 0.2);
+    --shadow: 0 1px 3px 0px hsl(0 0% 0% / 0.2), 0 1px 2px -1px hsl(0 0% 0% / 0.2);
+    --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.2), 0 2px 4px -2px hsl(0 0% 0% / 0.2);
+    --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.2), 0 4px 6px -4px hsl(0 0% 0% / 0.2);
+    --shadow-xl: 0 20px 25px -5px hsl(0 0% 0% / 0.25), 0 8px 10px -6px hsl(0 0% 0% / 0.25);
+    --shadow-2xl: 0 25px 50px -12px hsl(0 0% 0% / 0.35);
+    
     --tracking-normal: 0em;
     --spacing: 0.25rem;
-  }
 
-  .dark {
-    --background: 24 9% 10%;
-    --foreground: 60 9% 97%;
-
-    --card: 12 6% 15%;
-    --card-foreground: 60 9% 97%;
-
-    --popover: 30 6% 25%;
-    --popover-foreground: 60 9% 97%;
-
-    --primary: 43 96% 56%;
-    --primary-foreground: 20 91% 14%;
-
-    --secondary: 24 5% 44%;
-    --secondary-foreground: 60 9% 97%;
-
-    --muted: 24 5% 44%;
-    --muted-foreground: 60 9% 97%;
-
-    --accent: 25 83% 14%;
-    --accent-foreground: 47 95% 53%;
-
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 85% 97%;
-
-    --border: 33 5% 32%;
-    --input: 33 5% 32%;
-    --ring: 43 96% 56%;
-
-    --sidebar-background: 350 20% 10%;
-    --sidebar-foreground: 60 9% 97%;
-    --sidebar-primary: 43 96% 56%;
-    --sidebar-primary-foreground: 20 91% 14%;
-    --sidebar-accent: 47 95% 53%;
-    --sidebar-accent-foreground: 25 83% 14%;
-    --sidebar-border: 33 5% 32%;
-    --sidebar-ring: 43 96% 56%;
-    --chart-1: 45 96% 64%;
-    --chart-2: 48 96% 76%;
-    --chart-3: 43 96% 56%;
-    --chart-4: 37 92% 50%;
-    --chart-5: 33 5% 32%;
-    --sidebar: 12 6% 15%;
-    --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
-    --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
-    --shadow-sm: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
-    --shadow: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
-    --shadow-md: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 2px 4px -1px hsl(0 0% 0% / 0.1);
-    --shadow-lg: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 4px 6px -1px hsl(0 0% 0% / 0.1);
-    --shadow-xl: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 8px 10px -1px hsl(0 0% 0% / 0.1);
-    --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
+    /* Glow effects */
+    --glow-purple: 0 0 0 1px rgba(124,58,237,.25), 0 20px 60px rgba(124,58,237,.25);
+    --glow-cyan: 0 0 0 1px rgba(34,211,238,.18), 0 18px 55px rgba(34,211,238,.18);
   }
 }
 
@@ -136,5 +80,132 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-sans);
   }
+}
+
+/* Galaxy background */
+.galaxy-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E") center / cover no-repeat,
+    linear-gradient(180deg, hsl(240 15% 6%), hsl(240 15% 4%));
+}
+
+.galaxy-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(1px 1px at 20px 30px, rgba(255,255,255,.85), transparent 2px),
+    radial-gradient(1px 1px at 80px 120px, rgba(255,255,255,.65), transparent 2px),
+    radial-gradient(1px 1px at 140px 60px, rgba(255,255,255,.60), transparent 2px),
+    radial-gradient(1px 1px at 200px 180px, rgba(255,255,255,.75), transparent 2px),
+    radial-gradient(1px 1px at 260px 90px, rgba(255,255,255,.65), transparent 2px),
+    radial-gradient(1px 1px at 40px 200px, rgba(255,255,255,.50), transparent 2px),
+    radial-gradient(1px 1px at 170px 20px, rgba(255,255,255,.60), transparent 2px),
+    radial-gradient(2px 2px at 120px 80px, rgba(255,255,255,.80), transparent 3px),
+    radial-gradient(2px 2px at 260px 200px, rgba(255,255,255,.70), transparent 3px),
+    radial-gradient(2px 2px at 360px 40px, rgba(255,255,255,.75), transparent 3px);
+  background-size: 120px 120px, 120px 120px, 120px 120px, 120px 120px, 120px 120px, 120px 120px, 120px 120px, 260px 260px, 260px 260px, 260px 260px;
+  opacity: 0.8;
+}
+
+.galaxy-bg::after {
+  content: '';
+  position: absolute;
+  inset: -25%;
+  background:
+    radial-gradient(900px 600px at 18% 28%, rgba(124,58,237,.45), transparent 65%),
+    radial-gradient(850px 520px at 78% 30%, rgba(90,47,181,.35), transparent 62%),
+    radial-gradient(800px 560px at 30% 88%, rgba(34,211,238,.18), transparent 65%),
+    radial-gradient(700px 520px at 82% 86%, rgba(255,183,3,.12), transparent 70%),
+    radial-gradient(900px 700px at 50% 60%, rgba(255,255,255,.04), transparent 75%);
+  filter: blur(28px);
+  opacity: 0.75;
+  mix-blend-mode: screen;
+}
+
+/* Glass panel effect */
+.glass-panel {
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: var(--radius);
+  backdrop-filter: blur(8px);
+}
+
+/* Topbar gradient */
+.topbar-gradient {
+  background:
+    radial-gradient(900px 120px at 20% 10%, rgba(124,58,237,.55), transparent 65%),
+    radial-gradient(900px 120px at 80% 20%, rgba(34,211,238,.18), transparent 60%),
+    linear-gradient(180deg, rgba(90,47,181,.85), rgba(90,47,181,.55));
+  border-bottom: 1px solid rgba(255,255,255,.12);
+  backdrop-filter: blur(10px);
+}
+
+/* Service card selected state */
+.service-selected {
+  border-color: rgba(34,197,94,.65) !important;
+  box-shadow: 0 0 0 3px rgba(34,197,94,.14);
+}
+
+/* Calendar styles */
+.cal-day {
+  @apply border border-border/50 bg-muted/20 rounded-lg py-2.5 text-center cursor-pointer select-none transition-all;
+}
+
+.cal-day:hover:not(.cal-disabled) {
+  @apply border-border;
+}
+
+.cal-day.cal-disabled {
+  @apply opacity-35 cursor-not-allowed;
+}
+
+.cal-day.cal-today {
+  @apply border-primary;
+}
+
+.cal-day.cal-selected {
+  @apply bg-primary border-primary text-primary-foreground;
+}
+
+/* Stepper styles */
+.step-dot {
+  @apply w-7 h-7 rounded-full grid place-items-center bg-muted/40 border border-border text-xs font-medium;
+}
+
+.step-dot.active {
+  @apply bg-accent border-accent text-accent-foreground font-bold;
+}
+
+/* Form input focus */
+input:focus, select:focus, textarea:focus {
+  border-color: rgba(255,183,3,.65) !important;
+  box-shadow: 0 0 0 3px rgba(255,183,3,.15);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--primary) / 0.5);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary) / 0.7);
 }
