@@ -136,10 +136,10 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-accent/5 p-4">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent pointer-events-none" />
+    <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="galaxy-bg" />
       
-      <Card className="w-full max-w-md relative overflow-hidden border-border/50 shadow-2xl shadow-primary/5">
+      <Card className="w-full max-w-md relative overflow-hidden border-border/50 shadow-2xl shadow-primary/20 bg-card/80 backdrop-blur z-10">
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-accent to-primary" />
         
         <CardHeader className="space-y-3 pb-6">
