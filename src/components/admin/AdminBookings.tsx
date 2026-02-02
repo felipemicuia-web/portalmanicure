@@ -2,8 +2,13 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { logger } from "@/lib/logger";
 import { formatPhone } from "@/lib/validation";
-import { Calendar, Clock, User, Phone, FileText, CalendarDays } from "lucide-react";
+import { Calendar, Clock, User, Phone, CalendarDays, Pencil, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
 import {
   Table,
   TableBody,
@@ -19,6 +24,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface Booking {
   id: string;
@@ -45,6 +68,22 @@ export function AdminBookings() {
   const [loading, setLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [filterProfessional, setFilterProfessional] = useState<string>("all");
+  
+  // Edit state
+  const [editingBooking, setEditingBooking] = useState<Booking | null>(null);
+  const [editForm, setEditForm] = useState({
+    client_name: "",
+    client_phone: "",
+    booking_date: "",
+    booking_time: "",
+    status: "",
+    notes: "",
+  });
+  const [saving, setSaving] = useState(false);
+  
+  // Delete state
+  const [deletingBooking, setDeletingBooking] = useState<Booking | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -112,6 +151,77 @@ export function AdminBookings() {
     return true;
   });
 
+  const openEditDialog = (booking: Booking) => {
+    setEditingBooking(booking);
+    setEditForm({
+      client_name: booking.client_name,
+      client_phone: booking.client_phone,
+      booking_date: booking.booking_date,
+      booking_time: booking.booking_time.slice(0, 5),
+      status: booking.status,
+      notes: booking.notes || "",
+    });
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editingBooking) return;
+    
+    setSaving(true);
+    const { error } = await supabase
+      .from("bookings")
+      .update({
+        client_name: editForm.client_name,
+        client_phone: editForm.client_phone.replace(/\D/g, ""),
+        booking_date: editForm.booking_date,
+        booking_time: editForm.booking_time,
+        status: editForm.status,
+        notes: editForm.notes || null,
+      })
+      .eq("id", editingBooking.id);
+    
+    setSaving(false);
+    
+    if (error) {
+      logger.error("Error updating booking:", error);
+      toast.error("Erro ao atualizar agendamento");
+      return;
+    }
+    
+    toast.success("Agendamento atualizado!");
+    setEditingBooking(null);
+    
+    // Refresh bookings
+    setBookings((prev) =>
+      prev.map((b) =>
+        b.id === editingBooking.id
+          ? { ...b, ...editForm, client_phone: editForm.client_phone.replace(/\D/g, ""), notes: editForm.notes || null }
+          : b
+      )
+    );
+  };
+
+  const handleDelete = async () => {
+    if (!deletingBooking) return;
+    
+    setDeleting(true);
+    const { error } = await supabase
+      .from("bookings")
+      .delete()
+      .eq("id", deletingBooking.id);
+    
+    setDeleting(false);
+    
+    if (error) {
+      logger.error("Error deleting booking:", error);
+      toast.error("Erro ao excluir agendamento");
+      return;
+    }
+    
+    toast.success("Agendamento excluído!");
+    setDeletingBooking(null);
+    setBookings((prev) => prev.filter((b) => b.id !== deletingBooking.id));
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center py-12">
@@ -178,12 +288,13 @@ export function AdminBookings() {
               <TableHead>Profissional</TableHead>
               <TableHead className="text-right">Valor</TableHead>
               <TableHead className="text-center">Status</TableHead>
+              <TableHead className="text-center">Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredBookings.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
                   Nenhum agendamento encontrado
                 </TableCell>
               </TableRow>
@@ -204,12 +315,136 @@ export function AdminBookings() {
                   <TableCell>{getProfessionalName(booking.professional_id)}</TableCell>
                   <TableCell className="text-right">{formatPrice(booking.total_price)}</TableCell>
                   <TableCell className="text-center">{getStatusBadge(booking.status)}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center justify-center gap-1">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => openEditDialog(booking)}
+                        className="h-8 w-8"
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setDeletingBooking(booking)}
+                        className="h-8 w-8 text-destructive hover:text-destructive"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
                 </TableRow>
               ))
             )}
           </TableBody>
         </Table>
       </div>
+
+      {/* Edit Dialog */}
+      <Dialog open={!!editingBooking} onOpenChange={(open) => !open && setEditingBooking(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Editar Agendamento</DialogTitle>
+            <DialogDescription>Altere as informações do agendamento.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="client_name">Nome do Cliente</Label>
+              <Input
+                id="client_name"
+                value={editForm.client_name}
+                onChange={(e) => setEditForm((f) => ({ ...f, client_name: e.target.value }))}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="client_phone">Telefone</Label>
+              <Input
+                id="client_phone"
+                value={editForm.client_phone}
+                onChange={(e) => setEditForm((f) => ({ ...f, client_phone: e.target.value }))}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="booking_date">Data</Label>
+                <Input
+                  id="booking_date"
+                  type="date"
+                  value={editForm.booking_date}
+                  onChange={(e) => setEditForm((f) => ({ ...f, booking_date: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="booking_time">Horário</Label>
+                <Input
+                  id="booking_time"
+                  type="time"
+                  value={editForm.booking_time}
+                  onChange={(e) => setEditForm((f) => ({ ...f, booking_time: e.target.value }))}
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="status">Status</Label>
+              <Select value={editForm.status} onValueChange={(v) => setEditForm((f) => ({ ...f, status: v }))}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="confirmed">Confirmado</SelectItem>
+                  <SelectItem value="completed">Concluído</SelectItem>
+                  <SelectItem value="cancelled">Cancelado</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="notes">Observações</Label>
+              <Textarea
+                id="notes"
+                value={editForm.notes}
+                onChange={(e) => setEditForm((f) => ({ ...f, notes: e.target.value }))}
+                rows={3}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditingBooking(null)}>
+              Cancelar
+            </Button>
+            <Button onClick={handleSaveEdit} disabled={saving}>
+              {saving ? "Salvando..." : "Salvar"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation */}
+      <AlertDialog open={!!deletingBooking} onOpenChange={(open) => !open && setDeletingBooking(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir Agendamento</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir o agendamento de{" "}
+              <strong>{deletingBooking?.client_name}</strong> em{" "}
+              <strong>{deletingBooking && formatDate(deletingBooking.booking_date)}</strong>?
+              <br />
+              Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              disabled={deleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleting ? "Excluindo..." : "Excluir"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
