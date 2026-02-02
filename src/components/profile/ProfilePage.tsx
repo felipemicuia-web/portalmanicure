@@ -3,6 +3,7 @@ import { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { ProfileHeader } from "./ProfileHeader";
 import { PhotoGallery } from "./PhotoGallery";
+import { FollowingList } from "@/components/professional/FollowingList";
 
 interface Profile {
   id: string;
@@ -93,6 +94,7 @@ export function ProfilePage({ user }: ProfilePageProps) {
         bookingCount={bookingCount}
         onProfileUpdate={fetchData}
       />
+      <FollowingList user={user} />
       <PhotoGallery
         user={user}
         photos={photos}

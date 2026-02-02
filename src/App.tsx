@@ -7,6 +7,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import BookingPage from "./pages/BookingPage";
 import Auth from "./pages/Auth";
 import AdminPage from "./pages/AdminPage";
+import ProfessionalProfilePage from "./pages/ProfessionalProfilePage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -22,6 +23,7 @@ const App = () => (
             <Route path="/" element={<BookingPage />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/admin" element={<AdminPage />} />
+            <Route path="/professional/:id" element={<ProfessionalProfilePage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
