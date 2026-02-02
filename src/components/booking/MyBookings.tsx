@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { logger } from "@/lib/logger";
-import { formatPhone } from "@/lib/validation";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useAvailableTimes } from "@/hooks/useBookingData";
 import { Calendar, Clock, User as UserIcon, Pencil, Trash2, RefreshCw } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -45,6 +45,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { cn } from "@/lib/utils";
 
 interface Booking {
   id: string;
@@ -87,6 +88,13 @@ export function MyBookings({ user }: Props) {
   // Delete state
   const [deletingBooking, setDeletingBooking] = useState<Booking | null>(null);
   const [deleting, setDeleting] = useState(false);
+
+  // Fetch available times for the selected date/professional
+  const { times: availableTimes, loading: timesLoading } = useAvailableTimes(
+    editingBooking?.professional_id || "",
+    editForm.booking_date,
+    editingBooking?.duration_minutes || 0
+  );
 
   const fetchData = async () => {
     setLoading(true);
@@ -259,29 +267,59 @@ export function MyBookings({ user }: Props) {
     );
   }
 
+  // Include the current booking time as an option (since it's already booked by this user)
+  const allAvailableTimes = editingBooking
+    ? [...new Set([editingBooking.booking_time.slice(0, 5), ...availableTimes])].sort()
+    : availableTimes;
+
   const EditFormContent = () => (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-3">
-        <div className="space-y-2">
-          <Label htmlFor="booking_date">Data</Label>
-          <Input
-            id="booking_date"
-            type="date"
-            value={editForm.booking_date}
-            onChange={(e) => setEditForm((f) => ({ ...f, booking_date: e.target.value }))}
-            min={new Date().toISOString().split("T")[0]}
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="booking_time">Horário</Label>
-          <Input
-            id="booking_time"
-            type="time"
-            value={editForm.booking_time}
-            onChange={(e) => setEditForm((f) => ({ ...f, booking_time: e.target.value }))}
-          />
-        </div>
+      <div className="space-y-2">
+        <Label htmlFor="booking_date">Data</Label>
+        <Input
+          id="booking_date"
+          type="date"
+          value={editForm.booking_date}
+          onChange={(e) => setEditForm((f) => ({ ...f, booking_date: e.target.value, booking_time: "" }))}
+          min={new Date().toISOString().split("T")[0]}
+          className="w-full"
+        />
       </div>
+      
+      <div className="space-y-2">
+        <Label>Horário disponível</Label>
+        {timesLoading ? (
+          <div className="flex items-center justify-center py-4">
+            <div className="w-5 h-5 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+            <span className="ml-2 text-sm text-muted-foreground">Carregando horários...</span>
+          </div>
+        ) : allAvailableTimes.length === 0 ? (
+          <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20">
+            <p className="text-sm text-destructive text-center">
+              Não há horários disponíveis para esta data.
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 max-h-40 overflow-y-auto p-1">
+            {allAvailableTimes.map((t) => (
+              <button
+                key={t}
+                type="button"
+                onClick={() => setEditForm((f) => ({ ...f, booking_time: t }))}
+                className={cn(
+                  "py-2 px-3 rounded-lg text-sm font-medium transition-all duration-200",
+                  editForm.booking_time === t
+                    ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30"
+                    : "bg-muted/50 border border-border/50 text-foreground hover:bg-muted hover:border-border"
+                )}
+              >
+                {t}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
       <div className="space-y-2">
         <Label htmlFor="notes">Observações</Label>
         <Textarea
