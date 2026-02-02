@@ -11,6 +11,7 @@ import { ServiceList } from "@/components/booking/ServiceList";
 import { DateTimeSelect } from "@/components/booking/DateTimeSelect";
 import { BookingConfirm } from "@/components/booking/BookingConfirm";
 import { ProfilePage } from "@/components/profile/ProfilePage";
+import { MyBookings } from "@/components/booking/MyBookings";
 import { logger } from "@/lib/logger";
 import { normalizePhone, isValidBrazilianPhone, isValidName } from "@/lib/validation";
 
@@ -23,7 +24,7 @@ export default function BookingPage() {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activePage, setActivePage] = useState<"booking" | "profile" | "notifications">("booking");
+  const [activePage, setActivePage] = useState<"booking" | "profile" | "my-bookings">("booking");
   
   // Booking state
   const [currentStep, setCurrentStep] = useState(1);
@@ -364,13 +365,8 @@ export default function BookingPage() {
             <ProfilePage user={user} />
           )}
 
-          {activePage === "notifications" && (
-            <div className="glass-panel p-4 sm:p-5">
-              <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Notificações</h2>
-              <p className="text-muted-foreground text-sm">
-                Nenhuma notificação por enquanto.
-              </p>
-            </div>
+          {activePage === "my-bookings" && user && (
+            <MyBookings user={user} />
           )}
 
           <footer className="mt-6 sm:mt-8 flex flex-col sm:flex-row justify-between gap-2 sm:gap-4 text-[10px] sm:text-xs text-muted-foreground text-center sm:text-left">
