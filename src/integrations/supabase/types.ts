@@ -216,29 +216,18 @@ export type Database = {
       }
     }
     Views: {
-      gallery_photos_public: {
-        Row: {
-          caption: string | null
-          created_at: string | null
-          id: string | null
-          image_url: string | null
-        }
-        Insert: {
-          caption?: string | null
-          created_at?: string | null
-          id?: string | null
-          image_url?: string | null
-        }
-        Update: {
-          caption?: string | null
-          created_at?: string | null
-          id?: string | null
-          image_url?: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
+      get_public_gallery_photos: {
+        Args: { limit_count?: number }
+        Returns: {
+          caption: string
+          created_at: string
+          id: string
+          image_url: string
+        }[]
+      }
       validate_phone_format: { Args: { phone: string }; Returns: boolean }
     }
     Enums: {
