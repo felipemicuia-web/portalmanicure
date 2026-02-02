@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AdminProfessionals } from "@/components/admin/AdminProfessionals";
 import { AdminServices } from "@/components/admin/AdminServices";
 import { AdminBookings } from "@/components/admin/AdminBookings";
+import { AdminNotifications } from "@/components/admin/AdminNotifications";
 import {
   Users,
   Sparkles,
@@ -16,6 +17,7 @@ import {
   Shield,
   LogOut,
   Home,
+  Bell,
 } from "lucide-react";
 
 export default function AdminPage() {
@@ -123,8 +125,16 @@ export default function AdminPage() {
 
         {/* Main Content */}
         <main className="max-w-6xl mx-auto px-4 py-6">
-          <Tabs defaultValue="professionals" className="space-y-4 sm:space-y-6">
-            <TabsList className="grid w-full grid-cols-3 glass-panel p-1 h-auto">
+          <Tabs defaultValue="bookings" className="space-y-4 sm:space-y-6">
+            <TabsList className="grid w-full grid-cols-4 glass-panel p-1 h-auto">
+              <TabsTrigger value="bookings" className="gap-1.5 text-xs sm:text-sm py-2.5 px-2 sm:px-4 flex-col sm:flex-row">
+                <CalendarDays className="w-4 h-4" />
+                <span>Agenda</span>
+              </TabsTrigger>
+              <TabsTrigger value="notifications" className="gap-1.5 text-xs sm:text-sm py-2.5 px-2 sm:px-4 flex-col sm:flex-row relative">
+                <Bell className="w-4 h-4" />
+                <span>Avisos</span>
+              </TabsTrigger>
               <TabsTrigger value="professionals" className="gap-1.5 text-xs sm:text-sm py-2.5 px-2 sm:px-4 flex-col sm:flex-row">
                 <Users className="w-4 h-4" />
                 <span>Profissionais</span>
@@ -133,11 +143,15 @@ export default function AdminPage() {
                 <Sparkles className="w-4 h-4" />
                 <span>Serviços</span>
               </TabsTrigger>
-              <TabsTrigger value="bookings" className="gap-1.5 text-xs sm:text-sm py-2.5 px-2 sm:px-4 flex-col sm:flex-row">
-                <CalendarDays className="w-4 h-4" />
-                <span>Agenda</span>
-              </TabsTrigger>
             </TabsList>
+
+            <TabsContent value="bookings">
+              <AdminBookings />
+            </TabsContent>
+
+            <TabsContent value="notifications">
+              <AdminNotifications />
+            </TabsContent>
 
             <TabsContent value="professionals">
               <AdminProfessionals />
@@ -145,10 +159,6 @@ export default function AdminPage() {
 
             <TabsContent value="services">
               <AdminServices />
-            </TabsContent>
-
-            <TabsContent value="bookings">
-              <AdminBookings />
             </TabsContent>
           </Tabs>
         </main>

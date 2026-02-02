@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { User } from "@supabase/supabase-js";
-import { LogOut, User as UserIcon, Shield, Menu, X, Calendar, Bell } from "lucide-react";
+import { LogOut, User as UserIcon, Shield, Menu, X, Calendar, CalendarCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAdmin } from "@/hooks/useAdmin";
 import { useState } from "react";
@@ -8,8 +8,8 @@ import { cn } from "@/lib/utils";
 
 interface BookingTopbarProps {
   user: User | null;
-  activePage: "booking" | "profile" | "notifications";
-  onPageChange: (page: "booking" | "profile" | "notifications") => void;
+  activePage: "booking" | "profile" | "my-bookings";
+  onPageChange: (page: "booking" | "profile" | "my-bookings") => void;
   onLogout: () => void;
 }
 
@@ -22,7 +22,7 @@ export function BookingTopbar({
   const { isAdmin } = useAdmin(user);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
-  const handlePageChange = (page: "booking" | "profile" | "notifications") => {
+  const handlePageChange = (page: "booking" | "profile" | "my-bookings") => {
     onPageChange(page);
     setMobileMenuOpen(false);
   };
@@ -68,7 +68,7 @@ export function BookingTopbar({
                       : "text-white/80 hover:bg-white/10 hover:text-white"
                   )}
                 >
-                  Agendamentos
+                  Agendar
                 </button>
                 <button
                   onClick={() => onPageChange("profile")}
@@ -82,15 +82,15 @@ export function BookingTopbar({
                   Perfil
                 </button>
                 <button
-                  onClick={() => onPageChange("notifications")}
+                  onClick={() => onPageChange("my-bookings")}
                   className={cn(
                     "text-sm px-3 py-1.5 rounded-lg transition-all duration-200",
-                    activePage === "notifications" 
+                    activePage === "my-bookings" 
                       ? "bg-white/20 font-bold shadow-lg" 
                       : "text-white/80 hover:bg-white/10 hover:text-white"
                   )}
                 >
-                  Notificações
+                  Meus Agendamentos
                 </button>
                 {isAdmin && (
                   <Link to="/admin">
@@ -170,7 +170,7 @@ export function BookingTopbar({
                 )}
               >
                 <Calendar className="w-5 h-5" />
-                <span>Agendamentos</span>
+                <span>Agendar</span>
               </button>
               <button
                 onClick={() => handlePageChange("profile")}
@@ -185,16 +185,16 @@ export function BookingTopbar({
                 <span>Perfil</span>
               </button>
               <button
-                onClick={() => handlePageChange("notifications")}
+                onClick={() => handlePageChange("my-bookings")}
                 className={cn(
                   "flex items-center gap-3 px-3 py-3 rounded-xl text-left transition-all",
-                  activePage === "notifications" 
+                  activePage === "my-bookings" 
                     ? "bg-white/20 font-semibold" 
                     : "text-white/80 hover:bg-white/10"
                 )}
               >
-                <Bell className="w-5 h-5" />
-                <span>Notificações</span>
+                <CalendarCheck className="w-5 h-5" />
+                <span>Meus Agendamentos</span>
               </button>
               {isAdmin && (
                 <Link 
