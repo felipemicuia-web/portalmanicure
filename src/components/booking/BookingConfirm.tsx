@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, User, Briefcase, Calendar, Wallet, Phone, CheckCircle } from "lucide-react";
 
 interface BookingConfirmProps {
   professional: Professional | undefined;
@@ -21,17 +21,27 @@ interface BookingConfirmProps {
   onPrev: () => void;
   onSubmit: () => void;
   isSubmitting: boolean;
+  isConfirmed?: boolean;
 }
 
 function formatPrice(value: number): string {
-  return value.toFixed(2).replace(".", ",");
+  return value.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-function formatDuration(minutes: number): string {
-  const h = Math.floor(minutes / 60);
-  const m = minutes % 60;
-  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+function formatDateDisplay(dateStr: string): string {
+  if (!dateStr) return "—";
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+  
+  if (dateStr === todayStr) {
+    return "Hoje";
+  }
+  
+  const [year, month, day] = dateStr.split("-");
+  return `${day}/${month}/${year}`;
 }
+
+const MAX_NOTES_LENGTH = 500;
 
 export function BookingConfirm({
   professional,
@@ -49,49 +59,69 @@ export function BookingConfirm({
   onPrev,
   onSubmit,
   isSubmitting,
+  isConfirmed = false,
 }: BookingConfirmProps) {
-  const roundedMinutes = totalMinutes > 0 ? Math.ceil(totalMinutes / 60) * 60 : 0;
+  const handleNotesChange = (value: string) => {
+    if (value.length <= MAX_NOTES_LENGTH) {
+      onNotesChange(value);
+    }
+  };
 
   return (
-    <div className="glass-panel p-5 space-y-4">
+    <div className="glass-panel p-5 space-y-5">
+      {/* Header */}
       <div className="flex items-start justify-between gap-3">
         <div>
           <h2 className="text-xl font-semibold mb-1">Confirmar agendamento</h2>
           <p className="text-muted-foreground text-sm">
-            Preencha seus dados e confirme.
+            Revise seus dados e confirme abaixo.
           </p>
         </div>
-        <Button variant="ghost" onClick={onPrev} className="gap-1">
-          <ArrowLeft className="w-4 h-4" />
+        <Button variant="secondary" onClick={onPrev} className="gap-1.5">
           Voltar
         </Button>
       </div>
 
-      {/* Summary */}
-      <div className="border border-border/50 bg-card/50 rounded-xl p-3 space-y-2">
-        <div className="flex justify-between gap-2.5 py-1.5">
-          <span className="text-muted-foreground">Profissional</span>
-          <span className="font-bold">{professional?.name || "—"}</span>
+      {/* Summary Card */}
+      <div className="border border-border/50 bg-card/50 rounded-xl p-4 space-y-3">
+        <div className="flex items-center justify-between gap-3 py-1">
+          <div className="flex items-center gap-3 text-muted-foreground">
+            <User className="w-4 h-4" />
+            <span>Profissional</span>
+          </div>
+          <span className="font-semibold text-right">{professional?.name || "—"}</span>
         </div>
-        <div className="flex justify-between gap-2.5 py-1.5">
-          <span className="text-muted-foreground">Serviços</span>
-          <span className="font-bold text-right">
+        
+        <div className="flex items-center justify-between gap-3 py-1">
+          <div className="flex items-center gap-3 text-muted-foreground">
+            <Briefcase className="w-4 h-4" />
+            <span>Serviços</span>
+          </div>
+          <span className="font-semibold text-right">
             {selectedServices.length > 0 
               ? selectedServices.map(s => s.name).join(", ") 
               : "—"}
           </span>
         </div>
-        <div className="flex justify-between gap-2.5 py-1.5">
-          <span className="text-muted-foreground">Data/Hora</span>
-          <span className="font-bold">
-            {date && time ? `${date} ${time}` : "—"}
+        
+        <div className="flex items-center justify-between gap-3 py-1">
+          <div className="flex items-center gap-3 text-muted-foreground">
+            <Calendar className="w-4 h-4" />
+            <span>Data/Hora</span>
+          </div>
+          <span className="font-semibold text-right">
+            {date && time ? `${formatDateDisplay(date)} - ${time}` : "—"}
           </span>
         </div>
-        <div className="flex justify-between gap-2.5 py-1.5">
-          <span className="text-muted-foreground">Total</span>
-          <span className="font-bold">
+        
+        <div className="flex items-center justify-between gap-3 py-1">
+          <div className="flex items-center gap-3 text-muted-foreground">
+            <Wallet className="w-4 h-4" />
+            <span>Total</span>
+          </div>
+          <span className="font-semibold text-primary text-lg">
             {selectedServices.length > 0 
-              ? `R$ ${formatPrice(totalPrice)} • ${formatDuration(roundedMinutes)}` 
+              ? `R$ ${formatPrice(totalPrice)}` 
               : "—"}
           </span>
         </div>
@@ -101,48 +131,68 @@ export function BookingConfirm({
       <div className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <Label htmlFor="clientName" className="text-sm">Nome</Label>
-            <Input
-              id="clientName"
-              type="text"
-              value={clientName}
-              onChange={(e) => onClientNameChange(e.target.value)}
-              placeholder="Seu nome"
-              required
-              className="bg-input border-border mt-1.5"
-            />
+            <Label htmlFor="clientName" className="text-sm mb-1.5 block">Nome</Label>
+            <div className="relative">
+              <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                id="clientName"
+                type="text"
+                value={clientName}
+                onChange={(e) => onClientNameChange(e.target.value)}
+                placeholder="Seu nome"
+                required
+                className="bg-input border-border pl-10"
+              />
+            </div>
           </div>
           <div>
-            <Label htmlFor="clientPhone" className="text-sm">WhatsApp</Label>
-            <Input
-              id="clientPhone"
-              type="tel"
-              value={clientPhone}
-              onChange={(e) => onClientPhoneChange(e.target.value)}
-              placeholder="(11) 99999-9999"
-              required
-              className="bg-input border-border mt-1.5"
-            />
+            <Label htmlFor="clientPhone" className="text-sm mb-1.5 block">WhatsApp</Label>
+            <div className="relative">
+              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                id="clientPhone"
+                type="tel"
+                value={clientPhone}
+                onChange={(e) => onClientPhoneChange(e.target.value)}
+                placeholder="(11) 99999-9999"
+                required
+                className="bg-input border-border pl-10"
+              />
+            </div>
           </div>
         </div>
 
         <div>
-          <Label htmlFor="notes" className="text-sm">Observações</Label>
+          <div className="flex justify-between items-center mb-1.5">
+            <Label htmlFor="notes" className="text-sm">Observações</Label>
+            <span className="text-xs text-muted-foreground">
+              {notes.length} / {MAX_NOTES_LENGTH}
+            </span>
+          </div>
           <Textarea
             id="notes"
             value={notes}
-            onChange={(e) => onNotesChange(e.target.value)}
+            onChange={(e) => handleNotesChange(e.target.value)}
             rows={3}
             placeholder="Alguma observação?"
-            className="bg-input border-border mt-1.5"
+            className="bg-input border-border resize-none"
+            maxLength={MAX_NOTES_LENGTH}
           />
         </div>
+
+        {/* Success Message */}
+        {isConfirmed && (
+          <div className="flex items-center gap-2 text-primary">
+            <CheckCircle className="w-5 h-5" />
+            <span className="font-medium">Agendamento confirmado.</span>
+          </div>
+        )}
 
         <div className="flex justify-end pt-2">
           <Button
             onClick={onSubmit}
-            disabled={isSubmitting}
-            className="bg-primary hover:bg-primary/90"
+            disabled={isSubmitting || isConfirmed}
+            className="bg-primary hover:bg-primary/90 px-6"
           >
             {isSubmitting ? "Confirmando..." : "Confirmar agendamento"}
           </Button>
