@@ -1,12 +1,5 @@
 import { Professional } from "@/types/booking";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 
 interface ProfessionalSelectProps {
@@ -36,29 +29,37 @@ export function ProfessionalSelect({
           <Label htmlFor="professional" className="text-sm opacity-90 mb-2 block font-medium">
             Profissional
           </Label>
-          <Select value={selectedId} onValueChange={onSelect}>
-            <SelectTrigger 
-              id="professional" 
-              className="w-full bg-input/80 border-border/60 hover:border-border transition-all duration-200 h-12 text-base"
-            >
-              <SelectValue placeholder="Selecione" />
-            </SelectTrigger>
-            <SelectContent className="bg-popover/95 backdrop-blur-xl border-border/50">
-              {professionals.map((p) => (
-                <SelectItem 
-                  key={p.id} 
-                  value={p.id}
-                  className="hover:bg-primary/20 focus:bg-primary/20 cursor-pointer transition-colors"
+          <div id="professional" className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {professionals.map((p) => {
+              const isSelected = selectedId === p.id;
+              return (
+                <Button
+                  key={p.id}
+                  type="button"
+                  variant={isSelected ? "default" : "secondary"}
+                  onClick={() => onSelect(p.id)}
+                  className={
+                    isSelected
+                      ? "h-12 justify-start px-4 font-semibold shadow-lg shadow-primary/20"
+                      : "h-12 justify-start px-4"
+                  }
                 >
                   {p.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+                </Button>
+              );
+            })}
+
+            {professionals.length === 0 && (
+              <div className="text-sm text-muted-foreground">
+                Nenhum profissional disponível no momento.
+              </div>
+            )}
+          </div>
         </div>
 
         <Button 
-          onClick={onNext} 
+          onClick={onNext}
+          disabled={!selectedId}
           className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg shadow-primary/25 px-6 h-12 font-semibold"
         >
           Continuar
