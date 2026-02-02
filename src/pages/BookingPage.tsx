@@ -10,6 +10,7 @@ import { ProfessionalSelect } from "@/components/booking/ProfessionalSelect";
 import { ServiceList } from "@/components/booking/ServiceList";
 import { DateTimeSelect } from "@/components/booking/DateTimeSelect";
 import { BookingConfirm } from "@/components/booking/BookingConfirm";
+import { ProfilePage } from "@/components/profile/ProfilePage";
 
 function getTodayISO(): string {
   const d = new Date();
@@ -361,13 +362,8 @@ export default function BookingPage() {
             </>
           )}
 
-          {activePage === "profile" && (
-            <div className="glass-panel p-5">
-              <h2 className="text-xl font-semibold mb-4">Meu Perfil</h2>
-              <p className="text-muted-foreground">
-                Funcionalidade de perfil em desenvolvimento...
-              </p>
-            </div>
+          {activePage === "profile" && user && (
+            <ProfilePage user={user} />
           )}
 
           {activePage === "notifications" && (
