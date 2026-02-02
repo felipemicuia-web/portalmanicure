@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { logger } from "@/lib/logger";
 import { Plus, Trash2, X, Grid3X3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -72,7 +73,7 @@ export function PhotoGallery({ user, photos, onPhotosChange }: PhotoGalleryProps
           .upload(fileName, file);
 
         if (uploadError) {
-          console.error("Upload error:", uploadError);
+          logger.error("Upload error:", uploadError);
           continue;
         }
 
@@ -88,7 +89,7 @@ export function PhotoGallery({ user, photos, onPhotosChange }: PhotoGalleryProps
         });
 
         if (dbError) {
-          console.error("Database error:", dbError);
+          logger.error("Database error:", dbError);
         }
       }
 
@@ -99,7 +100,7 @@ export function PhotoGallery({ user, photos, onPhotosChange }: PhotoGalleryProps
 
       onPhotosChange();
     } catch (error) {
-      console.error("Upload error:", error);
+      logger.error("Upload error:", error);
       toast({
         title: "Erro",
         description: "Não foi possível adicionar as fotos.",
@@ -143,7 +144,7 @@ export function PhotoGallery({ user, photos, onPhotosChange }: PhotoGalleryProps
       setSelectedPhoto(null);
       onPhotosChange();
     } catch (error) {
-      console.error("Delete error:", error);
+      logger.error("Delete error:", error);
       toast({
         title: "Erro",
         description: "Não foi possível remover a foto.",
