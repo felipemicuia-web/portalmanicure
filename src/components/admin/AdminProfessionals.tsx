@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { logger } from "@/lib/logger";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,6 +27,21 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 
 interface Professional {
   id: string;
@@ -40,7 +56,7 @@ interface Professional {
 export function AdminProfessionals() {
   const [professionals, setProfessionals] = useState<Professional[]>([]);
   const [loading, setLoading] = useState(true);
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingProfessional, setEditingProfessional] = useState<Professional | null>(null);
   const [editName, setEditName] = useState("");
   const [editBio, setEditBio] = useState("");
   const [editInstagram, setEditInstagram] = useState("");
@@ -50,6 +66,7 @@ export function AdminProfessionals() {
   const [uploadingId, setUploadingId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  const isMobile = useIsMobile();
 
   const fetchProfessionals = async () => {
     const { data, error } = await supabase
@@ -91,8 +108,8 @@ export function AdminProfessionals() {
     }
   };
 
-  const handleEdit = async (id: string) => {
-    if (!editName.trim()) return;
+  const handleEdit = async () => {
+    if (!editingProfessional || !editName.trim()) return;
 
     const { error } = await supabase
       .from("professionals")
@@ -101,7 +118,7 @@ export function AdminProfessionals() {
         bio: editBio.trim() || null,
         instagram: editInstagram.trim() || null,
       })
-      .eq("id", id);
+      .eq("id", editingProfessional.id);
 
     if (error) {
       logger.error("Error updating professional:", error);
@@ -112,7 +129,7 @@ export function AdminProfessionals() {
       });
     } else {
       toast({ title: "Profissional atualizado!" });
-      setEditingId(null);
+      setEditingProfessional(null);
       fetchProfessionals();
     }
   };
@@ -155,7 +172,6 @@ export function AdminProfessionals() {
   const handlePhotoUpload = async (profId: string, file: File) => {
     if (!file) return;
 
-    // Validate file type
     if (!file.type.startsWith("image/")) {
       toast({
         title: "Erro",
@@ -165,7 +181,6 @@ export function AdminProfessionals() {
       return;
     }
 
-    // Validate file size (max 2MB)
     if (file.size > 2 * 1024 * 1024) {
       toast({
         title: "Erro",
@@ -181,19 +196,16 @@ export function AdminProfessionals() {
       const fileExt = file.name.split(".").pop()?.toLowerCase() || "jpg";
       const filePath = `${profId}/photo.${fileExt}`;
 
-      // Upload to storage
       const { error: uploadError } = await supabase.storage
         .from("avatars")
         .upload(filePath, file, { upsert: true });
 
       if (uploadError) throw uploadError;
 
-      // Get public URL
       const { data: urlData } = supabase.storage
         .from("avatars")
         .getPublicUrl(filePath);
 
-      // Update professional with photo URL (add timestamp to bust cache)
       const photoUrl = `${urlData.publicUrl}?t=${Date.now()}`;
       const { error: updateError } = await supabase
         .from("professionals")
@@ -226,10 +238,25 @@ export function AdminProfessionals() {
     if (file && uploadingId) {
       handlePhotoUpload(uploadingId, file);
     }
-    // Reset input
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
+  };
+
+  const openEditSheet = (prof: Professional) => {
+    setEditingProfessional(prof);
+    setEditName(prof.name);
+    setEditBio(prof.bio || "");
+    setEditInstagram(prof.instagram || "");
+  };
+
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase();
   };
 
   if (loading) {
@@ -240,9 +267,38 @@ export function AdminProfessionals() {
     );
   }
 
+  const EditFormContent = () => (
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <Label>Nome</Label>
+        <Input
+          value={editName}
+          onChange={(e) => setEditName(e.target.value)}
+          placeholder="Nome do profissional"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label>Biografia</Label>
+        <Textarea
+          value={editBio}
+          onChange={(e) => setEditBio(e.target.value)}
+          placeholder="Biografia (opcional)"
+          rows={3}
+        />
+      </div>
+      <div className="space-y-2">
+        <Label>Instagram</Label>
+        <Input
+          value={editInstagram}
+          onChange={(e) => setEditInstagram(e.target.value)}
+          placeholder="@usuario (sem @)"
+        />
+      </div>
+    </div>
+  );
+
   return (
     <div className="space-y-4">
-      {/* Hidden file input */}
       <input
         type="file"
         ref={fileInputRef}
@@ -254,10 +310,10 @@ export function AdminProfessionals() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Users className="w-5 h-5 text-primary" />
-          <h2 className="text-xl font-semibold">Profissionais</h2>
+          <h2 className="text-lg sm:text-xl font-semibold">Profissionais</h2>
         </div>
         <Button onClick={() => setIsAdding(true)} size="sm" className="gap-1">
-          <Plus className="w-4 h-4" /> Adicionar
+          <Plus className="w-4 h-4" /> <span className="hidden sm:inline">Adicionar</span>
         </Button>
       </div>
 
@@ -279,34 +335,100 @@ export function AdminProfessionals() {
         </div>
       )}
 
-      <div className="glass-panel overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-16">Foto</TableHead>
-              <TableHead>Nome</TableHead>
-              <TableHead className="hidden md:table-cell">Biografia</TableHead>
-              <TableHead className="w-24 text-center">Ativo</TableHead>
-              <TableHead className="w-28 text-right">Ações</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {professionals.length === 0 ? (
+      {/* Mobile: Cards Layout */}
+      {isMobile ? (
+        <div className="space-y-3">
+          {professionals.length === 0 ? (
+            <div className="glass-panel p-8 text-center text-muted-foreground">
+              Nenhum profissional cadastrado
+            </div>
+          ) : (
+            professionals.map((prof) => (
+              <div key={prof.id} className="glass-panel p-4">
+                <div className="flex items-start gap-3">
+                  <div className="relative group">
+                    <Avatar className="h-14 w-14 border-2 border-border/50">
+                      {prof.photo_url ? (
+                        <AvatarImage src={prof.photo_url} alt={prof.name} />
+                      ) : null}
+                      <AvatarFallback className="bg-muted text-muted-foreground text-sm font-semibold">
+                        {getInitials(prof.name) || <User className="w-5 h-5" />}
+                      </AvatarFallback>
+                    </Avatar>
+                    <button
+                      type="button"
+                      onClick={() => triggerFileInput(prof.id)}
+                      disabled={uploadingId === prof.id}
+                      className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 active:opacity-100 transition-opacity"
+                    >
+                      {uploadingId === prof.id ? (
+                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      ) : (
+                        <Upload className="w-4 h-4 text-white" />
+                      )}
+                    </button>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-2">
+                      <h3 className={`font-medium truncate ${!prof.active ? "text-muted-foreground" : ""}`}>
+                        {prof.name}
+                      </h3>
+                      <Switch
+                        checked={prof.active}
+                        onCheckedChange={() => handleToggleActive(prof.id, prof.active)}
+                      />
+                    </div>
+                    {prof.bio && (
+                      <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
+                        {prof.bio}
+                      </p>
+                    )}
+                    <div className="flex items-center gap-2 mt-3">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => openEditSheet(prof)}
+                        className="flex-1 gap-1"
+                      >
+                        <Pencil className="w-3.5 h-3.5" /> Editar
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setDeleteId(prof.id)}
+                        className="text-destructive hover:text-destructive"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      ) : (
+        /* Desktop: Table Layout */
+        <div className="glass-panel overflow-hidden">
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
-                  Nenhum profissional cadastrado
-                </TableCell>
+                <TableHead className="w-16">Foto</TableHead>
+                <TableHead>Nome</TableHead>
+                <TableHead className="hidden md:table-cell">Biografia</TableHead>
+                <TableHead className="w-24 text-center">Ativo</TableHead>
+                <TableHead className="w-28 text-right">Ações</TableHead>
               </TableRow>
-            ) : (
-              professionals.map((prof) => {
-                const initials = prof.name
-                  .split(" ")
-                  .map((n) => n[0])
-                  .join("")
-                  .slice(0, 2)
-                  .toUpperCase();
-
-                return (
+            </TableHeader>
+            <TableBody>
+              {professionals.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
+                    Nenhum profissional cadastrado
+                  </TableCell>
+                </TableRow>
+              ) : (
+                professionals.map((prof) => (
                   <TableRow key={prof.id}>
                     <TableCell>
                       <div className="relative group">
@@ -315,7 +437,7 @@ export function AdminProfessionals() {
                             <AvatarImage src={prof.photo_url} alt={prof.name} />
                           ) : null}
                           <AvatarFallback className="bg-muted text-muted-foreground text-xs font-semibold">
-                            {initials || <User className="w-4 h-4" />}
+                            {getInitials(prof.name) || <User className="w-4 h-4" />}
                           </AvatarFallback>
                         </Avatar>
                         <button
@@ -323,7 +445,6 @@ export function AdminProfessionals() {
                           onClick={() => triggerFileInput(prof.id)}
                           disabled={uploadingId === prof.id}
                           className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                          title="Alterar foto"
                         >
                           {uploadingId === prof.id ? (
                             <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -334,49 +455,14 @@ export function AdminProfessionals() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      {editingId === prof.id ? (
-                        <div className="space-y-2">
-                          <Input
-                            value={editName}
-                            onChange={(e) => setEditName(e.target.value)}
-                            placeholder="Nome"
-                            className="h-8"
-                            autoFocus
-                          />
-                          <Textarea
-                            value={editBio}
-                            onChange={(e) => setEditBio(e.target.value)}
-                            placeholder="Biografia (opcional)"
-                            rows={2}
-                            className="text-sm resize-none"
-                          />
-                          <Input
-                            value={editInstagram}
-                            onChange={(e) => setEditInstagram(e.target.value)}
-                            placeholder="Instagram (sem @)"
-                            className="h-8"
-                          />
-                          <div className="flex gap-1">
-                            <Button size="sm" onClick={() => handleEdit(prof.id)}>
-                              <Check className="w-4 h-4 mr-1" /> Salvar
-                            </Button>
-                            <Button size="sm" variant="ghost" onClick={() => setEditingId(null)}>
-                              <X className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      ) : (
-                        <span className={!prof.active ? "text-muted-foreground" : ""}>
-                          {prof.name}
-                        </span>
-                      )}
+                      <span className={!prof.active ? "text-muted-foreground" : ""}>
+                        {prof.name}
+                      </span>
                     </TableCell>
                     <TableCell className="hidden md:table-cell">
-                      {editingId !== prof.id && (
-                        <span className="text-sm text-muted-foreground line-clamp-2">
-                          {prof.bio || "-"}
-                        </span>
-                      )}
+                      <span className="text-sm text-muted-foreground line-clamp-2">
+                        {prof.bio || "-"}
+                      </span>
                     </TableCell>
                     <TableCell className="text-center">
                       <Switch
@@ -389,12 +475,7 @@ export function AdminProfessionals() {
                         <Button
                           size="icon"
                           variant="ghost"
-                          onClick={() => {
-                            setEditingId(prof.id);
-                            setEditName(prof.name);
-                            setEditBio(prof.bio || "");
-                            setEditInstagram(prof.instagram || "");
-                          }}
+                          onClick={() => openEditSheet(prof)}
                         >
                           <Pencil className="w-4 h-4" />
                         </Button>
@@ -408,13 +489,49 @@ export function AdminProfessionals() {
                       </div>
                     </TableCell>
                   </TableRow>
-                );
-              })
-            )}
-          </TableBody>
-        </Table>
-      </div>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      )}
 
+      {/* Edit: Drawer for mobile, Dialog for desktop */}
+      {isMobile ? (
+        <Drawer open={!!editingProfessional} onOpenChange={(open) => !open && setEditingProfessional(null)}>
+          <DrawerContent>
+            <DrawerHeader>
+              <DrawerTitle>Editar Profissional</DrawerTitle>
+            </DrawerHeader>
+            <div className="px-4 pb-4">
+              <EditFormContent />
+            </div>
+            <DrawerFooter className="pt-2">
+              <Button onClick={handleEdit}>Salvar</Button>
+              <DrawerClose asChild>
+                <Button variant="outline">Cancelar</Button>
+              </DrawerClose>
+            </DrawerFooter>
+          </DrawerContent>
+        </Drawer>
+      ) : (
+        <Dialog open={!!editingProfessional} onOpenChange={(open) => !open && setEditingProfessional(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Editar Profissional</DialogTitle>
+            </DialogHeader>
+            <EditFormContent />
+            <div className="flex justify-end gap-2 pt-4">
+              <Button variant="outline" onClick={() => setEditingProfessional(null)}>
+                Cancelar
+              </Button>
+              <Button onClick={handleEdit}>Salvar</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Delete Confirmation */}
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>

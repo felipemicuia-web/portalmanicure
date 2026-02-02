@@ -123,19 +123,19 @@ export default function AdminPage() {
 
         {/* Main Content */}
         <main className="max-w-6xl mx-auto px-4 py-6">
-          <Tabs defaultValue="professionals" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-3 glass-panel p-1">
-              <TabsTrigger value="professionals" className="gap-2">
+          <Tabs defaultValue="professionals" className="space-y-4 sm:space-y-6">
+            <TabsList className="grid w-full grid-cols-3 glass-panel p-1 h-auto">
+              <TabsTrigger value="professionals" className="gap-1.5 text-xs sm:text-sm py-2.5 px-2 sm:px-4 flex-col sm:flex-row">
                 <Users className="w-4 h-4" />
-                <span className="hidden sm:inline">Profissionais</span>
+                <span>Profissionais</span>
               </TabsTrigger>
-              <TabsTrigger value="services" className="gap-2">
+              <TabsTrigger value="services" className="gap-1.5 text-xs sm:text-sm py-2.5 px-2 sm:px-4 flex-col sm:flex-row">
                 <Sparkles className="w-4 h-4" />
-                <span className="hidden sm:inline">Serviços</span>
+                <span>Serviços</span>
               </TabsTrigger>
-              <TabsTrigger value="bookings" className="gap-2">
+              <TabsTrigger value="bookings" className="gap-1.5 text-xs sm:text-sm py-2.5 px-2 sm:px-4 flex-col sm:flex-row">
                 <CalendarDays className="w-4 h-4" />
-                <span className="hidden sm:inline">Agendamentos</span>
+                <span>Agenda</span>
               </TabsTrigger>
             </TabsList>
 
