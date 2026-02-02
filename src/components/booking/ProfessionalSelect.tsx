@@ -2,8 +2,9 @@ import { Professional } from "@/types/booking";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User, ChevronRight } from "lucide-react";
+import { User, ChevronRight, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useNavigate } from "react-router-dom";
 
 interface ProfessionalSelectProps {
   professionals: Professional[];
@@ -18,6 +19,13 @@ export function ProfessionalSelect({
   onSelect,
   onNext,
 }: ProfessionalSelectProps) {
+  const navigate = useNavigate();
+
+  const handleViewProfile = (e: React.MouseEvent, professionalId: string) => {
+    e.stopPropagation();
+    navigate(`/professional/${professionalId}`);
+  };
+
   return (
     <div className="glass-panel p-4 sm:p-6 space-y-4 sm:space-y-5">
       <div>
@@ -43,39 +51,54 @@ export function ProfessionalSelect({
                 .toUpperCase();
 
               return (
-                <button
+                <div
                   key={p.id}
-                  type="button"
-                  onClick={() => onSelect(p.id)}
                   className={cn(
                     "flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl border-2 transition-all duration-200 w-full",
                     isSelected
                       ? "bg-primary/20 border-primary shadow-lg shadow-primary/25 ring-2 ring-primary/40"
-                      : "bg-transparent border-border/40 hover:border-border hover:bg-muted/30 active:scale-[0.98]"
+                      : "bg-transparent border-border/40 hover:border-border hover:bg-muted/30"
                   )}
                 >
-                  <Avatar className={cn(
-                    "rounded-lg border-2 border-background/50 flex-shrink-0",
-                    "h-12 w-12 sm:h-16 sm:w-16"
-                  )}>
-                    {p.photo_url ? (
-                      <AvatarImage src={p.photo_url} alt={p.name} className="object-cover" />
-                    ) : null}
-                    <AvatarFallback className="rounded-lg bg-muted text-muted-foreground text-sm sm:text-lg font-semibold">
-                      {initials || <User className="w-5 h-5 sm:w-6 sm:h-6" />}
-                    </AvatarFallback>
-                  </Avatar>
-                  <span className={cn(
-                    "font-semibold text-sm sm:text-base flex-1 text-left",
-                    isSelected ? "text-primary" : "text-foreground"
-                  )}>
-                    {p.name}
-                  </span>
-                  <ChevronRight className={cn(
-                    "w-5 h-5 transition-transform flex-shrink-0",
-                    isSelected ? "text-primary translate-x-1" : "text-muted-foreground"
-                  )} />
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => onSelect(p.id)}
+                    className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0 active:scale-[0.98]"
+                  >
+                    <Avatar className={cn(
+                      "rounded-lg border-2 border-background/50 flex-shrink-0",
+                      "h-12 w-12 sm:h-16 sm:w-16"
+                    )}>
+                      {p.photo_url ? (
+                        <AvatarImage src={p.photo_url} alt={p.name} className="object-cover" />
+                      ) : null}
+                      <AvatarFallback className="rounded-lg bg-muted text-muted-foreground text-sm sm:text-lg font-semibold">
+                        {initials || <User className="w-5 h-5 sm:w-6 sm:h-6" />}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className={cn(
+                      "font-semibold text-sm sm:text-base flex-1 text-left truncate",
+                      isSelected ? "text-primary" : "text-foreground"
+                    )}>
+                      {p.name}
+                    </span>
+                  </button>
+                  
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      type="button"
+                      onClick={(e) => handleViewProfile(e, p.id)}
+                      className="p-2 rounded-lg hover:bg-muted/50 transition-colors text-muted-foreground hover:text-primary"
+                      title="Ver perfil"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                    </button>
+                    <ChevronRight className={cn(
+                      "w-5 h-5 transition-transform",
+                      isSelected ? "text-primary translate-x-1" : "text-muted-foreground"
+                    )} />
+                  </div>
+                </div>
               );
             })}
 
