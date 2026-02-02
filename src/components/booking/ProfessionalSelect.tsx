@@ -42,27 +42,28 @@ export function ProfessionalSelect({
                 .toUpperCase();
 
               return (
-                <Button
+                <button
                   key={p.id}
                   type="button"
-                  variant={isSelected ? "default" : "secondary"}
                   onClick={() => onSelect(p.id)}
-                  className={`h-auto py-3 px-4 justify-start gap-3 ${
+                  className={`flex items-center gap-4 p-3 rounded-xl border-2 transition-all duration-200 ${
                     isSelected
-                      ? "shadow-lg shadow-primary/20 ring-2 ring-primary/50"
-                      : "hover:bg-secondary/80"
+                      ? "bg-primary/20 border-primary shadow-lg shadow-primary/25 ring-2 ring-primary/40"
+                      : "bg-transparent border-border/40 hover:border-border hover:bg-muted/30"
                   }`}
                 >
-                  <Avatar className="h-10 w-10 border-2 border-background/50">
+                  <Avatar className="h-16 w-16 rounded-lg border-2 border-background/50">
                     {p.photo_url ? (
-                      <AvatarImage src={p.photo_url} alt={p.name} />
+                      <AvatarImage src={p.photo_url} alt={p.name} className="object-cover" />
                     ) : null}
-                    <AvatarFallback className="bg-muted text-muted-foreground text-sm font-semibold">
-                      {initials || <User className="w-4 h-4" />}
+                    <AvatarFallback className="rounded-lg bg-muted text-muted-foreground text-lg font-semibold">
+                      {initials || <User className="w-6 h-6" />}
                     </AvatarFallback>
                   </Avatar>
-                  <span className="font-semibold text-base">{p.name}</span>
-                </Button>
+                  <span className={`font-semibold text-base ${isSelected ? "text-primary" : "text-foreground"}`}>
+                    {p.name}
+                  </span>
+                </button>
               );
             })}
 
