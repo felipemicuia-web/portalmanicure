@@ -216,10 +216,30 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      gallery_photos_public: {
+        Row: {
+          caption: string | null
+          created_at: string | null
+          id: string | null
+          image_url: string | null
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string | null
+          id?: string | null
+          image_url?: string | null
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string | null
+          id?: string | null
+          image_url?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
-      [_ in never]: never
+      validate_phone_format: { Args: { phone: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
