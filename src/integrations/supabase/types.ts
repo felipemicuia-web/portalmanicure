@@ -63,7 +63,7 @@ export type Database = {
           professional_id: string
           status: string
           total_price: number
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           booking_date: string
@@ -77,7 +77,7 @@ export type Database = {
           professional_id: string
           status?: string
           total_price?: number
-          user_id?: string | null
+          user_id: string
         }
         Update: {
           booking_date?: string
@@ -91,7 +91,7 @@ export type Database = {
           professional_id?: string
           status?: string
           total_price?: number
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: [
           {
