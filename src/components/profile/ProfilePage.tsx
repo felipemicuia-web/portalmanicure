@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback } from "react";
 import { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { ProfileHeader } from "./ProfileHeader";
-import { PhotoGallery } from "./PhotoGallery";
 import { FollowingList } from "@/components/professional/FollowingList";
 
 interface Profile {
@@ -13,20 +12,12 @@ interface Profile {
   avatar_url: string | null;
 }
 
-interface GalleryPhoto {
-  id: string;
-  image_url: string;
-  caption: string | null;
-  created_at: string;
-}
-
 interface ProfilePageProps {
   user: User;
 }
 
 export function ProfilePage({ user }: ProfilePageProps) {
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [photos, setPhotos] = useState<GalleryPhoto[]>([]);
   const [bookingCount, setBookingCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
@@ -52,15 +43,6 @@ export function ProfilePage({ user }: ProfilePageProps) {
     } else {
       setProfile(profileData);
     }
-
-    // Fetch gallery photos
-    const { data: photosData } = await supabase
-      .from("gallery_photos")
-      .select("*")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false });
-
-    setPhotos(photosData || []);
 
     // Fetch booking count
     const { count } = await supabase
@@ -90,16 +72,11 @@ export function ProfilePage({ user }: ProfilePageProps) {
       <ProfileHeader
         user={user}
         profile={profile}
-        photoCount={photos.length}
+        photoCount={0}
         bookingCount={bookingCount}
         onProfileUpdate={fetchData}
       />
       <FollowingList user={user} />
-      <PhotoGallery
-        user={user}
-        photos={photos}
-        onPhotosChange={fetchData}
-      />
     </div>
   );
 }
