@@ -284,14 +284,14 @@ export default function BookingPage() {
           onLogout={handleLogout}
         />
 
-        <main className="max-w-6xl mx-auto px-4 py-6">
+        <main className="max-w-6xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
           {activePage === "booking" && (
             <>
               <BookingStepper currentStep={currentStep} onStepClick={goToStep} />
 
               {globalMessage && (
                 <div
-                  className={`mb-4 p-3 rounded-lg text-sm ${
+                  className={`mb-3 sm:mb-4 p-2.5 sm:p-3 rounded-lg text-xs sm:text-sm ${
                     globalMessage.type === "ok"
                       ? "bg-green-500/20 text-green-400 border border-green-500/30"
                       : "bg-destructive/20 text-destructive border border-destructive/30"
@@ -301,7 +301,7 @@ export default function BookingPage() {
                 </div>
               )}
 
-              <div className="mt-4">
+              <div className="mt-3 sm:mt-4">
                 {currentStep === 1 && (
                   <ProfessionalSelect
                     professionals={professionals}
@@ -365,17 +365,17 @@ export default function BookingPage() {
           )}
 
           {activePage === "notifications" && (
-            <div className="glass-panel p-5">
-              <h2 className="text-xl font-semibold mb-4">Notificações</h2>
-              <p className="text-muted-foreground">
+            <div className="glass-panel p-4 sm:p-5">
+              <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Notificações</h2>
+              <p className="text-muted-foreground text-sm">
                 Nenhuma notificação por enquanto.
               </p>
             </div>
           )}
 
-          <footer className="mt-8 flex justify-between gap-4 text-xs text-muted-foreground">
+          <footer className="mt-6 sm:mt-8 flex flex-col sm:flex-row justify-between gap-2 sm:gap-4 text-[10px] sm:text-xs text-muted-foreground text-center sm:text-left">
             <span>© {new Date().getFullYear()} Agendamento Manicure</span>
-            <span>Sistema de agendamento online</span>
+            <span className="hidden sm:inline">Sistema de agendamento online</span>
           </footer>
         </main>
       </div>
