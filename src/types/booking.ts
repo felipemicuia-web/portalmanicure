@@ -1,6 +1,7 @@
 export interface Professional {
   id: string;
   name: string;
+  photo_url: string | null;
   active: boolean;
   created_at: string;
 }

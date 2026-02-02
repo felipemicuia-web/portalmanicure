@@ -1,11 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { logger } from "@/lib/logger";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import { Plus, Pencil, Trash2, Check, X, Users } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Plus, Pencil, Trash2, Check, X, Users, Upload, User } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -28,6 +29,7 @@ import {
 interface Professional {
   id: string;
   name: string;
+  photo_url: string | null;
   active: boolean;
   created_at: string;
 }
@@ -40,6 +42,8 @@ export function AdminProfessionals() {
   const [newName, setNewName] = useState("");
   const [isAdding, setIsAdding] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [uploadingId, setUploadingId] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
   const fetchProfessionals = async () => {
@@ -139,6 +143,86 @@ export function AdminProfessionals() {
     setDeleteId(null);
   };
 
+  const handlePhotoUpload = async (profId: string, file: File) => {
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      toast({
+        title: "Erro",
+        description: "Selecione um arquivo de imagem válido.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate file size (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      toast({
+        title: "Erro",
+        description: "A imagem deve ter no máximo 2MB.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setUploadingId(profId);
+
+    try {
+      const fileExt = file.name.split(".").pop()?.toLowerCase() || "jpg";
+      const filePath = `${profId}/photo.${fileExt}`;
+
+      // Upload to storage
+      const { error: uploadError } = await supabase.storage
+        .from("avatars")
+        .upload(filePath, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: urlData } = supabase.storage
+        .from("avatars")
+        .getPublicUrl(filePath);
+
+      // Update professional with photo URL (add timestamp to bust cache)
+      const photoUrl = `${urlData.publicUrl}?t=${Date.now()}`;
+      const { error: updateError } = await supabase
+        .from("professionals")
+        .update({ photo_url: photoUrl })
+        .eq("id", profId);
+
+      if (updateError) throw updateError;
+
+      toast({ title: "Foto atualizada!" });
+      fetchProfessionals();
+    } catch (error) {
+      logger.error("Error uploading photo:", error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível enviar a foto.",
+        variant: "destructive",
+      });
+    } finally {
+      setUploadingId(null);
+    }
+  };
+
+  const triggerFileInput = (profId: string) => {
+    setUploadingId(profId);
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && uploadingId) {
+      handlePhotoUpload(uploadingId, file);
+    }
+    // Reset input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center py-12">
@@ -149,6 +233,15 @@ export function AdminProfessionals() {
 
   return (
     <div className="space-y-4">
+      {/* Hidden file input */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileChange}
+        accept="image/*"
+        className="hidden"
+      />
+
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Users className="w-5 h-5 text-primary" />
@@ -181,72 +274,107 @@ export function AdminProfessionals() {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead className="w-16">Foto</TableHead>
               <TableHead>Nome</TableHead>
               <TableHead className="w-24 text-center">Ativo</TableHead>
-              <TableHead className="w-24 text-right">Ações</TableHead>
+              <TableHead className="w-28 text-right">Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {professionals.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={3} className="text-center text-muted-foreground py-8">
+                <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
                   Nenhum profissional cadastrado
                 </TableCell>
               </TableRow>
             ) : (
-              professionals.map((prof) => (
-                <TableRow key={prof.id}>
-                  <TableCell>
-                    {editingId === prof.id ? (
-                      <div className="flex items-center gap-2">
-                        <Input
-                          value={editName}
-                          onChange={(e) => setEditName(e.target.value)}
-                          className="h-8"
-                          autoFocus
-                        />
-                        <Button size="icon" variant="ghost" onClick={() => handleEdit(prof.id)}>
-                          <Check className="w-4 h-4 text-primary" />
+              professionals.map((prof) => {
+                const initials = prof.name
+                  .split(" ")
+                  .map((n) => n[0])
+                  .join("")
+                  .slice(0, 2)
+                  .toUpperCase();
+
+                return (
+                  <TableRow key={prof.id}>
+                    <TableCell>
+                      <div className="relative group">
+                        <Avatar className="h-10 w-10 border-2 border-border/50">
+                          {prof.photo_url ? (
+                            <AvatarImage src={prof.photo_url} alt={prof.name} />
+                          ) : null}
+                          <AvatarFallback className="bg-muted text-muted-foreground text-xs font-semibold">
+                            {initials || <User className="w-4 h-4" />}
+                          </AvatarFallback>
+                        </Avatar>
+                        <button
+                          type="button"
+                          onClick={() => triggerFileInput(prof.id)}
+                          disabled={uploadingId === prof.id}
+                          className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                          title="Alterar foto"
+                        >
+                          {uploadingId === prof.id ? (
+                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          ) : (
+                            <Upload className="w-4 h-4 text-white" />
+                          )}
+                        </button>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {editingId === prof.id ? (
+                        <div className="flex items-center gap-2">
+                          <Input
+                            value={editName}
+                            onChange={(e) => setEditName(e.target.value)}
+                            className="h-8"
+                            autoFocus
+                          />
+                          <Button size="icon" variant="ghost" onClick={() => handleEdit(prof.id)}>
+                            <Check className="w-4 h-4 text-primary" />
+                          </Button>
+                          <Button size="icon" variant="ghost" onClick={() => setEditingId(null)}>
+                            <X className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      ) : (
+                        <span className={!prof.active ? "text-muted-foreground" : ""}>
+                          {prof.name}
+                        </span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Switch
+                        checked={prof.active}
+                        onCheckedChange={() => handleToggleActive(prof.id, prof.active)}
+                      />
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-1">
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          onClick={() => {
+                            setEditingId(prof.id);
+                            setEditName(prof.name);
+                          }}
+                        >
+                          <Pencil className="w-4 h-4" />
                         </Button>
-                        <Button size="icon" variant="ghost" onClick={() => setEditingId(null)}>
-                          <X className="w-4 h-4" />
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          onClick={() => setDeleteId(prof.id)}
+                        >
+                          <Trash2 className="w-4 h-4 text-destructive" />
                         </Button>
                       </div>
-                    ) : (
-                      <span className={!prof.active ? "text-muted-foreground" : ""}>
-                        {prof.name}
-                      </span>
-                    )}
-                  </TableCell>
-                  <TableCell className="text-center">
-                    <Switch
-                      checked={prof.active}
-                      onCheckedChange={() => handleToggleActive(prof.id, prof.active)}
-                    />
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-1">
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        onClick={() => {
-                          setEditingId(prof.id);
-                          setEditName(prof.name);
-                        }}
-                      >
-                        <Pencil className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        onClick={() => setDeleteId(prof.id)}
-                      >
-                        <Trash2 className="w-4 h-4 text-destructive" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))
+                    </TableCell>
+                  </TableRow>
+                );
+              })
             )}
           </TableBody>
         </Table>
