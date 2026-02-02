@@ -329,8 +329,7 @@ export default function ProfessionalProfilePage() {
             </div>
           </div>
 
-          {/* Services */}
-          <ProfessionalServices services={services} />
+          {/* Services removed as requested */}
 
           {/* Review Form */}
           {canReview && id && (

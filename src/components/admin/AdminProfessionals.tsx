@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { logger } from "@/lib/logger";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Plus, Pencil, Trash2, Check, X, Users, Upload, User } from "lucide-react";
@@ -30,6 +31,8 @@ interface Professional {
   id: string;
   name: string;
   photo_url: string | null;
+  bio: string | null;
+  instagram: string | null;
   active: boolean;
   created_at: string;
 }
@@ -39,6 +42,8 @@ export function AdminProfessionals() {
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
+  const [editBio, setEditBio] = useState("");
+  const [editInstagram, setEditInstagram] = useState("");
   const [newName, setNewName] = useState("");
   const [isAdding, setIsAdding] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -91,7 +96,11 @@ export function AdminProfessionals() {
 
     const { error } = await supabase
       .from("professionals")
-      .update({ name: editName.trim() })
+      .update({ 
+        name: editName.trim(),
+        bio: editBio.trim() || null,
+        instagram: editInstagram.trim() || null,
+      })
       .eq("id", id);
 
     if (error) {
@@ -276,6 +285,7 @@ export function AdminProfessionals() {
             <TableRow>
               <TableHead className="w-16">Foto</TableHead>
               <TableHead>Nome</TableHead>
+              <TableHead className="hidden md:table-cell">Biografia</TableHead>
               <TableHead className="w-24 text-center">Ativo</TableHead>
               <TableHead className="w-28 text-right">Ações</TableHead>
             </TableRow>
@@ -283,7 +293,7 @@ export function AdminProfessionals() {
           <TableBody>
             {professionals.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
+                <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
                   Nenhum profissional cadastrado
                 </TableCell>
               </TableRow>
@@ -325,23 +335,46 @@ export function AdminProfessionals() {
                     </TableCell>
                     <TableCell>
                       {editingId === prof.id ? (
-                        <div className="flex items-center gap-2">
+                        <div className="space-y-2">
                           <Input
                             value={editName}
                             onChange={(e) => setEditName(e.target.value)}
+                            placeholder="Nome"
                             className="h-8"
                             autoFocus
                           />
-                          <Button size="icon" variant="ghost" onClick={() => handleEdit(prof.id)}>
-                            <Check className="w-4 h-4 text-primary" />
-                          </Button>
-                          <Button size="icon" variant="ghost" onClick={() => setEditingId(null)}>
-                            <X className="w-4 h-4" />
-                          </Button>
+                          <Textarea
+                            value={editBio}
+                            onChange={(e) => setEditBio(e.target.value)}
+                            placeholder="Biografia (opcional)"
+                            rows={2}
+                            className="text-sm resize-none"
+                          />
+                          <Input
+                            value={editInstagram}
+                            onChange={(e) => setEditInstagram(e.target.value)}
+                            placeholder="Instagram (sem @)"
+                            className="h-8"
+                          />
+                          <div className="flex gap-1">
+                            <Button size="sm" onClick={() => handleEdit(prof.id)}>
+                              <Check className="w-4 h-4 mr-1" /> Salvar
+                            </Button>
+                            <Button size="sm" variant="ghost" onClick={() => setEditingId(null)}>
+                              <X className="w-4 h-4" />
+                            </Button>
+                          </div>
                         </div>
                       ) : (
                         <span className={!prof.active ? "text-muted-foreground" : ""}>
                           {prof.name}
+                        </span>
+                      )}
+                    </TableCell>
+                    <TableCell className="hidden md:table-cell">
+                      {editingId !== prof.id && (
+                        <span className="text-sm text-muted-foreground line-clamp-2">
+                          {prof.bio || "-"}
                         </span>
                       )}
                     </TableCell>
@@ -359,6 +392,8 @@ export function AdminProfessionals() {
                           onClick={() => {
                             setEditingId(prof.id);
                             setEditName(prof.name);
+                            setEditBio(prof.bio || "");
+                            setEditInstagram(prof.instagram || "");
                           }}
                         >
                           <Pencil className="w-4 h-4" />
