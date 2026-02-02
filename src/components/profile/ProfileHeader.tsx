@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { logger } from "@/lib/logger";
 import { Camera, Edit2, Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -94,7 +95,7 @@ export function ProfileHeader({
 
       onProfileUpdate();
     } catch (error) {
-      console.error("Avatar upload error:", error);
+      logger.error("Avatar upload error:", error);
       toast({
         title: "Erro",
         description: "Não foi possível atualizar a foto.",
@@ -131,7 +132,7 @@ export function ProfileHeader({
       setIsEditingName(false);
       onProfileUpdate();
     } catch (error) {
-      console.error("Name update error:", error);
+      logger.error("Name update error:", error);
       toast({
         title: "Erro",
         description: "Não foi possível atualizar o nome.",

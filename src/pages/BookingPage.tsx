@@ -11,14 +11,12 @@ import { ServiceList } from "@/components/booking/ServiceList";
 import { DateTimeSelect } from "@/components/booking/DateTimeSelect";
 import { BookingConfirm } from "@/components/booking/BookingConfirm";
 import { ProfilePage } from "@/components/profile/ProfilePage";
+import { logger } from "@/lib/logger";
+import { normalizePhone, isValidBrazilianPhone, isValidName } from "@/lib/validation";
 
 function getTodayISO(): string {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-}
-
-function normalizePhone(raw: string): string {
-  return raw.replace(/\D/g, "");
 }
 
 export default function BookingPage() {
@@ -175,13 +173,13 @@ export default function BookingPage() {
     const name = clientName.trim();
     const phoneDigits = normalizePhone(clientPhone);
 
-    if (name.length < 2) {
-      setGlobalMessage({ text: "Informe um nome válido.", type: "bad" });
+    if (!isValidName(name)) {
+      setGlobalMessage({ text: "Informe um nome válido (mínimo 2 caracteres, sem números).", type: "bad" });
       return;
     }
 
-    if (phoneDigits.length < 10 || phoneDigits.length > 11) {
-      setGlobalMessage({ text: "WhatsApp inválido. Use DDD + número.", type: "bad" });
+    if (!isValidBrazilianPhone(phoneDigits)) {
+      setGlobalMessage({ text: "WhatsApp inválido. Use formato: (11) 98765-4321", type: "bad" });
       return;
     }
 
@@ -252,7 +250,7 @@ export default function BookingPage() {
       setNotes("");
       setGlobalMessage({ text: "Agendamento confirmado com sucesso!", type: "ok" });
     } catch (error) {
-      console.error("Booking error:", error);
+      logger.error("Booking error:", error);
       toast({
         title: "Erro",
         description: "Não foi possível confirmar o agendamento. Tente novamente.",
