@@ -18,6 +18,7 @@ import { FollowButton } from "@/components/professional/FollowButton";
 import { ReviewList } from "@/components/professional/ReviewList";
 import { ReviewForm } from "@/components/professional/ReviewForm";
 import { ProfessionalServices } from "@/components/professional/ProfessionalServices";
+import { ProfessionalGallery } from "@/components/professional/ProfessionalGallery";
 
 interface Professional {
   id: string;
@@ -329,7 +330,8 @@ export default function ProfessionalProfilePage() {
             </div>
           </div>
 
-          {/* Services removed as requested */}
+          {/* Gallery */}
+          {id && <ProfessionalGallery professionalId={id} user={user} />}
 
           {/* Review Form */}
           {canReview && id && (

@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Plus, Pencil, Trash2, Check, X, Users, Upload, User } from "lucide-react";
+import { Plus, Pencil, Trash2, Check, X, Users, Upload, User, Image as ImageIcon } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -42,6 +42,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { AdminProfessionalGallery } from "./AdminProfessionalGallery";
 
 interface Professional {
   id: string;
@@ -64,6 +65,7 @@ export function AdminProfessionals() {
   const [isAdding, setIsAdding] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [uploadingId, setUploadingId] = useState<string | null>(null);
+  const [galleryProfessional, setGalleryProfessional] = useState<Professional | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const isMobile = useIsMobile();
@@ -267,6 +269,17 @@ export function AdminProfessionals() {
     );
   }
 
+  // Show gallery view if a professional is selected
+  if (galleryProfessional) {
+    return (
+      <AdminProfessionalGallery
+        professionalId={galleryProfessional.id}
+        professionalName={galleryProfessional.name}
+        onBack={() => setGalleryProfessional(null)}
+      />
+    );
+  }
+
   const EditFormContent = () => (
     <div className="space-y-4">
       <div className="space-y-2">
@@ -395,6 +408,14 @@ export function AdminProfessionals() {
                       <Button
                         size="sm"
                         variant="outline"
+                        onClick={() => setGalleryProfessional(prof)}
+                        className="gap-1"
+                      >
+                        <ImageIcon className="w-3.5 h-3.5" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
                         onClick={() => setDeleteId(prof.id)}
                         className="text-destructive hover:text-destructive"
                       >
@@ -478,6 +499,14 @@ export function AdminProfessionals() {
                           onClick={() => openEditSheet(prof)}
                         >
                           <Pencil className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          onClick={() => setGalleryProfessional(prof)}
+                          title="Galeria de fotos"
+                        >
+                          <ImageIcon className="w-4 h-4" />
                         </Button>
                         <Button
                           size="icon"
