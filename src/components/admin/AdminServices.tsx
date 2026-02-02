@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { logger } from "@/lib/logger";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,6 +22,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -71,6 +80,7 @@ export function AdminServices() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  const isMobile = useIsMobile();
 
   const fetchServices = async () => {
     const { data, error } = await supabase
@@ -165,7 +175,6 @@ export function AdminServices() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Show local preview immediately
     const localPreview = URL.createObjectURL(file);
     setPreviewUrl(localPreview);
 
@@ -174,11 +183,9 @@ export function AdminServices() {
       setForm({ ...form, image_url: uploadedUrl });
       setPreviewUrl(uploadedUrl);
     } else {
-      // Revert preview on error
       setPreviewUrl(form.image_url);
     }
 
-    // Reset input
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -269,6 +276,97 @@ export function AdminServices() {
     );
   }
 
+  const FormContent = () => (
+    <div className="space-y-4">
+      {/* Image Upload */}
+      <div className="space-y-2">
+        <Label>Imagem do Serviço</Label>
+        <div className="flex items-center gap-4">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg border-2 border-dashed border-border/50 overflow-hidden bg-muted flex items-center justify-center flex-shrink-0">
+            {previewUrl ? (
+              <img
+                src={previewUrl}
+                alt="Preview"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <ImageIcon className="w-6 h-6 sm:w-8 sm:h-8 text-muted-foreground" />
+            )}
+          </div>
+          <div className="flex-1 space-y-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploadingImage}
+              className="gap-2 w-full sm:w-auto"
+            >
+              {uploadingImage ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+                  Enviando...
+                </>
+              ) : (
+                <>
+                  <Upload className="w-4 h-4" />
+                  {previewUrl ? "Trocar" : "Enviar"}
+                </>
+              )}
+            </Button>
+            <p className="text-xs text-muted-foreground">
+              JPG, PNG ou GIF. Máx. 2MB.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="name">Nome</Label>
+        <Input
+          id="name"
+          value={form.name}
+          onChange={(e) => setForm({ ...form, name: e.target.value })}
+          placeholder="Ex: Manicure"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="description">Descrição (opcional)</Label>
+        <Textarea
+          id="description"
+          value={form.description}
+          onChange={(e) => setForm({ ...form, description: e.target.value })}
+          placeholder="Descrição do serviço"
+          rows={2}
+        />
+      </div>
+      <div className="grid grid-cols-2 gap-3 sm:gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="duration">Duração (min)</Label>
+          <Input
+            id="duration"
+            type="number"
+            min={15}
+            step={15}
+            value={form.duration_minutes}
+            onChange={(e) => setForm({ ...form, duration_minutes: parseInt(e.target.value) || 30 })}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="price">Preço (R$)</Label>
+          <Input
+            id="price"
+            type="number"
+            min={0}
+            step={0.01}
+            value={form.price}
+            onChange={(e) => setForm({ ...form, price: parseFloat(e.target.value) || 0 })}
+          />
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="space-y-4">
       {/* Hidden file input */}
@@ -283,177 +381,181 @@ export function AdminServices() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Sparkles className="w-5 h-5 text-primary" />
-          <h2 className="text-xl font-semibold">Serviços</h2>
+          <h2 className="text-lg sm:text-xl font-semibold">Serviços</h2>
         </div>
         <Button onClick={openAddDialog} size="sm" className="gap-1">
-          <Plus className="w-4 h-4" /> Adicionar
+          <Plus className="w-4 h-4" /> <span className="hidden sm:inline">Adicionar</span>
         </Button>
       </div>
 
-      <div className="glass-panel overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-16">Foto</TableHead>
-              <TableHead>Nome</TableHead>
-              <TableHead className="w-24 text-center">Duração</TableHead>
-              <TableHead className="w-28 text-right">Preço</TableHead>
-              <TableHead className="w-24 text-center">Ativo</TableHead>
-              <TableHead className="w-24 text-right">Ações</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {services.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
-                  Nenhum serviço cadastrado
-                </TableCell>
-              </TableRow>
-            ) : (
-              services.map((service) => (
-                <TableRow key={service.id}>
-                  <TableCell>
-                    <div className="w-10 h-10 rounded-lg border border-border/50 overflow-hidden bg-muted flex items-center justify-center">
-                      {service.image_url ? (
-                        <img
-                          src={service.image_url}
-                          alt={service.name}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <ImageIcon className="w-4 h-4 text-muted-foreground" />
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div>
-                      <span className={!service.active ? "text-muted-foreground" : ""}>
+      {/* Mobile: Cards Layout */}
+      {isMobile ? (
+        <div className="space-y-3">
+          {services.length === 0 ? (
+            <div className="glass-panel p-8 text-center text-muted-foreground">
+              Nenhum serviço cadastrado
+            </div>
+          ) : (
+            services.map((service) => (
+              <div key={service.id} className="glass-panel p-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-14 h-14 rounded-lg border border-border/50 overflow-hidden bg-muted flex items-center justify-center flex-shrink-0">
+                    {service.image_url ? (
+                      <img
+                        src={service.image_url}
+                        alt={service.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <ImageIcon className="w-6 h-6 text-muted-foreground" />
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-2">
+                      <h3 className={`font-medium truncate ${!service.active ? "text-muted-foreground" : ""}`}>
                         {service.name}
-                      </span>
-                      {service.description && (
-                        <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
-                          {service.description}
-                        </p>
-                      )}
+                      </h3>
+                      <Switch
+                        checked={service.active}
+                        onCheckedChange={() => handleToggleActive(service.id, service.active)}
+                      />
                     </div>
-                  </TableCell>
-                  <TableCell className="text-center">{service.duration_minutes} min</TableCell>
-                  <TableCell className="text-right">{formatPrice(service.price)}</TableCell>
-                  <TableCell className="text-center">
-                    <Switch
-                      checked={service.active}
-                      onCheckedChange={() => handleToggleActive(service.id, service.active)}
-                    />
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-1">
-                      <Button size="icon" variant="ghost" onClick={() => openEditDialog(service)}>
-                        <Pencil className="w-4 h-4" />
+                    <div className="flex items-center gap-3 text-sm text-muted-foreground mt-1">
+                      <span>{service.duration_minutes} min</span>
+                      <span className="font-medium text-foreground">{formatPrice(service.price)}</span>
+                    </div>
+                    {service.description && (
+                      <p className="text-sm text-muted-foreground line-clamp-1 mt-1">
+                        {service.description}
+                      </p>
+                    )}
+                    <div className="flex items-center gap-2 mt-3">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => openEditDialog(service)}
+                        className="flex-1 gap-1"
+                      >
+                        <Pencil className="w-3.5 h-3.5" /> Editar
                       </Button>
-                      <Button size="icon" variant="ghost" onClick={() => setDeleteId(service.id)}>
-                        <Trash2 className="w-4 h-4 text-destructive" />
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setDeleteId(service.id)}
+                        className="text-destructive hover:text-destructive"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
                       </Button>
                     </div>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      ) : (
+        /* Desktop: Table Layout */
+        <div className="glass-panel overflow-hidden">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-16">Foto</TableHead>
+                <TableHead>Nome</TableHead>
+                <TableHead className="w-24 text-center">Duração</TableHead>
+                <TableHead className="w-28 text-right">Preço</TableHead>
+                <TableHead className="w-24 text-center">Ativo</TableHead>
+                <TableHead className="w-24 text-right">Ações</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {services.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                    Nenhum serviço cadastrado
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
+              ) : (
+                services.map((service) => (
+                  <TableRow key={service.id}>
+                    <TableCell>
+                      <div className="w-10 h-10 rounded-lg border border-border/50 overflow-hidden bg-muted flex items-center justify-center">
+                        {service.image_url ? (
+                          <img
+                            src={service.image_url}
+                            alt={service.name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <ImageIcon className="w-4 h-4 text-muted-foreground" />
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div>
+                        <span className={!service.active ? "text-muted-foreground" : ""}>
+                          {service.name}
+                        </span>
+                        {service.description && (
+                          <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
+                            {service.description}
+                          </p>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-center">{service.duration_minutes} min</TableCell>
+                    <TableCell className="text-right">{formatPrice(service.price)}</TableCell>
+                    <TableCell className="text-center">
+                      <Switch
+                        checked={service.active}
+                        onCheckedChange={() => handleToggleActive(service.id, service.active)}
+                      />
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-1">
+                        <Button size="icon" variant="ghost" onClick={() => openEditDialog(service)}>
+                          <Pencil className="w-4 h-4" />
+                        </Button>
+                        <Button size="icon" variant="ghost" onClick={() => setDeleteId(service.id)}>
+                          <Trash2 className="w-4 h-4 text-destructive" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      )}
 
-      {/* Add/Edit Dialog */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="bg-background/95 backdrop-blur-xl">
-          <DialogHeader>
-            <DialogTitle>{editingService ? "Editar Serviço" : "Novo Serviço"}</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 mt-4">
-            {/* Image Upload */}
-            <div className="space-y-2">
-              <Label>Imagem do Serviço</Label>
-              <div className="flex items-center gap-4">
-                <div className="w-20 h-20 rounded-lg border-2 border-dashed border-border/50 overflow-hidden bg-muted flex items-center justify-center">
-                  {previewUrl ? (
-                    <img
-                      src={previewUrl}
-                      alt="Preview"
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <ImageIcon className="w-8 h-8 text-muted-foreground" />
-                  )}
-                </div>
-                <div className="flex-1 space-y-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={uploadingImage}
-                    className="gap-2"
-                  >
-                    {uploadingImage ? (
-                      <>
-                        <div className="w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
-                        Enviando...
-                      </>
-                    ) : (
-                      <>
-                        <Upload className="w-4 h-4" />
-                        {previewUrl ? "Trocar imagem" : "Enviar imagem"}
-                      </>
-                    )}
-                  </Button>
-                  <p className="text-xs text-muted-foreground">
-                    JPG, PNG ou GIF. Máx. 2MB.
-                  </p>
-                </div>
-              </div>
+      {/* Add/Edit: Drawer for mobile, Dialog for desktop */}
+      {isMobile ? (
+        <Drawer open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DrawerContent>
+            <DrawerHeader>
+              <DrawerTitle>{editingService ? "Editar Serviço" : "Novo Serviço"}</DrawerTitle>
+            </DrawerHeader>
+            <div className="px-4 pb-4 max-h-[60vh] overflow-y-auto">
+              <FormContent />
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="name">Nome</Label>
-              <Input
-                id="name"
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                placeholder="Ex: Manicure"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="description">Descrição (opcional)</Label>
-              <Textarea
-                id="description"
-                value={form.description}
-                onChange={(e) => setForm({ ...form, description: e.target.value })}
-                placeholder="Descrição do serviço"
-                rows={2}
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="duration">Duração (minutos)</Label>
-                <Input
-                  id="duration"
-                  type="number"
-                  min={15}
-                  step={15}
-                  value={form.duration_minutes}
-                  onChange={(e) => setForm({ ...form, duration_minutes: parseInt(e.target.value) || 30 })}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="price">Preço (R$)</Label>
-                <Input
-                  id="price"
-                  type="number"
-                  min={0}
-                  step={0.01}
-                  value={form.price}
-                  onChange={(e) => setForm({ ...form, price: parseFloat(e.target.value) || 0 })}
-                />
-              </div>
+            <DrawerFooter className="pt-2">
+              <Button onClick={handleSave} disabled={uploadingImage}>
+                {editingService ? "Salvar" : "Adicionar"}
+              </Button>
+              <DrawerClose asChild>
+                <Button variant="outline">Cancelar</Button>
+              </DrawerClose>
+            </DrawerFooter>
+          </DrawerContent>
+        </Drawer>
+      ) : (
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogContent className="bg-background/95 backdrop-blur-xl">
+            <DialogHeader>
+              <DialogTitle>{editingService ? "Editar Serviço" : "Novo Serviço"}</DialogTitle>
+            </DialogHeader>
+            <div className="mt-4">
+              <FormContent />
             </div>
             <div className="flex justify-end gap-2 pt-4">
               <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
@@ -463,9 +565,9 @@ export function AdminServices() {
                 {editingService ? "Salvar" : "Adicionar"}
               </Button>
             </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+          </DialogContent>
+        </Dialog>
+      )}
 
       {/* Delete Confirmation */}
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>

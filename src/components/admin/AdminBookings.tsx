@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { logger } from "@/lib/logger";
 import { formatPhone } from "@/lib/validation";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { Calendar, Clock, User, Phone, CalendarDays, Pencil, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -32,6 +33,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -68,6 +78,7 @@ export function AdminBookings() {
   const [loading, setLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [filterProfessional, setFilterProfessional] = useState<string>("all");
+  const isMobile = useIsMobile();
   
   // Edit state
   const [editingBooking, setEditingBooking] = useState<Booking | null>(null);
@@ -125,6 +136,14 @@ export function AdminBookings() {
     });
   };
 
+  const formatDateShort = (dateStr: string) => {
+    const date = new Date(dateStr + "T00:00:00");
+    return date.toLocaleDateString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+    });
+  };
+
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("pt-BR", {
       style: "currency",
@@ -135,13 +154,13 @@ export function AdminBookings() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "confirmed":
-        return <Badge className="bg-green-500/20 text-green-400 border-green-500/30">Confirmado</Badge>;
+        return <Badge className="bg-green-500/20 text-green-400 border-green-500/30 text-xs">Confirmado</Badge>;
       case "cancelled":
-        return <Badge className="bg-red-500/20 text-red-400 border-red-500/30">Cancelado</Badge>;
+        return <Badge className="bg-red-500/20 text-red-400 border-red-500/30 text-xs">Cancelado</Badge>;
       case "completed":
-        return <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30">Concluído</Badge>;
+        return <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30 text-xs">Concluído</Badge>;
       default:
-        return <Badge variant="secondary">{status}</Badge>;
+        return <Badge variant="secondary" className="text-xs">{status}</Badge>;
     }
   };
 
@@ -190,7 +209,6 @@ export function AdminBookings() {
     toast.success("Agendamento atualizado!");
     setEditingBooking(null);
     
-    // Refresh bookings
     setBookings((prev) =>
       prev.map((b) =>
         b.id === editingBooking.id
@@ -230,17 +248,80 @@ export function AdminBookings() {
     );
   }
 
+  const EditFormContent = () => (
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <Label htmlFor="client_name">Nome do Cliente</Label>
+        <Input
+          id="client_name"
+          value={editForm.client_name}
+          onChange={(e) => setEditForm((f) => ({ ...f, client_name: e.target.value }))}
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="client_phone">Telefone</Label>
+        <Input
+          id="client_phone"
+          value={editForm.client_phone}
+          onChange={(e) => setEditForm((f) => ({ ...f, client_phone: e.target.value }))}
+        />
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <div className="space-y-2">
+          <Label htmlFor="booking_date">Data</Label>
+          <Input
+            id="booking_date"
+            type="date"
+            value={editForm.booking_date}
+            onChange={(e) => setEditForm((f) => ({ ...f, booking_date: e.target.value }))}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="booking_time">Horário</Label>
+          <Input
+            id="booking_time"
+            type="time"
+            value={editForm.booking_time}
+            onChange={(e) => setEditForm((f) => ({ ...f, booking_time: e.target.value }))}
+          />
+        </div>
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="status">Status</Label>
+        <Select value={editForm.status} onValueChange={(v) => setEditForm((f) => ({ ...f, status: v }))}>
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="confirmed">Confirmado</SelectItem>
+            <SelectItem value="completed">Concluído</SelectItem>
+            <SelectItem value="cancelled">Cancelado</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="notes">Observações</Label>
+        <Textarea
+          id="notes"
+          value={editForm.notes}
+          onChange={(e) => setEditForm((f) => ({ ...f, notes: e.target.value }))}
+          rows={3}
+        />
+      </div>
+    </div>
+  );
+
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between flex-wrap gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <CalendarDays className="w-5 h-5 text-primary" />
-          <h2 className="text-xl font-semibold">Agendamentos</h2>
+          <h2 className="text-lg sm:text-xl font-semibold">Agendamentos</h2>
           <span className="text-sm text-muted-foreground">({filteredBookings.length})</span>
         </div>
         <div className="flex gap-2">
           <Select value={filterStatus} onValueChange={setFilterStatus}>
-            <SelectTrigger className="w-36">
+            <SelectTrigger className="w-full sm:w-32">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
@@ -251,7 +332,7 @@ export function AdminBookings() {
             </SelectContent>
           </Select>
           <Select value={filterProfessional} onValueChange={setFilterProfessional}>
-            <SelectTrigger className="w-40">
+            <SelectTrigger className="w-full sm:w-36">
               <SelectValue placeholder="Profissional" />
             </SelectTrigger>
             <SelectContent>
@@ -266,159 +347,186 @@ export function AdminBookings() {
         </div>
       </div>
 
-      <div className="glass-panel overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>
-                <div className="flex items-center gap-1">
-                  <Calendar className="w-4 h-4" /> Data
+      {/* Mobile: Cards Layout */}
+      {isMobile ? (
+        <div className="space-y-3">
+          {filteredBookings.length === 0 ? (
+            <div className="glass-panel p-8 text-center text-muted-foreground">
+              Nenhum agendamento encontrado
+            </div>
+          ) : (
+            filteredBookings.map((booking) => (
+              <div key={booking.id} className="glass-panel p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-medium">{booking.client_name}</span>
+                      {getStatusBadge(booking.status)}
+                    </div>
+                    <div className="flex items-center gap-1 text-sm text-muted-foreground mt-1">
+                      <Phone className="w-3 h-3" />
+                      {formatPhone(booking.client_phone)}
+                    </div>
+                    <div className="flex items-center gap-3 mt-2 text-sm">
+                      <div className="flex items-center gap-1">
+                        <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
+                        {formatDateShort(booking.booking_date)}
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Clock className="w-3.5 h-3.5 text-muted-foreground" />
+                        {booking.booking_time.slice(0, 5)}
+                      </div>
+                      <span className="font-medium">{formatPrice(booking.total_price)}</span>
+                    </div>
+                    <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
+                      <User className="w-3 h-3" />
+                      {getProfessionalName(booking.professional_id)}
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => openEditDialog(booking)}
+                      className="h-8 w-8"
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setDeletingBooking(booking)}
+                      className="h-8 w-8 text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </div>
-              </TableHead>
-              <TableHead>
-                <div className="flex items-center gap-1">
-                  <Clock className="w-4 h-4" /> Horário
-                </div>
-              </TableHead>
-              <TableHead>
-                <div className="flex items-center gap-1">
-                  <User className="w-4 h-4" /> Cliente
-                </div>
-              </TableHead>
-              <TableHead>Profissional</TableHead>
-              <TableHead className="text-right">Valor</TableHead>
-              <TableHead className="text-center">Status</TableHead>
-              <TableHead className="text-center">Ações</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredBookings.length === 0 ? (
+              </div>
+            ))
+          )}
+        </div>
+      ) : (
+        /* Desktop: Table Layout */
+        <div className="glass-panel overflow-x-auto">
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
-                  Nenhum agendamento encontrado
-                </TableCell>
+                <TableHead>
+                  <div className="flex items-center gap-1">
+                    <Calendar className="w-4 h-4" /> Data
+                  </div>
+                </TableHead>
+                <TableHead>
+                  <div className="flex items-center gap-1">
+                    <Clock className="w-4 h-4" /> Horário
+                  </div>
+                </TableHead>
+                <TableHead>
+                  <div className="flex items-center gap-1">
+                    <User className="w-4 h-4" /> Cliente
+                  </div>
+                </TableHead>
+                <TableHead>Profissional</TableHead>
+                <TableHead className="text-right">Valor</TableHead>
+                <TableHead className="text-center">Status</TableHead>
+                <TableHead className="text-center">Ações</TableHead>
               </TableRow>
-            ) : (
-              filteredBookings.map((booking) => (
-                <TableRow key={booking.id}>
-                  <TableCell>{formatDate(booking.booking_date)}</TableCell>
-                  <TableCell>{booking.booking_time.slice(0, 5)}</TableCell>
-                  <TableCell>
-                    <div>
-                      <span>{booking.client_name}</span>
-                      <p className="text-xs text-muted-foreground flex items-center gap-1">
-                        <Phone className="w-3 h-3" />
-                        {formatPhone(booking.client_phone)}
-                      </p>
-                    </div>
-                  </TableCell>
-                  <TableCell>{getProfessionalName(booking.professional_id)}</TableCell>
-                  <TableCell className="text-right">{formatPrice(booking.total_price)}</TableCell>
-                  <TableCell className="text-center">{getStatusBadge(booking.status)}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center justify-center gap-1">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => openEditDialog(booking)}
-                        className="h-8 w-8"
-                      >
-                        <Pencil className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => setDeletingBooking(booking)}
-                        className="h-8 w-8 text-destructive hover:text-destructive"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
+            </TableHeader>
+            <TableBody>
+              {filteredBookings.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
+                    Nenhum agendamento encontrado
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
+              ) : (
+                filteredBookings.map((booking) => (
+                  <TableRow key={booking.id}>
+                    <TableCell>{formatDate(booking.booking_date)}</TableCell>
+                    <TableCell>{booking.booking_time.slice(0, 5)}</TableCell>
+                    <TableCell>
+                      <div>
+                        <span>{booking.client_name}</span>
+                        <p className="text-xs text-muted-foreground flex items-center gap-1">
+                          <Phone className="w-3 h-3" />
+                          {formatPhone(booking.client_phone)}
+                        </p>
+                      </div>
+                    </TableCell>
+                    <TableCell>{getProfessionalName(booking.professional_id)}</TableCell>
+                    <TableCell className="text-right">{formatPrice(booking.total_price)}</TableCell>
+                    <TableCell className="text-center">{getStatusBadge(booking.status)}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center justify-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => openEditDialog(booking)}
+                          className="h-8 w-8"
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => setDeletingBooking(booking)}
+                          className="h-8 w-8 text-destructive hover:text-destructive"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      )}
 
-      {/* Edit Dialog */}
-      <Dialog open={!!editingBooking} onOpenChange={(open) => !open && setEditingBooking(null)}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Editar Agendamento</DialogTitle>
-            <DialogDescription>Altere as informações do agendamento.</DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="client_name">Nome do Cliente</Label>
-              <Input
-                id="client_name"
-                value={editForm.client_name}
-                onChange={(e) => setEditForm((f) => ({ ...f, client_name: e.target.value }))}
-              />
+      {/* Edit: Drawer for mobile, Dialog for desktop */}
+      {isMobile ? (
+        <Drawer open={!!editingBooking} onOpenChange={(open) => !open && setEditingBooking(null)}>
+          <DrawerContent>
+            <DrawerHeader>
+              <DrawerTitle>Editar Agendamento</DrawerTitle>
+              <DrawerDescription>Altere as informações do agendamento.</DrawerDescription>
+            </DrawerHeader>
+            <div className="px-4 pb-4 max-h-[60vh] overflow-y-auto">
+              <EditFormContent />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="client_phone">Telefone</Label>
-              <Input
-                id="client_phone"
-                value={editForm.client_phone}
-                onChange={(e) => setEditForm((f) => ({ ...f, client_phone: e.target.value }))}
-              />
+            <DrawerFooter className="pt-2">
+              <Button onClick={handleSaveEdit} disabled={saving}>
+                {saving ? "Salvando..." : "Salvar"}
+              </Button>
+              <DrawerClose asChild>
+                <Button variant="outline">Cancelar</Button>
+              </DrawerClose>
+            </DrawerFooter>
+          </DrawerContent>
+        </Drawer>
+      ) : (
+        <Dialog open={!!editingBooking} onOpenChange={(open) => !open && setEditingBooking(null)}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Editar Agendamento</DialogTitle>
+              <DialogDescription>Altere as informações do agendamento.</DialogDescription>
+            </DialogHeader>
+            <div className="py-4">
+              <EditFormContent />
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="booking_date">Data</Label>
-                <Input
-                  id="booking_date"
-                  type="date"
-                  value={editForm.booking_date}
-                  onChange={(e) => setEditForm((f) => ({ ...f, booking_date: e.target.value }))}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="booking_time">Horário</Label>
-                <Input
-                  id="booking_time"
-                  type="time"
-                  value={editForm.booking_time}
-                  onChange={(e) => setEditForm((f) => ({ ...f, booking_time: e.target.value }))}
-                />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="status">Status</Label>
-              <Select value={editForm.status} onValueChange={(v) => setEditForm((f) => ({ ...f, status: v }))}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="confirmed">Confirmado</SelectItem>
-                  <SelectItem value="completed">Concluído</SelectItem>
-                  <SelectItem value="cancelled">Cancelado</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="notes">Observações</Label>
-              <Textarea
-                id="notes"
-                value={editForm.notes}
-                onChange={(e) => setEditForm((f) => ({ ...f, notes: e.target.value }))}
-                rows={3}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setEditingBooking(null)}>
-              Cancelar
-            </Button>
-            <Button onClick={handleSaveEdit} disabled={saving}>
-              {saving ? "Salvando..." : "Salvar"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setEditingBooking(null)}>
+                Cancelar
+              </Button>
+              <Button onClick={handleSaveEdit} disabled={saving}>
+                {saving ? "Salvando..." : "Salvar"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
 
       {/* Delete Confirmation */}
       <AlertDialog open={!!deletingBooking} onOpenChange={(open) => !open && setDeletingBooking(null)}>
