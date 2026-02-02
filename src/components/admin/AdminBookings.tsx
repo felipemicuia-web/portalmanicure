@@ -102,7 +102,7 @@ export function AdminBookings() {
         supabase
           .from("bookings")
           .select("*")
-          .order("booking_date", { ascending: false })
+          .order("booking_date", { ascending: true })
           .order("booking_time", { ascending: true }),
         supabase.from("professionals").select("id, name"),
       ]);
