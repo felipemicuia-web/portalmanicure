@@ -480,3 +480,82 @@ input:focus, select:focus, textarea:focus {
 .glow-ring:focus-within::before {
   opacity: 0.5;
 }
+
+/* ===== MOBILE-FIRST RESPONSIVE ===== */
+
+/* Extra small breakpoint */
+@media (min-width: 400px) {
+  .xs\:block { display: block; }
+  .xs\:inline { display: inline; }
+  .xs\:hidden { display: none; }
+  .xs\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+/* Touch-friendly tap targets */
+@media (pointer: coarse) {
+  .cal-day {
+    min-height: 44px;
+  }
+  
+  button, 
+  [role="button"] {
+    min-height: 44px;
+  }
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .galaxy-bg::before,
+  .galaxy-bg::after,
+  .step-dot.active::before {
+    animation: none;
+  }
+  
+  * {
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Safe area insets for notched phones */
+@supports (padding: max(0px)) {
+  .topbar-gradient {
+    padding-top: max(0.75rem, env(safe-area-inset-top));
+  }
+  
+  .glass-panel {
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+}
+
+/* Mobile-optimized scrollbar */
+@media (max-width: 640px) {
+  ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    border-width: 0;
+  }
+}
+
+/* Improved focus states for mobile */
+@media (hover: none) {
+  .card-hover:hover {
+    transform: none;
+    box-shadow: none;
+  }
+  
+  .card-hover:active {
+    transform: scale(0.98);
+  }
+}
+
+/* Prevent text selection on buttons */
+button,
+[role="button"] {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
