@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
 import { User } from "@supabase/supabase-js";
-import { LogOut, User as UserIcon } from "lucide-react";
+import { LogOut, User as UserIcon, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAdmin } from "@/hooks/useAdmin";
 
 interface BookingTopbarProps {
   user: User | null;
@@ -16,6 +17,8 @@ export function BookingTopbar({
   onPageChange,
   onLogout 
 }: BookingTopbarProps) {
+  const { isAdmin } = useAdmin(user);
+  
   return (
     <header className="sticky top-0 z-50 topbar-gradient">
       <div className="max-w-6xl mx-auto px-4 py-4">
@@ -73,6 +76,18 @@ export function BookingTopbar({
                 >
                   Notificações
                 </button>
+                {isAdmin && (
+                  <Link to="/admin">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="gap-1.5 text-white/80 hover:text-white hover:bg-white/10 border border-primary/30"
+                    >
+                      <Shield className="w-4 h-4" />
+                      Admin
+                    </Button>
+                  </Link>
+                )}
                 <Button 
                   variant="ghost" 
                   size="sm" 
