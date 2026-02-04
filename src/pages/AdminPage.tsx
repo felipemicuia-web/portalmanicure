@@ -10,6 +10,7 @@ import { AdminProfessionals } from "@/components/admin/AdminProfessionals";
 import { AdminServices } from "@/components/admin/AdminServices";
 import { AdminBookings } from "@/components/admin/AdminBookings";
 import { AdminNotifications } from "@/components/admin/AdminNotifications";
+import { AdminTheme } from "@/components/admin/AdminTheme";
 import {
   Users,
   Sparkles,
@@ -18,6 +19,7 @@ import {
   LogOut,
   Home,
   Bell,
+  Palette,
 } from "lucide-react";
 
 export default function AdminPage() {
@@ -126,22 +128,26 @@ export default function AdminPage() {
         {/* Main Content */}
         <main className="max-w-6xl mx-auto px-4 py-6">
           <Tabs defaultValue="bookings" className="space-y-4 sm:space-y-6">
-            <TabsList className="grid w-full grid-cols-4 glass-panel p-1 h-auto">
-              <TabsTrigger value="bookings" className="gap-1.5 text-xs sm:text-sm py-2.5 px-2 sm:px-4 flex-col sm:flex-row">
+            <TabsList className="grid w-full grid-cols-5 glass-panel p-1 h-auto">
+              <TabsTrigger value="bookings" className="gap-1.5 text-xs sm:text-sm py-2.5 px-1 sm:px-3 flex-col sm:flex-row">
                 <CalendarDays className="w-4 h-4" />
-                <span>Agenda</span>
+                <span className="hidden xs:inline sm:inline">Agenda</span>
               </TabsTrigger>
-              <TabsTrigger value="notifications" className="gap-1.5 text-xs sm:text-sm py-2.5 px-2 sm:px-4 flex-col sm:flex-row relative">
+              <TabsTrigger value="notifications" className="gap-1.5 text-xs sm:text-sm py-2.5 px-1 sm:px-3 flex-col sm:flex-row relative">
                 <Bell className="w-4 h-4" />
-                <span>Avisos</span>
+                <span className="hidden xs:inline sm:inline">Avisos</span>
               </TabsTrigger>
-              <TabsTrigger value="professionals" className="gap-1.5 text-xs sm:text-sm py-2.5 px-2 sm:px-4 flex-col sm:flex-row">
+              <TabsTrigger value="professionals" className="gap-1.5 text-xs sm:text-sm py-2.5 px-1 sm:px-3 flex-col sm:flex-row">
                 <Users className="w-4 h-4" />
-                <span>Profissionais</span>
+                <span className="hidden xs:inline sm:inline">Profissionais</span>
               </TabsTrigger>
-              <TabsTrigger value="services" className="gap-1.5 text-xs sm:text-sm py-2.5 px-2 sm:px-4 flex-col sm:flex-row">
+              <TabsTrigger value="services" className="gap-1.5 text-xs sm:text-sm py-2.5 px-1 sm:px-3 flex-col sm:flex-row">
                 <Sparkles className="w-4 h-4" />
-                <span>Serviços</span>
+                <span className="hidden xs:inline sm:inline">Serviços</span>
+              </TabsTrigger>
+              <TabsTrigger value="theme" className="gap-1.5 text-xs sm:text-sm py-2.5 px-1 sm:px-3 flex-col sm:flex-row">
+                <Palette className="w-4 h-4" />
+                <span className="hidden xs:inline sm:inline">Cores</span>
               </TabsTrigger>
             </TabsList>
 
@@ -159,6 +165,10 @@ export default function AdminPage() {
 
             <TabsContent value="services">
               <AdminServices />
+            </TabsContent>
+
+            <TabsContent value="theme">
+              <AdminTheme />
             </TabsContent>
           </Tabs>
         </main>

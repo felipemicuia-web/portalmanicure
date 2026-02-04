@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -12,9 +13,34 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+// Theme loader component
+function ThemeLoader() {
+  useEffect(() => {
+    const stored = localStorage.getItem("site-theme-colors");
+    if (stored) {
+      try {
+        const colors = JSON.parse(stored);
+        const root = document.documentElement;
+        root.style.setProperty("--primary", colors.primary);
+        root.style.setProperty("--secondary", colors.secondary);
+        root.style.setProperty("--accent", colors.accent);
+        root.style.setProperty("--background", colors.background);
+        root.style.setProperty("--card", colors.card);
+        root.style.setProperty("--ring", colors.primary);
+        root.style.setProperty("--sidebar-primary", colors.primary);
+        root.style.setProperty("--sidebar-accent", colors.secondary);
+      } catch {
+        // Use default theme
+      }
+    }
+  }, []);
+  return null;
+}
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
+      <ThemeLoader />
       <Toaster />
       <Sonner />
       <ErrorBoundary>
