@@ -103,18 +103,18 @@ function buildAvailableTimes(
     lunchEnd = toMinutes(workSettings.lunch_end);
   }
 
-  const blockMinutes = 60;
-  const roundedService = Math.ceil(totalServiceMinutes / blockMinutes) * blockMinutes;
-  const step = blockMinutes + intervalMinutes;
-
-  if (step <= 0) return [];
+  // Usa a duração real do serviço (não arredonda mais para 60min)
+  const serviceDuration = totalServiceMinutes;
+  
+  // Gera slots a cada 30 minutos para mais opções
+  const slotStep = 30;
 
   const slots: string[] = [];
-  for (let t = start; t + roundedService <= end; t += step) {
+  
+  for (let t = start; t + serviceDuration <= end; t += slotStep) {
     const slotStart = t;
-    const slotEnd = t + roundedService;
-    const blockedEnd = slotEnd + intervalMinutes;
-
+    const slotEnd = t + serviceDuration;
+    
     // Verifica se o slot conflita com o horário de almoço
     if (lunchStart !== null && lunchEnd !== null) {
       if (overlaps(slotStart, slotEnd, lunchStart, lunchEnd)) {
@@ -122,9 +122,19 @@ function buildAvailableTimes(
       }
     }
 
-    // Verifica conflito com outros agendamentos
-    const conflict = bookings.some((b) => overlaps(slotStart, blockedEnd, b.start, b.end));
-    if (!conflict) slots.push(toHHMM(slotStart));
+    // Período bloqueado inclui o intervalo após o serviço
+    const blockedEnd = slotEnd + intervalMinutes;
+
+    // Verifica conflito com outros agendamentos (considerando intervalo)
+    const conflict = bookings.some((b) => {
+      // O booking também tem um período de intervalo após ele
+      const bookingBlockedEnd = b.end + intervalMinutes;
+      return overlaps(slotStart, blockedEnd, b.start, bookingBlockedEnd);
+    });
+    
+    if (!conflict) {
+      slots.push(toHHMM(slotStart));
+    }
   }
 
   return slots;
