@@ -47,6 +47,10 @@ const App = () => (
       <ThemeLoader />
       <Toaster />
       <Sonner />
+      {/* Galaxy background with pulsing stars */}
+      <div className="galaxy-bg">
+        <div className="pulsing-stars" />
+      </div>
       <ErrorBoundary>
         <BrowserRouter>
           <Routes>
