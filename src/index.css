@@ -67,11 +67,11 @@
     --tracking-normal: 0em;
     --spacing: 0.25rem;
 
-    /* Enhanced glow effects */
-    --glow-purple: 0 0 0 1px rgba(124,58,237,.25), 0 20px 60px rgba(124,58,237,.25);
-    --glow-cyan: 0 0 0 1px rgba(34,211,238,.18), 0 18px 55px rgba(34,211,238,.18);
-    --glow-gold: 0 0 0 1px rgba(255,183,3,.20), 0 15px 40px rgba(255,183,3,.20);
-    --glow-pink: 0 0 40px rgba(236,72,153,.3);
+    /* Enhanced glow effects - now use CSS variables */
+    --glow-purple: 0 0 0 1px hsl(var(--primary) / 0.25), 0 20px 60px hsl(var(--primary) / 0.25);
+    --glow-cyan: 0 0 0 1px hsl(var(--secondary) / 0.18), 0 18px 55px hsl(var(--secondary) / 0.18);
+    --glow-gold: 0 0 0 1px hsl(var(--accent) / 0.20), 0 15px 40px hsl(var(--accent) / 0.20);
+    --glow-pink: 0 0 40px hsl(var(--primary) / 0.3);
   }
 }
 
@@ -93,8 +93,7 @@
   pointer-events: none;
   z-index: 0;
   overflow: hidden;
-  background:
-    linear-gradient(180deg, hsl(240 15% 6%), hsl(240 15% 3%));
+  background: linear-gradient(180deg, hsl(var(--background)), hsl(var(--background) / 0.95));
 }
 
 /* Stars layer - multiple sizes */
@@ -122,17 +121,17 @@
   animation: twinkle 8s ease-in-out infinite alternate;
 }
 
-/* Nebula layer - enhanced gradients */
+/* Nebula layer - uses theme colors */
 .galaxy-bg::after {
   content: '';
   position: absolute;
   inset: -30%;
   background:
-    radial-gradient(1000px 700px at 15% 25%, rgba(124,58,237,.55), transparent 60%),
-    radial-gradient(900px 600px at 75% 25%, rgba(90,47,181,.45), transparent 55%),
-    radial-gradient(800px 500px at 85% 75%, rgba(34,211,238,.25), transparent 60%),
-    radial-gradient(700px 450px at 25% 85%, rgba(236,72,153,.20), transparent 55%),
-    radial-gradient(600px 400px at 50% 50%, rgba(255,183,3,.15), transparent 65%),
+    radial-gradient(1000px 700px at 15% 25%, hsl(var(--primary) / 0.4), transparent 60%),
+    radial-gradient(900px 600px at 75% 25%, hsl(var(--primary) / 0.3), transparent 55%),
+    radial-gradient(800px 500px at 85% 75%, hsl(var(--secondary) / 0.25), transparent 60%),
+    radial-gradient(700px 450px at 25% 85%, hsl(var(--accent) / 0.15), transparent 55%),
+    radial-gradient(600px 400px at 50% 50%, hsl(var(--secondary) / 0.1), transparent 65%),
     radial-gradient(1200px 900px at 50% 50%, rgba(255,255,255,.03), transparent 70%);
   filter: blur(35px);
   opacity: 0.85;
@@ -194,14 +193,14 @@
   background:
     linear-gradient(
       135deg,
-      rgba(124,58,237,.75) 0%,
-      rgba(90,47,181,.65) 40%,
-      rgba(139,92,246,.55) 100%
+      hsl(var(--primary) / 0.75) 0%,
+      hsl(var(--primary) / 0.65) 40%,
+      hsl(var(--primary) / 0.55) 100%
     );
   border-bottom: 1px solid rgba(255,255,255,.15);
   backdrop-filter: blur(20px) saturate(200%);
   box-shadow: 
-    0 4px 30px rgba(124,58,237,.3),
+    0 4px 30px hsl(var(--primary) / 0.3),
     0 1px 0 rgba(255,255,255,.1) inset;
   position: relative;
 }
