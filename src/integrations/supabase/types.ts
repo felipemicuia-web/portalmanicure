@@ -485,6 +485,36 @@ export type Database = {
         }
         Relationships: []
       }
+      work_settings: {
+        Row: {
+          end_time: string
+          id: string
+          interval_minutes: number
+          lunch_end: string | null
+          lunch_start: string | null
+          start_time: string
+          updated_at: string
+        }
+        Insert: {
+          end_time?: string
+          id?: string
+          interval_minutes?: number
+          lunch_end?: string | null
+          lunch_start?: string | null
+          start_time?: string
+          updated_at?: string
+        }
+        Update: {
+          end_time?: string
+          id?: string
+          interval_minutes?: number
+          lunch_end?: string | null
+          lunch_start?: string | null
+          start_time?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
