@@ -35,9 +35,9 @@ const themePresets: ThemePreset[] = [
     },
   },
   {
-    id: "rose-gold",
+    id: "rosa",
     name: "🌸 Rosa Elegante",
-    description: "Rosa suave com toques dourados",
+    description: "Pétalas flutuantes e tons rosados",
     colors: {
       primary: "340 65% 55%",
       secondary: "30 80% 65%",
@@ -49,9 +49,9 @@ const themePresets: ThemePreset[] = [
     },
   },
   {
-    id: "ocean",
+    id: "oceano",
     name: "🌊 Oceano",
-    description: "Azul profundo e verde água",
+    description: "Bolhas subindo do fundo do mar",
     colors: {
       primary: "200 80% 50%",
       secondary: "175 70% 45%",
@@ -63,9 +63,9 @@ const themePresets: ThemePreset[] = [
     },
   },
   {
-    id: "forest",
+    id: "floresta",
     name: "🌿 Floresta",
-    description: "Verde natural e tons terrosos",
+    description: "Folhas caindo suavemente",
     colors: {
       primary: "145 60% 42%",
       secondary: "80 45% 50%",
@@ -77,9 +77,9 @@ const themePresets: ThemePreset[] = [
     },
   },
   {
-    id: "sunset",
+    id: "pordosol",
     name: "🌅 Pôr do Sol",
-    description: "Laranja quente e vermelho",
+    description: "Raios de luz quentes",
     colors: {
       primary: "25 90% 55%",
       secondary: "350 75% 55%",
@@ -91,9 +91,9 @@ const themePresets: ThemePreset[] = [
     },
   },
   {
-    id: "midnight",
+    id: "meianoite",
     name: "🌙 Meia-Noite",
-    description: "Azul escuro e prata",
+    description: "Flocos de neve brilhantes",
     colors: {
       primary: "220 70% 55%",
       secondary: "210 20% 70%",
@@ -105,9 +105,9 @@ const themePresets: ThemePreset[] = [
     },
   },
   {
-    id: "lavender",
+    id: "lavanda",
     name: "💜 Lavanda",
-    description: "Lilás suave e tons pastel",
+    description: "Borboletas flutuantes",
     colors: {
       primary: "280 60% 60%",
       secondary: "320 50% 60%",

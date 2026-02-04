@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { ThemedBackground } from "@/components/backgrounds/ThemedBackground";
 import BookingPage from "./pages/BookingPage";
 import Auth from "./pages/Auth";
 import AdminPage from "./pages/AdminPage";
@@ -47,10 +48,10 @@ const App = () => (
       <ThemeLoader />
       <Toaster />
       <Sonner />
-      {/* Galaxy background with pulsing stars */}
-      <div className="galaxy-bg">
-        <div className="pulsing-stars" />
-      </div>
+      {/* Galaxy background base */}
+      <div className="galaxy-bg" />
+      {/* Themed animated particles */}
+      <ThemedBackground />
       <ErrorBoundary>
         <BrowserRouter>
           <Routes>
