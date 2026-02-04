@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { logger } from "@/lib/logger";
 import { formatPhone } from "@/lib/validation";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Calendar, Clock, User, Phone, CalendarDays, Pencil, Trash2 } from "lucide-react";
+import { Calendar, Clock, User, Phone, CalendarDays, Pencil, Trash2, MessageCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -125,6 +125,34 @@ export function AdminBookings() {
 
   const getProfessionalName = (id: string) => {
     return professionals.find((p) => p.id === id)?.name || "—";
+  };
+
+  const sendWhatsAppMessage = (booking: Booking) => {
+    const professionalName = getProfessionalName(booking.professional_id);
+    const formattedDate = formatDate(booking.booking_date);
+    const formattedTime = booking.booking_time.slice(0, 5);
+    const formattedPrice = formatPrice(booking.total_price);
+    
+    const message = `Olá ${booking.client_name}! 👋\n\n` +
+      `Seu agendamento foi confirmado! ✅\n\n` +
+      `📅 *Data:* ${formattedDate}\n` +
+      `🕐 *Horário:* ${formattedTime}\n` +
+      `👤 *Profissional:* ${professionalName}\n` +
+      `💰 *Valor:* ${formattedPrice}\n` +
+      `⏱️ *Duração:* ${booking.duration_minutes} minutos\n` +
+      (booking.notes ? `📝 *Obs:* ${booking.notes}\n` : "") +
+      `\nAguardamos você! 💅✨`;
+    
+    // Remove non-numeric characters from phone and add Brazil country code if needed
+    let phone = booking.client_phone.replace(/\D/g, "");
+    if (phone.length <= 11) {
+      phone = "55" + phone;
+    }
+    
+    const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, "_blank");
+    
+    toast.success("WhatsApp aberto com a mensagem do agendamento!");
   };
 
   const formatDate = (dateStr: string) => {
@@ -387,6 +415,15 @@ export function AdminBookings() {
                     <Button
                       variant="ghost"
                       size="icon"
+                      onClick={() => sendWhatsAppMessage(booking)}
+                      className="h-8 w-8 text-green-500 hover:text-green-600"
+                      title="Enviar via WhatsApp"
+                    >
+                      <MessageCircle className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
                       onClick={() => openEditDialog(booking)}
                       className="h-8 w-8"
                     >
@@ -459,6 +496,15 @@ export function AdminBookings() {
                     <TableCell className="text-center">{getStatusBadge(booking.status)}</TableCell>
                     <TableCell>
                       <div className="flex items-center justify-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => sendWhatsAppMessage(booking)}
+                          className="h-8 w-8 text-green-500 hover:text-green-600"
+                          title="Enviar via WhatsApp"
+                        >
+                          <MessageCircle className="w-4 h-4" />
+                        </Button>
                         <Button
                           variant="ghost"
                           size="icon"
