@@ -26,9 +26,13 @@ function ThemeLoader() {
         root.style.setProperty("--accent", colors.accent);
         root.style.setProperty("--background", colors.background);
         root.style.setProperty("--card", colors.card);
+        root.style.setProperty("--muted", colors.muted || "240 10% 20%");
+        root.style.setProperty("--border", colors.border || "240 10% 20%");
         root.style.setProperty("--ring", colors.primary);
         root.style.setProperty("--sidebar-primary", colors.primary);
         root.style.setProperty("--sidebar-accent", colors.secondary);
+        root.style.setProperty("--popover", colors.card);
+        root.style.setProperty("--input", colors.background);
       } catch {
         // Use default theme
       }
