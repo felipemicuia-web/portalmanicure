@@ -143,13 +143,22 @@ export function AdminBookings() {
       (booking.notes ? `📝 *Obs:* ${booking.notes}\n` : "") +
       `\nAguardamos você! 💅✨`;
     
-    // Remove non-numeric characters from phone and add Brazil country code if needed
-    let phone = booking.client_phone.replace(/\D/g, "");
-    if (phone.length <= 11) {
-      phone = "55" + phone;
+    // Normaliza telefone (somente dígitos) e garante DDI 55 quando necessário
+    let phone = booking.client_phone.replace(/\D/g, "").replace(/^0+/, "");
+
+    // Se vier apenas com DDD+numero (10/11 dígitos), prefixa Brasil
+    if (phone.length === 10 || phone.length === 11) {
+      phone = `55${phone}`;
     }
-    
-    return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+
+    // Links mais confiáveis por plataforma:
+    // - Mobile: abre o app via deep-link
+    // - Desktop: abre o WhatsApp Web direto na conversa
+    const encodedText = encodeURIComponent(message);
+    if (isMobile) {
+      return `whatsapp://send?phone=${phone}&text=${encodedText}`;
+    }
+    return `https://web.whatsapp.com/send?phone=${phone}&text=${encodedText}&app_absent=0`;
   };
 
   const formatDate = (dateStr: string) => {
