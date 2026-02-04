@@ -127,7 +127,7 @@ export function AdminBookings() {
     return professionals.find((p) => p.id === id)?.name || "—";
   };
 
-  const sendWhatsAppMessage = (booking: Booking) => {
+  const getWhatsAppUrl = (booking: Booking) => {
     const professionalName = getProfessionalName(booking.professional_id);
     const formattedDate = formatDate(booking.booking_date);
     const formattedTime = booking.booking_time.slice(0, 5);
@@ -149,10 +149,7 @@ export function AdminBookings() {
       phone = "55" + phone;
     }
     
-    const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, "_blank");
-    
-    toast.success("WhatsApp aberto com a mensagem do agendamento!");
+    return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
   };
 
   const formatDate = (dateStr: string) => {
@@ -412,15 +409,15 @@ export function AdminBookings() {
                     </div>
                   </div>
                   <div className="flex flex-col gap-1">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => sendWhatsAppMessage(booking)}
-                      className="h-8 w-8 text-green-500 hover:text-green-600"
+                    <a
+                      href={getWhatsAppUrl(booking)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center h-8 w-8 rounded-md text-green-500 hover:text-green-600 hover:bg-accent"
                       title="Enviar via WhatsApp"
                     >
                       <MessageCircle className="w-4 h-4" />
-                    </Button>
+                    </a>
                     <Button
                       variant="ghost"
                       size="icon"
@@ -496,15 +493,15 @@ export function AdminBookings() {
                     <TableCell className="text-center">{getStatusBadge(booking.status)}</TableCell>
                     <TableCell>
                       <div className="flex items-center justify-center gap-1">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => sendWhatsAppMessage(booking)}
-                          className="h-8 w-8 text-green-500 hover:text-green-600"
+                        <a
+                          href={getWhatsAppUrl(booking)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center justify-center h-8 w-8 rounded-md text-green-500 hover:text-green-600 hover:bg-accent"
                           title="Enviar via WhatsApp"
                         >
                           <MessageCircle className="w-4 h-4" />
-                        </Button>
+                        </a>
                         <Button
                           variant="ghost"
                           size="icon"
