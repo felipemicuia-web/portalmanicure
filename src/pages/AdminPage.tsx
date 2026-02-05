@@ -12,6 +12,7 @@ import { AdminBookings } from "@/components/admin/AdminBookings";
 import { AdminNotifications } from "@/components/admin/AdminNotifications";
 import { AdminTheme } from "@/components/admin/AdminTheme";
 import { AdminWorkHours } from "@/components/admin/AdminWorkHours";
+import { AdminProfessionalSchedule } from "@/components/admin/AdminProfessionalSchedule";
 import {
   Users,
   Sparkles,
@@ -22,6 +23,7 @@ import {
   Bell,
   Palette,
   Clock,
+  UserCog,
 } from "lucide-react";
 
 export default function AdminPage() {
@@ -130,7 +132,7 @@ export default function AdminPage() {
         {/* Main Content */}
         <main className="max-w-6xl mx-auto px-4 py-6">
           <Tabs defaultValue="bookings" className="space-y-4 sm:space-y-6">
-            <TabsList className="grid w-full grid-cols-6 glass-panel p-1 h-auto">
+            <TabsList className="grid w-full grid-cols-7 glass-panel p-1 h-auto">
               <TabsTrigger value="bookings" className="gap-1.5 text-xs sm:text-sm py-2.5 px-1 sm:px-3 flex-col sm:flex-row">
                 <CalendarDays className="w-4 h-4" />
                 <span className="hidden xs:inline sm:inline">Agenda</span>
@@ -142,6 +144,10 @@ export default function AdminPage() {
               <TabsTrigger value="hours" className="gap-1.5 text-xs sm:text-sm py-2.5 px-1 sm:px-3 flex-col sm:flex-row">
                 <Clock className="w-4 h-4" />
                 <span className="hidden xs:inline sm:inline">Horários</span>
+              </TabsTrigger>
+              <TabsTrigger value="schedules" className="gap-1.5 text-xs sm:text-sm py-2.5 px-1 sm:px-3 flex-col sm:flex-row">
+                <UserCog className="w-4 h-4" />
+                <span className="hidden xs:inline sm:inline">Folgas</span>
               </TabsTrigger>
               <TabsTrigger value="professionals" className="gap-1.5 text-xs sm:text-sm py-2.5 px-1 sm:px-3 flex-col sm:flex-row">
                 <Users className="w-4 h-4" />
@@ -167,6 +173,10 @@ export default function AdminPage() {
 
             <TabsContent value="hours">
               <AdminWorkHours />
+            </TabsContent>
+
+            <TabsContent value="schedules">
+              <AdminProfessionalSchedule />
             </TabsContent>
 
             <TabsContent value="professionals">

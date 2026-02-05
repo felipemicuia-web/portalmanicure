@@ -49,20 +49,47 @@ export function useAvailableTimes(
 
       setLoading(true);
 
-      // Fetch existing bookings for that date and professional
-      const { data: bookings } = await supabase
-        .from("bookings")
-        .select("booking_time, duration_minutes")
-        .eq("professional_id", professionalId)
-        .eq("booking_date", date)
-        .neq("status", "cancelled");
+      // Fetch professional's working days and blocked dates along with bookings
+      const [bookingsResult, professionalResult, blockedResult] = await Promise.all([
+        supabase
+          .from("bookings")
+          .select("booking_time, duration_minutes")
+          .eq("professional_id", professionalId)
+          .eq("booking_date", date)
+          .neq("status", "cancelled"),
+        supabase
+          .from("professionals")
+          .select("working_days")
+          .eq("id", professionalId)
+          .single(),
+        supabase
+          .from("professional_blocked_dates")
+          .select("blocked_date")
+          .eq("professional_id", professionalId)
+          .eq("blocked_date", date),
+      ]);
 
-      const busy = (bookings || []).map((b) => ({
+      // Check if date is blocked for this professional
+      if (blockedResult.data && blockedResult.data.length > 0) {
+        setTimes([]);
+        setLoading(false);
+        return;
+      }
+
+      // Use professional's working days if set, otherwise use global settings
+      const effectiveWorkingDays = professionalResult.data?.working_days ?? workSettings.working_days;
+
+      const busy = (bookingsResult.data || []).map((b) => ({
         start: toMinutes(b.booking_time),
         end: toMinutes(b.booking_time) + Number(b.duration_minutes || 0),
       }));
 
-      const availableSlots = buildAvailableTimes(totalMinutes, busy, workSettings, date);
+      const availableSlots = buildAvailableTimes(
+        totalMinutes, 
+        busy, 
+        { ...workSettings, working_days: effectiveWorkingDays }, 
+        date
+      );
       setTimes(availableSlots);
       setLoading(false);
     }
