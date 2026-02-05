@@ -4,6 +4,7 @@ import { logger } from "@/lib/logger";
 import { formatPhone } from "@/lib/validation";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Calendar, Clock, User, Phone, CalendarDays, Pencil, Trash2, MessageCircle } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -64,6 +65,7 @@ interface Booking {
   status: string;
   notes: string | null;
   professional_id: string;
+  user_id: string;
   created_at: string;
 }
 
@@ -72,9 +74,15 @@ interface Professional {
   name: string;
 }
 
+interface Profile {
+  user_id: string;
+  avatar_url: string | null;
+}
+
 export function AdminBookings() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [professionals, setProfessionals] = useState<Professional[]>([]);
+  const [profiles, setProfiles] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [filterProfessional, setFilterProfessional] = useState<string>("all");
@@ -111,6 +119,16 @@ export function AdminBookings() {
         logger.error("Error fetching bookings:", bookingsRes.error);
       } else {
         setBookings(bookingsRes.data || []);
+        
+        // Fetch profiles for all user_ids
+        const userIds = [...new Set((bookingsRes.data || []).map((b) => b.user_id).filter(Boolean))];
+        if (userIds.length > 0) {
+          const { data: profilesData } = await supabase
+            .from("profiles")
+            .select("user_id, avatar_url")
+            .in("user_id", userIds);
+          setProfiles(profilesData || []);
+        }
       }
 
       if (professionalsRes.data) {
@@ -125,6 +143,10 @@ export function AdminBookings() {
 
   const getProfessionalName = (id: string) => {
     return professionals.find((p) => p.id === id)?.name || "—";
+  };
+
+  const getClientAvatar = (userId: string) => {
+    return profiles.find((p) => p.user_id === userId)?.avatar_url || null;
   };
 
   const getWhatsAppUrl = (booking: Booking) => {
@@ -183,6 +205,15 @@ export function AdminBookings() {
       style: "currency",
       currency: "BRL",
     }).format(price);
+  };
+
+  const getClientInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .slice(0, 2)
+      .join("")
+      .toUpperCase();
   };
 
   const getStatusBadge = (status: string) => {
@@ -393,8 +424,14 @@ export function AdminBookings() {
               <div key={booking.id} className="glass-panel p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-medium">{booking.client_name}</span>
+                    <div className="flex items-center gap-2">
+                      <Avatar className="h-8 w-8 flex-shrink-0">
+                        <AvatarImage src={getClientAvatar(booking.user_id) || undefined} alt={booking.client_name} />
+                        <AvatarFallback className="text-xs bg-primary/10 text-primary">
+                          {getClientInitials(booking.client_name)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="font-medium truncate">{booking.client_name}</span>
                       {getStatusBadge(booking.status)}
                     </div>
                     <div className="flex items-center gap-1 text-sm text-muted-foreground mt-1">
@@ -489,12 +526,20 @@ export function AdminBookings() {
                     <TableCell>{formatDate(booking.booking_date)}</TableCell>
                     <TableCell>{booking.booking_time.slice(0, 5)}</TableCell>
                     <TableCell>
-                      <div>
-                        <span>{booking.client_name}</span>
-                        <p className="text-xs text-muted-foreground flex items-center gap-1">
-                          <Phone className="w-3 h-3" />
-                          {formatPhone(booking.client_phone)}
-                        </p>
+                      <div className="flex items-center gap-2">
+                        <Avatar className="h-8 w-8 flex-shrink-0">
+                          <AvatarImage src={getClientAvatar(booking.user_id) || undefined} alt={booking.client_name} />
+                          <AvatarFallback className="text-xs bg-primary/10 text-primary">
+                            {getClientInitials(booking.client_name)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <span>{booking.client_name}</span>
+                          <p className="text-xs text-muted-foreground flex items-center gap-1">
+                            <Phone className="w-3 h-3" />
+                            {formatPhone(booking.client_phone)}
+                          </p>
+                        </div>
                       </div>
                     </TableCell>
                     <TableCell>{getProfessionalName(booking.professional_id)}</TableCell>
