@@ -6,20 +6,34 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Eye, EyeOff, Mail, Lock, User, ArrowLeft } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, User, ArrowLeft, Phone } from "lucide-react";
 import { z } from "zod";
+import { isValidBrazilianPhone, normalizePhone, formatPhone } from "@/lib/validation";
 
 const emailSchema = z.string().email("Email inválido");
 const passwordSchema = z.string().min(6, "Senha deve ter pelo menos 6 caracteres");
+const nameSchema = z.string().min(2, "Nome deve ter pelo menos 2 caracteres");
+
+interface FormErrors {
+  email?: string;
+  password?: string;
+  confirmPassword?: string;
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+}
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [phone, setPhone] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState<{ email?: string; password?: string; confirmPassword?: string }>({});
+  const [errors, setErrors] = useState<FormErrors>({});
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -39,8 +53,15 @@ const Auth = () => {
     return () => subscription.unsubscribe();
   }, [navigate]);
 
+  const handlePhoneChange = (value: string) => {
+    const digits = normalizePhone(value);
+    if (digits.length <= 11) {
+      setPhone(formatPhone(digits));
+    }
+  };
+
   const validateForm = () => {
-    const newErrors: { email?: string; password?: string; confirmPassword?: string } = {};
+    const newErrors: FormErrors = {};
 
     const emailResult = emailSchema.safeParse(email);
     if (!emailResult.success) {
@@ -52,8 +73,24 @@ const Auth = () => {
       newErrors.password = passwordResult.error.errors[0].message;
     }
 
-    if (!isLogin && password !== confirmPassword) {
-      newErrors.confirmPassword = "As senhas não coincidem";
+    if (!isLogin) {
+      if (password !== confirmPassword) {
+        newErrors.confirmPassword = "As senhas não coincidem";
+      }
+
+      const firstNameResult = nameSchema.safeParse(firstName.trim());
+      if (!firstNameResult.success) {
+        newErrors.firstName = firstNameResult.error.errors[0].message;
+      }
+
+      const lastNameResult = nameSchema.safeParse(lastName.trim());
+      if (!lastNameResult.success) {
+        newErrors.lastName = lastNameResult.error.errors[0].message;
+      }
+
+      if (!isValidBrazilianPhone(phone)) {
+        newErrors.phone = "Telefone inválido. Use DDD + número (ex: 11 99999-9999)";
+      }
     }
 
     setErrors(newErrors);
@@ -95,7 +132,7 @@ const Auth = () => {
           });
         }
       } else {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -117,7 +154,17 @@ const Auth = () => {
               variant: "destructive",
             });
           }
-        } else {
+        } else if (data.user) {
+          // Create profile with name and phone
+          const fullName = `${firstName.trim()} ${lastName.trim()}`;
+          const normalizedPhone = normalizePhone(phone);
+          
+          await supabase.from("profiles").upsert({
+            user_id: data.user.id,
+            name: fullName,
+            phone: normalizedPhone,
+          });
+
           toast({
             title: "Conta criada!",
             description: "Cadastro realizado com sucesso",
@@ -218,29 +265,93 @@ const Auth = () => {
             </div>
 
             {!isLogin && (
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword" className="text-sm font-medium">
-                  Confirmar Senha
-                </Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <Input
-                    id="confirmPassword"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="••••••••"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    className={`pl-10 h-11 ${errors.confirmPassword ? "border-destructive" : ""}`}
-                    required
-                  />
+              <>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <Label htmlFor="firstName" className="text-sm font-medium">
+                      Nome
+                    </Label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <Input
+                        id="firstName"
+                        type="text"
+                        placeholder="Maria"
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                        className={`pl-10 h-11 ${errors.firstName ? "border-destructive" : ""}`}
+                        required
+                      />
+                    </div>
+                    {errors.firstName && (
+                      <p className="text-sm text-destructive">{errors.firstName}</p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="lastName" className="text-sm font-medium">
+                      Sobrenome
+                    </Label>
+                    <Input
+                      id="lastName"
+                      type="text"
+                      placeholder="Silva"
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                      className={`h-11 ${errors.lastName ? "border-destructive" : ""}`}
+                      required
+                    />
+                    {errors.lastName && (
+                      <p className="text-sm text-destructive">{errors.lastName}</p>
+                    )}
+                  </div>
                 </div>
-                {errors.confirmPassword && (
-                  <p className="text-sm text-destructive">{errors.confirmPassword}</p>
-                )}
-              </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="phone" className="text-sm font-medium">
+                    WhatsApp (com DDD)
+                  </Label>
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <Input
+                      id="phone"
+                      type="tel"
+                      placeholder="(11) 99999-9999"
+                      value={phone}
+                      onChange={(e) => handlePhoneChange(e.target.value)}
+                      className={`pl-10 h-11 ${errors.phone ? "border-destructive" : ""}`}
+                      required
+                    />
+                  </div>
+                  {errors.phone && (
+                    <p className="text-sm text-destructive">{errors.phone}</p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword" className="text-sm font-medium">
+                    Confirmar Senha
+                  </Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <Input
+                      id="confirmPassword"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      className={`pl-10 h-11 ${errors.confirmPassword ? "border-destructive" : ""}`}
+                      required
+                    />
+                  </div>
+                  {errors.confirmPassword && (
+                    <p className="text-sm text-destructive">{errors.confirmPassword}</p>
+                  )}
+                </div>
+              </>
             )}
 
-            <Button 
+            <Button
               type="submit" 
               className="w-full h-11 font-semibold bg-primary hover:bg-primary/90 transition-all duration-200"
               disabled={loading}
@@ -264,6 +375,9 @@ const Auth = () => {
                 onClick={() => {
                   setIsLogin(!isLogin);
                   setErrors({});
+                  setFirstName("");
+                  setLastName("");
+                  setPhone("");
                 }}
                 className="ml-1 font-semibold text-primary hover:underline"
               >
