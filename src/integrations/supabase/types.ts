@@ -494,6 +494,7 @@ export type Database = {
           lunch_start: string | null
           start_time: string
           updated_at: string
+          working_days: number[]
         }
         Insert: {
           end_time?: string
@@ -503,6 +504,7 @@ export type Database = {
           lunch_start?: string | null
           start_time?: string
           updated_at?: string
+          working_days?: number[]
         }
         Update: {
           end_time?: string
@@ -512,6 +514,7 @@ export type Database = {
           lunch_start?: string | null
           start_time?: string
           updated_at?: string
+          working_days?: number[]
         }
         Relationships: []
       }

@@ -3,6 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Professional, Service } from "@/types/booking";
 import { useWorkSettings, WorkSettings } from "@/hooks/useWorkSettings";
 
+export { useWorkSettings };
+
 export function useBookingData() {
   const [professionals, setProfessionals] = useState<Professional[]>([]);
   const [services, setServices] = useState<Service[]>([]);
@@ -60,7 +62,7 @@ export function useAvailableTimes(
         end: toMinutes(b.booking_time) + Number(b.duration_minutes || 0),
       }));
 
-      const availableSlots = buildAvailableTimes(totalMinutes, busy, workSettings);
+      const availableSlots = buildAvailableTimes(totalMinutes, busy, workSettings, date);
       setTimes(availableSlots);
       setLoading(false);
     }
@@ -89,8 +91,19 @@ function overlaps(aStart: number, aEnd: number, bStart: number, bEnd: number): b
 function buildAvailableTimes(
   totalServiceMinutes: number,
   bookings: { start: number; end: number }[],
-  workSettings: WorkSettings
+  workSettings: WorkSettings,
+  selectedDate?: string
 ): string[] {
+  // Se uma data foi selecionada, verifica se é um dia de trabalho
+  if (selectedDate) {
+    const dateObj = new Date(selectedDate + "T12:00:00"); // Adiciona horário para evitar problemas de timezone
+    const dayOfWeek = dateObj.getDay(); // 0 = domingo, 1 = segunda, etc.
+    
+    if (!workSettings.working_days.includes(dayOfWeek)) {
+      return []; // Retorna vazio se não é dia de trabalho
+    }
+  }
+
   const start = toMinutes(workSettings.start_time);
   const end = toMinutes(workSettings.end_time);
   const intervalMinutes = workSettings.interval_minutes;
