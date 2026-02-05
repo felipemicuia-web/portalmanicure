@@ -7,6 +7,7 @@ export interface WorkSettings {
   interval_minutes: number;
   lunch_start: string | null;
   lunch_end: string | null;
+  working_days: number[];
 }
 
 const DEFAULT_SETTINGS: WorkSettings = {
@@ -15,6 +16,7 @@ const DEFAULT_SETTINGS: WorkSettings = {
   interval_minutes: 10,
   lunch_start: null,
   lunch_end: null,
+  working_days: [1, 2, 3, 4, 5, 6], // Segunda a Sábado por padrão
 };
 
 export function useWorkSettings() {
@@ -25,7 +27,7 @@ export function useWorkSettings() {
     async function fetchSettings() {
       const { data, error } = await supabase
         .from("work_settings")
-        .select("start_time, end_time, interval_minutes, lunch_start, lunch_end")
+        .select("start_time, end_time, interval_minutes, lunch_start, lunch_end, working_days")
         .maybeSingle();
 
       if (!error && data) {
@@ -35,6 +37,7 @@ export function useWorkSettings() {
           interval_minutes: data.interval_minutes,
           lunch_start: data.lunch_start,
           lunch_end: data.lunch_end,
+          working_days: data.working_days || [1, 2, 3, 4, 5, 6],
         });
       }
       setLoading(false);

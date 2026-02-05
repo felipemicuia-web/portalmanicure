@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Clock, Coffee, Save, Loader2 } from "lucide-react";
+import { Clock, Coffee, Save, Loader2, Calendar } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface WorkSettings {
   id: string;
@@ -14,7 +15,18 @@ interface WorkSettings {
   interval_minutes: number;
   lunch_start: string | null;
   lunch_end: string | null;
+  working_days: number[];
 }
+
+const WEEKDAYS = [
+  { value: 0, label: "Domingo", short: "Dom" },
+  { value: 1, label: "Segunda", short: "Seg" },
+  { value: 2, label: "Terça", short: "Ter" },
+  { value: 3, label: "Quarta", short: "Qua" },
+  { value: 4, label: "Quinta", short: "Qui" },
+  { value: 5, label: "Sexta", short: "Sex" },
+  { value: 6, label: "Sábado", short: "Sáb" },
+];
 
 export function AdminWorkHours() {
   const [settings, setSettings] = useState<WorkSettings | null>(null);
@@ -59,6 +71,7 @@ export function AdminWorkHours() {
       interval_minutes: settings.interval_minutes,
       lunch_start: hasLunch ? settings.lunch_start : null,
       lunch_end: hasLunch ? settings.lunch_end : null,
+      working_days: settings.working_days,
       updated_at: new Date().toISOString(),
     };
 
@@ -82,6 +95,15 @@ export function AdminWorkHours() {
         description: "Configurações de horário atualizadas com sucesso.",
       });
     }
+  }
+
+  function toggleDay(day: number) {
+    if (!settings) return;
+    const days = settings.working_days || [];
+    const newDays = days.includes(day)
+      ? days.filter((d) => d !== day)
+      : [...days, day].sort((a, b) => a - b);
+    setSettings({ ...settings, working_days: newDays });
   }
 
   if (loading) {
@@ -213,6 +235,38 @@ export function AdminWorkHours() {
               </div>
             )}
           </div>
+
+          {/* Dias de funcionamento */}
+          <div className="border-t border-border/50 pt-6">
+            <div className="flex items-center gap-3 mb-4">
+              <Calendar className="w-5 h-5 text-muted-foreground" />
+              <div>
+                <Label className="text-base">Dias de Funcionamento</Label>
+                <p className="text-xs text-muted-foreground">
+                  Selecione os dias da semana em que o estabelecimento funciona
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">
+              {WEEKDAYS.map((day) => (
+                <label
+                  key={day.value}
+                  className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all ${
+                    settings.working_days?.includes(day.value)
+                      ? "border-primary bg-primary/10"
+                      : "border-border/50 bg-background hover:border-primary/50"
+                  }`}
+                >
+                  <Checkbox
+                    checked={settings.working_days?.includes(day.value)}
+                    onCheckedChange={() => toggleDay(day.value)}
+                  />
+                  <span className="text-sm font-medium">{day.label}</span>
+                </label>
+              ))}
+            </div>
+          </div>
         </div>
 
         <div className="flex justify-end mt-8">
@@ -248,6 +302,18 @@ export function AdminWorkHours() {
               <span className="text-foreground font-medium">{settings.lunch_end}</span>
             </p>
           )}
+          <p>
+            📅 Dias:{" "}
+            <span className="text-foreground font-medium">
+              {settings.working_days?.length === 7
+                ? "Todos os dias"
+                : settings.working_days?.length === 0
+                ? "Nenhum dia selecionado"
+                : WEEKDAYS.filter((d) => settings.working_days?.includes(d.value))
+                    .map((d) => d.short)
+                    .join(", ")}
+            </span>
+          </p>
         </div>
       </div>
     </div>

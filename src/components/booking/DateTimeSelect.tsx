@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, ChevronLeft, ChevronRight, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useWorkSettings } from "@/hooks/useWorkSettings";
 
 interface DateTimeSelectProps {
   selectedDate: string;
@@ -56,6 +57,8 @@ export function DateTimeSelect({
 
   const viewYear = viewDate.getFullYear();
   const viewMonth = viewDate.getMonth();
+  
+  const { settings: workSettings } = useWorkSettings();
 
   const firstDay = new Date(viewYear, viewMonth, 1);
   const startDow = firstDay.getDay();
@@ -81,7 +84,9 @@ export function DateTimeSelect({
 
     const iso = formatDateISO(d);
     const dMid = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-    const isDisabled = dMid < todayMid || isOut;
+    const dayOfWeek = d.getDay();
+    const isNonWorkingDay = !workSettings.working_days.includes(dayOfWeek);
+    const isDisabled = dMid < todayMid || isOut || isNonWorkingDay;
     const isToday = dMid.getTime() === todayMid.getTime();
     const isSelected = selectedDate === iso;
 
