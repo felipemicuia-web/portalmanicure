@@ -4,12 +4,14 @@ import { Label } from "@/components/ui/label";
 import { ArrowLeft, ChevronLeft, ChevronRight, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useWorkSettings } from "@/hooks/useWorkSettings";
+import { useProfessionalSchedule } from "@/hooks/useProfessionalSchedule";
 
 interface DateTimeSelectProps {
   selectedDate: string;
   selectedTime: string;
   availableTimes: string[];
   timesLoading: boolean;
+  professionalId: string;
   onDateChange: (date: string) => void;
   onTimeChange: (time: string) => void;
   onPrev: () => void;
@@ -39,6 +41,7 @@ export function DateTimeSelect({
   selectedTime,
   availableTimes,
   timesLoading,
+  professionalId,
   onDateChange,
   onTimeChange,
   onPrev,
@@ -57,8 +60,11 @@ export function DateTimeSelect({
 
   const viewYear = viewDate.getFullYear();
   const viewMonth = viewDate.getMonth();
-  
   const { settings: workSettings } = useWorkSettings();
+  const { schedule: professionalSchedule } = useProfessionalSchedule(professionalId);
+
+  // Usa os dias de trabalho do profissional se configurado, senão usa o global
+  const effectiveWorkingDays = professionalSchedule.workingDays ?? workSettings.working_days;
 
   const firstDay = new Date(viewYear, viewMonth, 1);
   const startDow = firstDay.getDay();
@@ -85,8 +91,9 @@ export function DateTimeSelect({
     const iso = formatDateISO(d);
     const dMid = new Date(d.getFullYear(), d.getMonth(), d.getDate());
     const dayOfWeek = d.getDay();
-    const isNonWorkingDay = !workSettings.working_days.includes(dayOfWeek);
-    const isDisabled = dMid < todayMid || isOut || isNonWorkingDay;
+    const isNonWorkingDay = !effectiveWorkingDays.includes(dayOfWeek);
+    const isBlockedDate = professionalSchedule.blockedDates.includes(iso);
+    const isDisabled = dMid < todayMid || isOut || isNonWorkingDay || isBlockedDate;
     const isToday = dMid.getTime() === todayMid.getTime();
     const isSelected = selectedDate === iso;
 

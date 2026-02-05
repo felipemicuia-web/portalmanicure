@@ -328,6 +328,7 @@ export default function BookingPage() {
                     selectedTime={selectedTime}
                     availableTimes={availableTimes}
                     timesLoading={timesLoading}
+                    professionalId={professionalId}
                     onDateChange={(d) => {
                       setSelectedDate(d);
                       setSelectedTime("");

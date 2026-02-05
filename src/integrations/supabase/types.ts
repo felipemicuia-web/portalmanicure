@@ -255,6 +255,38 @@ export type Database = {
           },
         ]
       }
+      professional_blocked_dates: {
+        Row: {
+          blocked_date: string
+          created_at: string
+          id: string
+          professional_id: string
+          reason: string | null
+        }
+        Insert: {
+          blocked_date: string
+          created_at?: string
+          id?: string
+          professional_id: string
+          reason?: string | null
+        }
+        Update: {
+          blocked_date?: string
+          created_at?: string
+          id?: string
+          professional_id?: string
+          reason?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "professional_blocked_dates_professional_id_fkey"
+            columns: ["professional_id"]
+            isOneToOne: false
+            referencedRelation: "professionals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       professional_photos: {
         Row: {
           caption: string | null
@@ -332,6 +364,7 @@ export type Database = {
           instagram: string | null
           name: string
           photo_url: string | null
+          working_days: number[] | null
         }
         Insert: {
           active?: boolean
@@ -341,6 +374,7 @@ export type Database = {
           instagram?: string | null
           name: string
           photo_url?: string | null
+          working_days?: number[] | null
         }
         Update: {
           active?: boolean
@@ -350,6 +384,7 @@ export type Database = {
           instagram?: string | null
           name?: string
           photo_url?: string | null
+          working_days?: number[] | null
         }
         Relationships: []
       }
