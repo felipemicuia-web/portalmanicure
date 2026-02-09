@@ -72,7 +72,6 @@ export function ProfilePage({ user }: ProfilePageProps) {
       <ProfileHeader
         user={user}
         profile={profile}
-        photoCount={0}
         bookingCount={bookingCount}
         onProfileUpdate={fetchData}
       />
