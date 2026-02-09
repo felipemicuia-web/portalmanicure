@@ -95,7 +95,10 @@ export default function BookingPage() {
 
       if (data) {
         if (data.name && !clientName) setClientName(data.name);
-        if (data.phone && !clientPhone) setClientPhone(data.phone);
+        if (data.phone && !clientPhone) {
+          const { formatPhone } = await import("@/lib/validation");
+          setClientPhone(formatPhone(data.phone));
+        }
         if (data.notes && !notes) setNotes(data.notes);
       }
     }
