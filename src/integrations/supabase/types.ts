@@ -529,6 +529,7 @@ export type Database = {
           lunch_start: string | null
           start_time: string
           updated_at: string
+          whatsapp_template: string | null
           working_days: number[]
         }
         Insert: {
@@ -539,6 +540,7 @@ export type Database = {
           lunch_start?: string | null
           start_time?: string
           updated_at?: string
+          whatsapp_template?: string | null
           working_days?: number[]
         }
         Update: {
@@ -549,6 +551,7 @@ export type Database = {
           lunch_start?: string | null
           start_time?: string
           updated_at?: string
+          whatsapp_template?: string | null
           working_days?: number[]
         }
         Relationships: []
