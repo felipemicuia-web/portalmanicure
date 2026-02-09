@@ -13,6 +13,7 @@ import { AdminNotifications } from "@/components/admin/AdminNotifications";
 import { AdminTheme } from "@/components/admin/AdminTheme";
 import { AdminWorkHours } from "@/components/admin/AdminWorkHours";
 import { AdminProfessionalSchedule } from "@/components/admin/AdminProfessionalSchedule";
+import { AdminWhatsAppTemplate } from "@/components/admin/AdminWhatsAppTemplate";
 import {
   Users,
   Sparkles,
@@ -24,6 +25,7 @@ import {
   Palette,
   Clock,
   UserCog,
+  MessageCircle,
 } from "lucide-react";
 
 export default function AdminPage() {
@@ -132,7 +134,7 @@ export default function AdminPage() {
         {/* Main Content */}
         <main className="max-w-6xl mx-auto px-4 py-6">
           <Tabs defaultValue="bookings" className="space-y-4 sm:space-y-6">
-            <TabsList className="grid w-full grid-cols-7 glass-panel p-1 h-auto">
+            <TabsList className="grid w-full grid-cols-8 glass-panel p-1 h-auto">
               <TabsTrigger value="bookings" className="gap-1.5 text-xs sm:text-sm py-2.5 px-1 sm:px-3 flex-col sm:flex-row">
                 <CalendarDays className="w-4 h-4" />
                 <span className="hidden xs:inline sm:inline">Agenda</span>
@@ -140,6 +142,10 @@ export default function AdminPage() {
               <TabsTrigger value="notifications" className="gap-1.5 text-xs sm:text-sm py-2.5 px-1 sm:px-3 flex-col sm:flex-row relative">
                 <Bell className="w-4 h-4" />
                 <span className="hidden xs:inline sm:inline">Avisos</span>
+              </TabsTrigger>
+              <TabsTrigger value="whatsapp" className="gap-1.5 text-xs sm:text-sm py-2.5 px-1 sm:px-3 flex-col sm:flex-row">
+                <MessageCircle className="w-4 h-4" />
+                <span className="hidden xs:inline sm:inline">WhatsApp</span>
               </TabsTrigger>
               <TabsTrigger value="hours" className="gap-1.5 text-xs sm:text-sm py-2.5 px-1 sm:px-3 flex-col sm:flex-row">
                 <Clock className="w-4 h-4" />
@@ -169,6 +175,10 @@ export default function AdminPage() {
 
             <TabsContent value="notifications">
               <AdminNotifications />
+            </TabsContent>
+
+            <TabsContent value="whatsapp">
+              <AdminWhatsAppTemplate />
             </TabsContent>
 
             <TabsContent value="hours">

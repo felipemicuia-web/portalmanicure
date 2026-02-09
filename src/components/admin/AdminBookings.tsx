@@ -83,6 +83,7 @@ export function AdminBookings() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [professionals, setProfessionals] = useState<Professional[]>([]);
   const [profiles, setProfiles] = useState<Profile[]>([]);
+  const [whatsappTemplate, setWhatsappTemplate] = useState("");
   const [loading, setLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [filterProfessional, setFilterProfessional] = useState<string>("all");
@@ -106,13 +107,14 @@ export function AdminBookings() {
 
   useEffect(() => {
     async function fetchData() {
-      const [bookingsRes, professionalsRes] = await Promise.all([
+      const [bookingsRes, professionalsRes, settingsRes] = await Promise.all([
         supabase
           .from("bookings")
           .select("*")
           .order("booking_date", { ascending: true })
           .order("booking_time", { ascending: true }),
         supabase.from("professionals").select("id, name"),
+        supabase.from("work_settings").select("whatsapp_template").limit(1).single(),
       ]);
 
       if (bookingsRes.error) {
@@ -120,7 +122,6 @@ export function AdminBookings() {
       } else {
         setBookings(bookingsRes.data || []);
         
-        // Fetch profiles for all user_ids
         const userIds = [...new Set((bookingsRes.data || []).map((b) => b.user_id).filter(Boolean))];
         if (userIds.length > 0) {
           const { data: profilesData } = await supabase
@@ -133,6 +134,10 @@ export function AdminBookings() {
 
       if (professionalsRes.data) {
         setProfessionals(professionalsRes.data);
+      }
+
+      if (settingsRes.data?.whatsapp_template) {
+        setWhatsappTemplate(settingsRes.data.whatsapp_template);
       }
 
       setLoading(false);
@@ -154,28 +159,35 @@ export function AdminBookings() {
     const formattedDate = formatDate(booking.booking_date);
     const formattedTime = booking.booking_time.slice(0, 5);
     const formattedPrice = formatPrice(booking.total_price);
-    
-    const message = `Olá ${booking.client_name}! 👋\n\n` +
-      `Seu agendamento foi confirmado! ✅\n\n` +
-      `📅 *Data:* ${formattedDate}\n` +
-      `🕐 *Horário:* ${formattedTime}\n` +
-      `👤 *Profissional:* ${professionalName}\n` +
-      `💰 *Valor:* ${formattedPrice}\n` +
-      `⏱️ *Duração:* ${booking.duration_minutes} minutos\n` +
-      (booking.notes ? `📝 *Obs:* ${booking.notes}\n` : "") +
-      `\nAguardamos você! 💅✨`;
-    
-    // Normaliza telefone (somente dígitos) e garante DDI 55 quando necessário
-    let phone = booking.client_phone.replace(/\D/g, "").replace(/^0+/, "");
+    const obsText = booking.notes ? `📝 *Obs:* ${booking.notes}\n` : "";
 
-    // Se vier apenas com DDD+numero (10/11 dígitos), prefixa Brasil
+    let message: string;
+    if (whatsappTemplate) {
+      message = whatsappTemplate
+        .replace(/\{nome\}/g, booking.client_name)
+        .replace(/\{data\}/g, formattedDate)
+        .replace(/\{horario\}/g, formattedTime)
+        .replace(/\{profissional\}/g, professionalName)
+        .replace(/\{valor\}/g, formattedPrice)
+        .replace(/\{duracao\}/g, String(booking.duration_minutes))
+        .replace(/\{obs\}/g, obsText);
+    } else {
+      message = `Olá ${booking.client_name}! 👋\n\n` +
+        `Seu agendamento foi confirmado! ✅\n\n` +
+        `📅 *Data:* ${formattedDate}\n` +
+        `🕐 *Horário:* ${formattedTime}\n` +
+        `👤 *Profissional:* ${professionalName}\n` +
+        `💰 *Valor:* ${formattedPrice}\n` +
+        `⏱️ *Duração:* ${booking.duration_minutes} minutos\n` +
+        (booking.notes ? `📝 *Obs:* ${booking.notes}\n` : "") +
+        `\nAguardamos você! 💅✨`;
+    }
+    
+    let phone = booking.client_phone.replace(/\D/g, "").replace(/^0+/, "");
     if (phone.length === 10 || phone.length === 11) {
       phone = `55${phone}`;
     }
 
-    // Links mais confiáveis por plataforma:
-    // - Mobile: abre o app via deep-link
-    // - Desktop: abre o WhatsApp Web direto na conversa
     const encodedText = encodeURIComponent(message);
     if (isMobile) {
       return `whatsapp://send?phone=${phone}&text=${encodedText}`;
