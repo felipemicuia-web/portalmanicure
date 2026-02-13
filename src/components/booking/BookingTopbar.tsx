@@ -34,31 +34,43 @@ export function BookingTopbar({
     setMobileMenuOpen(false);
   };
   
-  return (
+    const isBanner = branding.logoDisplayMode === "banner" && branding.logoUrl;
+
+    return (
     <header className="sticky top-0 z-50 topbar-gradient">
       <div className="max-w-6xl mx-auto px-3 sm:px-4 py-3 sm:py-4">
         <div className="flex items-center justify-between gap-2 sm:gap-4">
-          {/* Brand - Compact on mobile */}
+          {/* Brand */}
           <div className="flex items-center gap-2 sm:gap-3 group min-w-0">
-            <div 
-              className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-gradient-to-br from-white/20 to-white/5 border border-white/20 flex items-center justify-center overflow-hidden shadow-lg group-hover:scale-105 transition-transform duration-300 flex-shrink-0"
-              aria-hidden="true"
-              style={{ boxShadow: '0 8px 32px rgba(124,58,237,.3), inset 0 1px 0 rgba(255,255,255,.2)' }}
-            >
-              {branding.logoUrl ? (
-                <img src={branding.logoUrl} alt="Logo" className="w-full h-full object-contain p-1" />
-              ) : (
-                <span className="text-xl sm:text-2xl">💅</span>
-              )}
-            </div>
-            <div className="min-w-0">
-              <div className="font-bold tracking-wide text-base sm:text-lg bg-gradient-to-r from-white via-white/90 to-white/80 bg-clip-text truncate">
-                {branding.siteName}
-              </div>
-              <div className="text-[10px] sm:text-xs text-white/70 hidden xs:block">
-                {branding.siteSubtitle}
-              </div>
-            </div>
+            {isBanner ? (
+              <img 
+                src={branding.logoUrl!} 
+                alt={branding.siteName} 
+                className="h-10 sm:h-12 max-w-[200px] sm:max-w-[280px] object-contain"
+              />
+            ) : (
+              <>
+                <div 
+                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-gradient-to-br from-white/20 to-white/5 border border-white/20 flex items-center justify-center overflow-hidden shadow-lg group-hover:scale-105 transition-transform duration-300 flex-shrink-0"
+                  aria-hidden="true"
+                  style={{ boxShadow: '0 8px 32px rgba(124,58,237,.3), inset 0 1px 0 rgba(255,255,255,.2)' }}
+                >
+                  {branding.logoUrl ? (
+                    <img src={branding.logoUrl} alt="Logo" className="w-full h-full object-contain p-1" />
+                  ) : (
+                    <span className="text-xl sm:text-2xl">💅</span>
+                  )}
+                </div>
+                <div className="min-w-0">
+                  <div className="font-bold tracking-wide text-base sm:text-lg bg-gradient-to-r from-white via-white/90 to-white/80 bg-clip-text truncate">
+                    {branding.siteName}
+                  </div>
+                  <div className="text-[10px] sm:text-xs text-white/70 hidden xs:block">
+                    {branding.siteSubtitle}
+                  </div>
+                </div>
+              </>
+            )}
           </div>
 
           {/* Desktop Navigation */}

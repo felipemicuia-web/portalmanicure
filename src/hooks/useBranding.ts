@@ -5,12 +5,14 @@ export interface Branding {
   siteName: string;
   siteSubtitle: string;
   logoUrl: string | null;
+  logoDisplayMode: "icon" | "banner";
 }
 
 const DEFAULT_BRANDING: Branding = {
   siteName: "Agendamento",
   siteSubtitle: "Agende seu horário",
   logoUrl: null,
+  logoDisplayMode: "icon",
 };
 
 export function useBranding() {
@@ -21,7 +23,7 @@ export function useBranding() {
     async function fetch() {
       const { data } = await supabase
         .from("work_settings")
-        .select("site_name, site_subtitle, logo_url")
+        .select("site_name, site_subtitle, logo_url, logo_display_mode")
         .limit(1)
         .single();
 
@@ -30,6 +32,7 @@ export function useBranding() {
           siteName: data.site_name || "Agendamento",
           siteSubtitle: data.site_subtitle || "Agende seu horário",
           logoUrl: data.logo_url,
+          logoDisplayMode: (data.logo_display_mode as "icon" | "banner") || "icon",
         });
       }
       setLoading(false);

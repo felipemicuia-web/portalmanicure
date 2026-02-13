@@ -6,12 +6,14 @@ import { Image, Save, Upload, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 export function AdminBranding() {
   const [siteName, setSiteName] = useState("Agendamento");
   const [siteSubtitle, setSiteSubtitle] = useState("Agende seu horário");
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
-  const [originalData, setOriginalData] = useState({ siteName: "", siteSubtitle: "", logoUrl: "" });
+  const [logoDisplayMode, setLogoDisplayMode] = useState<"icon" | "banner">("icon");
+  const [originalData, setOriginalData] = useState({ siteName: "", siteSubtitle: "", logoUrl: "", logoDisplayMode: "icon" });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -21,7 +23,7 @@ export function AdminBranding() {
     async function fetch() {
       const { data } = await supabase
         .from("work_settings")
-        .select("site_name, site_subtitle, logo_url")
+        .select("site_name, site_subtitle, logo_url, logo_display_mode")
         .limit(1)
         .single();
 
@@ -29,10 +31,12 @@ export function AdminBranding() {
         setSiteName(data.site_name || "Agendamento");
         setSiteSubtitle(data.site_subtitle || "Agende seu horário");
         setLogoUrl(data.logo_url);
+        setLogoDisplayMode((data.logo_display_mode as "icon" | "banner") || "icon");
         setOriginalData({
           siteName: data.site_name || "Agendamento",
           siteSubtitle: data.site_subtitle || "Agende seu horário",
           logoUrl: data.logo_url || "",
+          logoDisplayMode: data.logo_display_mode || "icon",
         });
       }
       setLoading(false);
@@ -91,6 +95,7 @@ export function AdminBranding() {
         site_name: siteName.trim(),
         site_subtitle: siteSubtitle.trim(),
         logo_url: logoUrl,
+        logo_display_mode: logoDisplayMode,
       })
       .not("id", "is", null);
 
@@ -100,14 +105,15 @@ export function AdminBranding() {
       toast.error("Erro ao salvar");
       return;
     }
-    setOriginalData({ siteName: siteName.trim(), siteSubtitle: siteSubtitle.trim(), logoUrl: logoUrl || "" });
+    setOriginalData({ siteName: siteName.trim(), siteSubtitle: siteSubtitle.trim(), logoUrl: logoUrl || "", logoDisplayMode });
     toast.success("Identidade visual salva!");
   };
 
   const hasChanges =
     siteName !== originalData.siteName ||
     siteSubtitle !== originalData.siteSubtitle ||
-    (logoUrl || "") !== originalData.logoUrl;
+    (logoUrl || "") !== originalData.logoUrl ||
+    logoDisplayMode !== originalData.logoDisplayMode;
 
   if (loading) {
     return (
@@ -170,6 +176,23 @@ export function AdminBranding() {
           <p className="text-xs text-muted-foreground">Recomendado: PNG transparente, máx. 2MB</p>
         </div>
 
+        {/* Display Mode */}
+        {logoUrl && (
+          <div className="space-y-2">
+            <Label>Modo de exibição da logo</Label>
+            <RadioGroup value={logoDisplayMode} onValueChange={(v) => setLogoDisplayMode(v as "icon" | "banner")} className="flex gap-4">
+              <div className="flex items-center gap-2">
+                <RadioGroupItem value="icon" id="mode-icon" />
+                <Label htmlFor="mode-icon" className="font-normal cursor-pointer">Ícone pequeno + texto</Label>
+              </div>
+              <div className="flex items-center gap-2">
+                <RadioGroupItem value="banner" id="mode-banner" />
+                <Label htmlFor="mode-banner" className="font-normal cursor-pointer">Logo como banner</Label>
+              </div>
+            </RadioGroup>
+          </div>
+        )}
+
         {/* Site Name */}
         <div className="space-y-2">
           <Label htmlFor="site-name">Nome do site</Label>
@@ -198,19 +221,23 @@ export function AdminBranding() {
         <div className="space-y-2">
           <Label>Pré-visualização</Label>
           <div className="rounded-xl bg-gradient-to-r from-primary/30 to-primary/10 border border-border/50 p-4">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-white/20 border border-white/20 flex items-center justify-center overflow-hidden shadow-lg flex-shrink-0">
-                {logoUrl ? (
-                  <img src={logoUrl} alt="Logo preview" className="w-full h-full object-contain p-1" />
-                ) : (
-                  <span className="text-2xl">💅</span>
-                )}
+            {logoDisplayMode === "banner" && logoUrl ? (
+              <img src={logoUrl} alt="Banner preview" className="h-12 max-w-[280px] object-contain" />
+            ) : (
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-white/20 border border-white/20 flex items-center justify-center overflow-hidden shadow-lg flex-shrink-0">
+                  {logoUrl ? (
+                    <img src={logoUrl} alt="Logo preview" className="w-full h-full object-contain p-1" />
+                  ) : (
+                    <span className="text-2xl">💅</span>
+                  )}
+                </div>
+                <div>
+                  <div className="font-bold text-base sm:text-lg">{siteName || "Agendamento"}</div>
+                  <div className="text-xs text-muted-foreground">{siteSubtitle || "Agende seu horário"}</div>
+                </div>
               </div>
-              <div>
-                <div className="font-bold text-base sm:text-lg">{siteName || "Agendamento"}</div>
-                <div className="text-xs text-muted-foreground">{siteSubtitle || "Agende seu horário"}</div>
-              </div>
-            </div>
+            )}
           </div>
         </div>
 
