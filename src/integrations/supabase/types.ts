@@ -525,6 +525,7 @@ export type Database = {
           end_time: string
           id: string
           interval_minutes: number
+          logo_display_mode: string
           logo_url: string | null
           lunch_end: string | null
           lunch_start: string | null
@@ -539,6 +540,7 @@ export type Database = {
           end_time?: string
           id?: string
           interval_minutes?: number
+          logo_display_mode?: string
           logo_url?: string | null
           lunch_end?: string | null
           lunch_start?: string | null
@@ -553,6 +555,7 @@ export type Database = {
           end_time?: string
           id?: string
           interval_minutes?: number
+          logo_display_mode?: string
           logo_url?: string | null
           lunch_end?: string | null
           lunch_start?: string | null
