@@ -46,7 +46,7 @@ export function BookingTopbar({
               <img 
                 src={branding.logoUrl!} 
                 alt={branding.siteName} 
-                className="h-10 sm:h-12 max-w-[200px] sm:max-w-[280px] object-contain"
+                className="h-14 sm:h-16 md:h-20 max-w-[300px] sm:max-w-[400px] object-contain"
               />
             ) : (
               <>
