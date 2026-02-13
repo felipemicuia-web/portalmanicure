@@ -14,6 +14,7 @@ import { AdminTheme } from "@/components/admin/AdminTheme";
 import { AdminWorkHours } from "@/components/admin/AdminWorkHours";
 import { AdminProfessionalSchedule } from "@/components/admin/AdminProfessionalSchedule";
 import { AdminWhatsAppTemplate } from "@/components/admin/AdminWhatsAppTemplate";
+import { AdminBranding } from "@/components/admin/AdminBranding";
 import {
   Users,
   Sparkles,
@@ -26,6 +27,7 @@ import {
   Clock,
   UserCog,
   MessageCircle,
+  ImageIcon,
 } from "lucide-react";
 
 export default function AdminPage() {
@@ -134,7 +136,7 @@ export default function AdminPage() {
         {/* Main Content */}
         <main className="max-w-6xl mx-auto px-4 py-6">
           <Tabs defaultValue="bookings" className="space-y-4 sm:space-y-6">
-            <TabsList className="grid w-full grid-cols-8 glass-panel p-1 h-auto">
+            <TabsList className="grid w-full grid-cols-9 glass-panel p-1 h-auto">
               <TabsTrigger value="bookings" className="gap-1.5 text-xs sm:text-sm py-2.5 px-1 sm:px-3 flex-col sm:flex-row">
                 <CalendarDays className="w-4 h-4" />
                 <span className="hidden xs:inline sm:inline">Agenda</span>
@@ -162,6 +164,10 @@ export default function AdminPage() {
               <TabsTrigger value="services" className="gap-1.5 text-xs sm:text-sm py-2.5 px-1 sm:px-3 flex-col sm:flex-row">
                 <Sparkles className="w-4 h-4" />
                 <span className="hidden xs:inline sm:inline">Serviços</span>
+              </TabsTrigger>
+              <TabsTrigger value="branding" className="gap-1.5 text-xs sm:text-sm py-2.5 px-1 sm:px-3 flex-col sm:flex-row">
+                <ImageIcon className="w-4 h-4" />
+                <span className="hidden xs:inline sm:inline">Logo</span>
               </TabsTrigger>
               <TabsTrigger value="theme" className="gap-1.5 text-xs sm:text-sm py-2.5 px-1 sm:px-3 flex-col sm:flex-row">
                 <Palette className="w-4 h-4" />
@@ -195,6 +201,10 @@ export default function AdminPage() {
 
             <TabsContent value="services">
               <AdminServices />
+            </TabsContent>
+
+            <TabsContent value="branding">
+              <AdminBranding />
             </TabsContent>
 
             <TabsContent value="theme">

@@ -3,6 +3,7 @@ import { User } from "@supabase/supabase-js";
 import { LogOut, User as UserIcon, Shield, Menu, X, Calendar, CalendarCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAdmin } from "@/hooks/useAdmin";
+import { useBranding } from "@/hooks/useBranding";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 
@@ -20,6 +21,7 @@ export function BookingTopbar({
   onLogout 
 }: BookingTopbarProps) {
   const { isAdmin } = useAdmin(user);
+  const { branding } = useBranding();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   const handlePageChange = (page: "booking" | "profile" | "my-bookings") => {
@@ -39,18 +41,22 @@ export function BookingTopbar({
           {/* Brand - Compact on mobile */}
           <div className="flex items-center gap-2 sm:gap-3 group min-w-0">
             <div 
-              className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-gradient-to-br from-white/20 to-white/5 border border-white/20 flex items-center justify-center text-xl sm:text-2xl shadow-lg group-hover:scale-105 transition-transform duration-300 flex-shrink-0"
+              className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-gradient-to-br from-white/20 to-white/5 border border-white/20 flex items-center justify-center overflow-hidden shadow-lg group-hover:scale-105 transition-transform duration-300 flex-shrink-0"
               aria-hidden="true"
               style={{ boxShadow: '0 8px 32px rgba(124,58,237,.3), inset 0 1px 0 rgba(255,255,255,.2)' }}
             >
-              💅
+              {branding.logoUrl ? (
+                <img src={branding.logoUrl} alt="Logo" className="w-full h-full object-contain p-1" />
+              ) : (
+                <span className="text-xl sm:text-2xl">💅</span>
+              )}
             </div>
             <div className="min-w-0">
               <div className="font-bold tracking-wide text-base sm:text-lg bg-gradient-to-r from-white via-white/90 to-white/80 bg-clip-text truncate">
-                Agendamento
+                {branding.siteName}
               </div>
               <div className="text-[10px] sm:text-xs text-white/70 hidden xs:block">
-                Agende seu horário
+                {branding.siteSubtitle}
               </div>
             </div>
           </div>

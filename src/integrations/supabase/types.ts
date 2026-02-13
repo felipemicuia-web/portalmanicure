@@ -525,8 +525,11 @@ export type Database = {
           end_time: string
           id: string
           interval_minutes: number
+          logo_url: string | null
           lunch_end: string | null
           lunch_start: string | null
+          site_name: string | null
+          site_subtitle: string | null
           start_time: string
           updated_at: string
           whatsapp_template: string | null
@@ -536,8 +539,11 @@ export type Database = {
           end_time?: string
           id?: string
           interval_minutes?: number
+          logo_url?: string | null
           lunch_end?: string | null
           lunch_start?: string | null
+          site_name?: string | null
+          site_subtitle?: string | null
           start_time?: string
           updated_at?: string
           whatsapp_template?: string | null
@@ -547,8 +553,11 @@ export type Database = {
           end_time?: string
           id?: string
           interval_minutes?: number
+          logo_url?: string | null
           lunch_end?: string | null
           lunch_start?: string | null
+          site_name?: string | null
+          site_subtitle?: string | null
           start_time?: string
           updated_at?: string
           whatsapp_template?: string | null
