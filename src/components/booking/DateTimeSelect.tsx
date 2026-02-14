@@ -49,8 +49,6 @@ export function DateTimeSelect({
 }: DateTimeSelectProps) {
   const today = new Date();
   const todayMid = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-  const maxDate = new Date(todayMid);
-  maxDate.setDate(maxDate.getDate() + 30);
   
   const [viewDate, setViewDate] = useState(() => {
     if (selectedDate) {
@@ -85,22 +83,19 @@ export function DateTimeSelect({
     const dayOfWeek = d.getDay();
     const isNonWorkingDay = !effectiveWorkingDays.includes(dayOfWeek);
     const isBlockedDate = professionalSchedule.blockedDates.includes(iso);
-    const isDisabled = dMid < todayMid || dMid > maxDate || isNonWorkingDay || isBlockedDate;
+    const isDisabled = dMid < todayMid || isNonWorkingDay || isBlockedDate;
     const isToday = dMid.getTime() === todayMid.getTime();
     const isSelected = selectedDate === iso;
 
     cells.push({ date: d, iso, isDisabled, isToday, isSelected });
   }
 
-  const canGoPrev = new Date(viewYear, viewMonth, 1) > new Date(todayMid.getFullYear(), todayMid.getMonth(), 1);
-  const canGoNext = new Date(viewYear, viewMonth + 1, 1) <= maxDate;
-
   const goToPrevMonth = () => {
-    if (canGoPrev) setViewDate(new Date(viewYear, viewMonth - 1, 1));
+    setViewDate(new Date(viewYear, viewMonth - 1, 1));
   };
 
   const goToNextMonth = () => {
-    if (canGoNext) setViewDate(new Date(viewYear, viewMonth + 1, 1));
+    setViewDate(new Date(viewYear, viewMonth + 1, 1));
   };
 
   return (
@@ -133,7 +128,6 @@ export function DateTimeSelect({
               variant="ghost" 
               size="icon" 
               onClick={goToPrevMonth}
-              disabled={!canGoPrev}
               className="hover:bg-white/10 w-9 h-9 sm:w-10 sm:h-10"
             >
               <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -149,7 +143,6 @@ export function DateTimeSelect({
               variant="ghost" 
               size="icon" 
               onClick={goToNextMonth}
-              disabled={!canGoNext}
               className="hover:bg-white/10 w-9 h-9 sm:w-10 sm:h-10"
             >
               <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
