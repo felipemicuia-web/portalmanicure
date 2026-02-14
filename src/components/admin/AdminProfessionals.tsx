@@ -331,9 +331,11 @@ export function AdminProfessionals() {
         <Label>Subtítulo</Label>
         <Input
           value={editSubtitle}
-          onChange={(e) => setEditSubtitle(e.target.value)}
-          placeholder="Ex: Especialista em unhas em gel"
+          onChange={(e) => setEditSubtitle(e.target.value.slice(0, 22))}
+          placeholder="Ex: Especialista em gel"
+          maxLength={22}
         />
+        <span className="text-xs text-muted-foreground">{editSubtitle.length}/22</span>
       </div>
       <div className="space-y-2">
         <Label>Biografia</Label>
