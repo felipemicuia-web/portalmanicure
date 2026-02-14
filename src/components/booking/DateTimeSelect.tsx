@@ -73,33 +73,23 @@ export function DateTimeSelect({
   const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
   const prevMonthDays = new Date(viewYear, viewMonth, 0).getDate();
 
-  const cells: { date: Date; iso: string; isOut: boolean; isDisabled: boolean; isToday: boolean; isSelected: boolean }[] = [];
-  
-  for (let i = 0; i < 42; i++) {
-    const dayNum = i - startDow + 1;
-    let d: Date;
-    let isOut = false;
+  const cells: (null | { date: Date; iso: string; isDisabled: boolean; isToday: boolean; isSelected: boolean })[] = [];
+  for (let i = 0; i < startDow; i++) {
+    cells.push(null);
+  }
 
-    if (dayNum < 1) {
-      isOut = true;
-      d = new Date(viewYear, viewMonth - 1, prevMonthDays + dayNum);
-    } else if (dayNum > daysInMonth) {
-      isOut = true;
-      d = new Date(viewYear, viewMonth + 1, dayNum - daysInMonth);
-    } else {
-      d = new Date(viewYear, viewMonth, dayNum);
-    }
-
+  for (let dayNum = 1; dayNum <= daysInMonth; dayNum++) {
+    const d = new Date(viewYear, viewMonth, dayNum);
     const iso = formatDateISO(d);
     const dMid = new Date(d.getFullYear(), d.getMonth(), d.getDate());
     const dayOfWeek = d.getDay();
     const isNonWorkingDay = !effectiveWorkingDays.includes(dayOfWeek);
     const isBlockedDate = professionalSchedule.blockedDates.includes(iso);
-    const isDisabled = dMid < todayMid || dMid > maxDate || isOut || isNonWorkingDay || isBlockedDate;
+    const isDisabled = dMid < todayMid || dMid > maxDate || isNonWorkingDay || isBlockedDate;
     const isToday = dMid.getTime() === todayMid.getTime();
     const isSelected = selectedDate === iso;
 
-    cells.push({ date: d, iso, isOut, isDisabled, isToday, isSelected });
+    cells.push({ date: d, iso, isDisabled, isToday, isSelected });
   }
 
   const canGoPrev = new Date(viewYear, viewMonth, 1) > new Date(todayMid.getFullYear(), todayMid.getMonth(), 1);
@@ -174,20 +164,24 @@ export function DateTimeSelect({
           {/* Days grid - compact on mobile */}
           <div className="grid grid-cols-7 gap-1 sm:gap-1.5">
             {cells.map((cell, idx) => (
-              <button
-                key={idx}
-                type="button"
-                disabled={cell.isDisabled}
-                onClick={() => !cell.isDisabled && onDateChange(cell.iso)}
-                className={cn(
-                  "cal-day text-xs sm:text-sm font-medium py-2 sm:py-2.5",
-                  cell.isDisabled && "cal-disabled",
-                  cell.isToday && "cal-today",
-                  cell.isSelected && "cal-selected"
-                )}
-              >
-                {cell.date.getDate()}
-              </button>
+              cell === null ? (
+                <div key={idx} />
+              ) : (
+                <button
+                  key={idx}
+                  type="button"
+                  disabled={cell.isDisabled}
+                  onClick={() => !cell.isDisabled && onDateChange(cell.iso)}
+                  className={cn(
+                    "cal-day text-xs sm:text-sm font-medium py-2 sm:py-2.5",
+                    cell.isDisabled && "cal-disabled",
+                    cell.isToday && "cal-today",
+                    cell.isSelected && "cal-selected"
+                  )}
+                >
+                  {cell.date.getDate()}
+                </button>
+              )
             ))}
           </div>
         </div>
