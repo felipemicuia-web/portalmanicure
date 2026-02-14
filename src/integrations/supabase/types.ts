@@ -364,6 +364,7 @@ export type Database = {
           instagram: string | null
           name: string
           photo_url: string | null
+          subtitle: string | null
           working_days: number[] | null
         }
         Insert: {
@@ -374,6 +375,7 @@ export type Database = {
           instagram?: string | null
           name: string
           photo_url?: string | null
+          subtitle?: string | null
           working_days?: number[] | null
         }
         Update: {
@@ -384,6 +386,7 @@ export type Database = {
           instagram?: string | null
           name?: string
           photo_url?: string | null
+          subtitle?: string | null
           working_days?: number[] | null
         }
         Relationships: []

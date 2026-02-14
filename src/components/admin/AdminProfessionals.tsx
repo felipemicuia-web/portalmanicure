@@ -48,6 +48,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 interface Professional {
   id: string;
   name: string;
+  subtitle: string | null;
   photo_url: string | null;
   bio: string | null;
   instagram: string | null;
@@ -65,6 +66,7 @@ export function AdminProfessionals() {
   const [loading, setLoading] = useState(true);
   const [editingProfessional, setEditingProfessional] = useState<Professional | null>(null);
   const [editName, setEditName] = useState("");
+  const [editSubtitle, setEditSubtitle] = useState("");
   const [editBio, setEditBio] = useState("");
   const [editInstagram, setEditInstagram] = useState("");
   const [newName, setNewName] = useState("");
@@ -136,6 +138,7 @@ export function AdminProfessionals() {
       .from("professionals")
       .update({ 
         name: editName.trim(),
+        subtitle: editSubtitle.trim() || null,
         bio: editBio.trim() || null,
         instagram: editInstagram.trim() || null,
       })
@@ -274,6 +277,7 @@ export function AdminProfessionals() {
   const openEditSheet = (prof: Professional) => {
     setEditingProfessional(prof);
     setEditName(prof.name);
+    setEditSubtitle(prof.subtitle || "");
     setEditBio(prof.bio || "");
     setEditInstagram(prof.instagram || "");
     fetchProfessionalServices(prof.id);
@@ -321,6 +325,14 @@ export function AdminProfessionals() {
           value={editName}
           onChange={(e) => setEditName(e.target.value)}
           placeholder="Nome do profissional"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label>Subtítulo</Label>
+        <Input
+          value={editSubtitle}
+          onChange={(e) => setEditSubtitle(e.target.value)}
+          placeholder="Ex: Especialista em unhas em gel"
         />
       </div>
       <div className="space-y-2">

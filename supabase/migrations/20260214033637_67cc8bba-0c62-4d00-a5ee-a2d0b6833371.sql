@@ -1,0 +1,1 @@
+ALTER TABLE public.professionals ADD COLUMN subtitle text DEFAULT NULL;
