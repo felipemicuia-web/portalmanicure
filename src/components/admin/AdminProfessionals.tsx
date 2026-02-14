@@ -317,7 +317,7 @@ export function AdminProfessionals() {
     );
   }
 
-  const EditFormContent = () => (
+  const editFormContent = (
     <div className="space-y-4">
       <div className="space-y-2">
         <Label>Nome</Label>
@@ -597,7 +597,7 @@ export function AdminProfessionals() {
               <DrawerTitle>Editar Profissional</DrawerTitle>
             </DrawerHeader>
             <div className="px-4 pb-4">
-              <EditFormContent />
+              {editFormContent}
             </div>
             <DrawerFooter className="pt-2">
               <Button onClick={handleEdit}>Salvar</Button>
@@ -613,7 +613,7 @@ export function AdminProfessionals() {
             <DialogHeader>
               <DialogTitle>Editar Profissional</DialogTitle>
             </DialogHeader>
-            <EditFormContent />
+            {editFormContent}
             <div className="flex justify-end gap-2 pt-4">
               <Button variant="outline" onClick={() => setEditingProfessional(null)}>
                 Cancelar
