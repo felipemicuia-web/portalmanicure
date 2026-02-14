@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Professional } from "@/types/booking";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -5,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { User, ChevronRight, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ProfessionalSelectProps {
   professionals: Professional[];
@@ -20,6 +22,30 @@ export function ProfessionalSelect({
   onNext,
 }: ProfessionalSelectProps) {
   const navigate = useNavigate();
+  const [profServices, setProfServices] = useState<Record<string, string[]>>({});
+
+  useEffect(() => {
+    async function fetchProfServices() {
+      const { data } = await supabase
+        .from("professional_services")
+        .select("professional_id, service_id, services:service_id(name)")
+        .in("professional_id", professionals.map(p => p.id));
+      
+      if (data) {
+        const map: Record<string, string[]> = {};
+        for (const row of data as any[]) {
+          const pid = row.professional_id;
+          const sName = row.services?.name;
+          if (sName) {
+            if (!map[pid]) map[pid] = [];
+            map[pid].push(sName);
+          }
+        }
+        setProfServices(map);
+      }
+    }
+    if (professionals.length > 0) fetchProfServices();
+  }, [professionals]);
 
   const handleViewProfile = (e: React.MouseEvent, professionalId: string) => {
     e.stopPropagation();
@@ -63,7 +89,7 @@ export function ProfessionalSelect({
                   <button
                     type="button"
                     onClick={() => onSelect(p.id)}
-                    className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0 active:scale-[0.98]"
+                    className="flex items-start gap-3 sm:gap-4 flex-1 min-w-0 active:scale-[0.98]"
                   >
                     <Avatar className={cn(
                       "rounded-lg border-2 border-background/50 flex-shrink-0",
@@ -76,12 +102,19 @@ export function ProfessionalSelect({
                         {initials || <User className="w-5 h-5 sm:w-6 sm:h-6" />}
                       </AvatarFallback>
                     </Avatar>
-                    <span className={cn(
-                      "font-semibold text-sm sm:text-base flex-1 text-left truncate",
-                      isSelected ? "text-primary" : "text-foreground"
-                    )}>
-                      {p.name}
-                    </span>
+                    <div className="flex-1 min-w-0">
+                      <span className={cn(
+                        "font-semibold text-sm sm:text-base text-left truncate block",
+                        isSelected ? "text-primary" : "text-foreground"
+                      )}>
+                        {p.name}
+                      </span>
+                      {profServices[p.id] && profServices[p.id].length > 0 && (
+                        <span className="text-xs text-muted-foreground text-left truncate block mt-0.5">
+                          {profServices[p.id].join(" · ")}
+                        </span>
+                      )}
+                    </div>
                   </button>
                   
                   <div className="flex items-center gap-2 shrink-0">
