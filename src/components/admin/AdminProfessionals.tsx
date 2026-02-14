@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Plus, Pencil, Trash2, Check, X, Users, Upload, User, Image as ImageIcon } from "lucide-react";
+import { Plus, Pencil, Trash2, Check, X, Users, Upload, User, Image as ImageIcon, Sparkles } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -43,6 +43,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { AdminProfessionalGallery } from "./AdminProfessionalGallery";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface Professional {
   id: string;
@@ -52,6 +53,11 @@ interface Professional {
   instagram: string | null;
   active: boolean;
   created_at: string;
+}
+
+interface ServiceItem {
+  id: string;
+  name: string;
 }
 
 export function AdminProfessionals() {
@@ -66,6 +72,8 @@ export function AdminProfessionals() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [uploadingId, setUploadingId] = useState<string | null>(null);
   const [galleryProfessional, setGalleryProfessional] = useState<Professional | null>(null);
+  const [allServices, setAllServices] = useState<ServiceItem[]>([]);
+  const [selectedServiceIds, setSelectedServiceIds] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const isMobile = useIsMobile();
@@ -84,8 +92,19 @@ export function AdminProfessionals() {
     setLoading(false);
   };
 
+  const fetchAllServices = async () => {
+    const { data } = await supabase.from("services").select("id, name").eq("active", true).order("name");
+    if (data) setAllServices(data);
+  };
+
+  const fetchProfessionalServices = async (profId: string) => {
+    const { data } = await supabase.from("professional_services").select("service_id").eq("professional_id", profId);
+    setSelectedServiceIds(data?.map(d => d.service_id) || []);
+  };
+
   useEffect(() => {
     fetchProfessionals();
+    fetchAllServices();
   }, []);
 
   const handleAdd = async () => {
@@ -130,6 +149,13 @@ export function AdminProfessionals() {
         variant: "destructive",
       });
     } else {
+      // Save professional services
+      await supabase.from("professional_services").delete().eq("professional_id", editingProfessional.id);
+      if (selectedServiceIds.length > 0) {
+        await supabase.from("professional_services").insert(
+          selectedServiceIds.map(sid => ({ professional_id: editingProfessional.id, service_id: sid }))
+        );
+      }
       toast({ title: "Profissional atualizado!" });
       setEditingProfessional(null);
       fetchProfessionals();
@@ -250,6 +276,13 @@ export function AdminProfessionals() {
     setEditName(prof.name);
     setEditBio(prof.bio || "");
     setEditInstagram(prof.instagram || "");
+    fetchProfessionalServices(prof.id);
+  };
+
+  const toggleService = (serviceId: string) => {
+    setSelectedServiceIds(prev =>
+      prev.includes(serviceId) ? prev.filter(id => id !== serviceId) : [...prev, serviceId]
+    );
   };
 
   const getInitials = (name: string) => {
@@ -307,6 +340,25 @@ export function AdminProfessionals() {
           placeholder="@usuario (sem @)"
         />
       </div>
+      {allServices.length > 0 && (
+        <div className="space-y-2">
+          <Label className="flex items-center gap-1.5">
+            <Sparkles className="w-4 h-4" />
+            Serviços que realiza
+          </Label>
+          <div className="space-y-2 max-h-40 overflow-y-auto p-2 rounded-lg border border-border/50 bg-muted/20">
+            {allServices.map(s => (
+              <label key={s.id} className="flex items-center gap-2 cursor-pointer text-sm">
+                <Checkbox
+                  checked={selectedServiceIds.includes(s.id)}
+                  onCheckedChange={() => toggleService(s.id)}
+                />
+                {s.name}
+              </label>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 
