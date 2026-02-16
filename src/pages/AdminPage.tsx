@@ -5,7 +5,7 @@ import { User, Session } from "@supabase/supabase-js";
 import { useAdmin } from "@/hooks/useAdmin";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { AdminProfessionals } from "@/components/admin/AdminProfessionals";
 import { AdminServices } from "@/components/admin/AdminServices";
 import { AdminBookings } from "@/components/admin/AdminBookings";
@@ -30,12 +30,43 @@ import {
   MessageCircle,
   ImageIcon,
   UsersRound,
+  Menu,
+  ChevronLeft,
+  type LucideIcon,
 } from "lucide-react";
+
+const MENU_ITEMS: { value: string; label: string; icon: LucideIcon }[] = [
+  { value: "bookings", label: "Agenda", icon: CalendarDays },
+  { value: "notifications", label: "Avisos", icon: Bell },
+  { value: "whatsapp", label: "WhatsApp", icon: MessageCircle },
+  { value: "hours", label: "Horários", icon: Clock },
+  { value: "schedules", label: "Folgas", icon: UserCog },
+  { value: "professionals", label: "Profissionais", icon: Users },
+  { value: "services", label: "Serviços", icon: Sparkles },
+  { value: "branding", label: "Logo", icon: ImageIcon },
+  { value: "theme", label: "Cores", icon: Palette },
+  { value: "users", label: "Clientes", icon: UsersRound },
+];
+
+const TAB_CONTENT: Record<string, React.ReactNode> = {
+  bookings: <AdminBookings />,
+  notifications: <AdminNotifications />,
+  whatsapp: <AdminWhatsAppTemplate />,
+  hours: <AdminWorkHours />,
+  schedules: <AdminProfessionalSchedule />,
+  professionals: <AdminProfessionals />,
+  services: <AdminServices />,
+  branding: <AdminBranding />,
+  theme: <AdminTheme />,
+  users: <AdminUsers />,
+};
 
 export default function AdminPage() {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("bookings");
+  const [menuOpen, setMenuOpen] = useState(false);
   const { isAdmin, loading: adminLoading } = useAdmin(user);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -105,123 +136,153 @@ export default function AdminPage() {
     );
   }
 
+  const activeItem = MENU_ITEMS.find((m) => m.value === activeTab);
+  const ActiveIcon = activeItem?.icon ?? CalendarDays;
+
   return (
     <div className="min-h-screen bg-background">
       <div className="galaxy-bg" />
 
-      <div className="relative z-10">
-        {/* Header */}
-        <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
-          <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Shield className="w-6 h-6 text-primary" />
-              <h1 className="text-xl font-bold gradient-text">Painel Admin</h1>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate("/")}
-                className="gap-1"
-              >
-                <Home className="w-4 h-4" />
-                <span className="hidden sm:inline">Início</span>
-              </Button>
-              <Button variant="ghost" size="sm" onClick={handleLogout} className="gap-1">
-                <LogOut className="w-4 h-4" />
-                <span className="hidden sm:inline">Sair</span>
-              </Button>
-            </div>
+      <div className="relative z-10 flex">
+        {/* Desktop Sidebar */}
+        <aside className="hidden md:flex flex-col w-56 lg:w-64 min-h-screen border-r border-border/50 bg-background/80 backdrop-blur-xl sticky top-0 h-screen">
+          <div className="p-4 border-b border-border/50 flex items-center gap-2">
+            <Shield className="w-5 h-5 text-primary" />
+            <h1 className="font-bold gradient-text">Painel Admin</h1>
           </div>
-        </header>
+          <nav className="flex-1 py-2 overflow-y-auto">
+            {MENU_ITEMS.map((item) => {
+              const Icon = item.icon;
+              const isActive = activeTab === item.value;
+              return (
+                <button
+                  key={item.value}
+                  onClick={() => setActiveTab(item.value)}
+                  className={`w-full flex items-center gap-3 px-4 py-3 text-sm transition-colors ${
+                    isActive
+                      ? "bg-primary/10 text-primary font-semibold border-r-2 border-primary"
+                      : "text-muted-foreground hover:bg-accent hover:text-foreground"
+                  }`}
+                >
+                  <Icon className="w-4 h-4 shrink-0" />
+                  {item.label}
+                </button>
+              );
+            })}
+          </nav>
+          <div className="p-3 border-t border-border/50 space-y-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate("/")}
+              className="w-full justify-start gap-2"
+            >
+              <Home className="w-4 h-4" />
+              Início
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleLogout}
+              className="w-full justify-start gap-2 text-destructive hover:text-destructive"
+            >
+              <LogOut className="w-4 h-4" />
+              Sair
+            </Button>
+          </div>
+        </aside>
 
-        {/* Main Content */}
-        <main className="max-w-6xl mx-auto px-4 py-6">
-          <Tabs defaultValue="bookings" className="space-y-4 sm:space-y-6">
-            <TabsList className="grid w-full grid-cols-10 glass-panel p-1 h-auto">
-              <TabsTrigger value="bookings" className="gap-1.5 text-xs sm:text-sm py-2.5 px-1 sm:px-3 flex-col sm:flex-row">
-                <CalendarDays className="w-4 h-4" />
-                <span className="hidden xs:inline sm:inline">Agenda</span>
-              </TabsTrigger>
-              <TabsTrigger value="notifications" className="gap-1.5 text-xs sm:text-sm py-2.5 px-1 sm:px-3 flex-col sm:flex-row relative">
-                <Bell className="w-4 h-4" />
-                <span className="hidden xs:inline sm:inline">Avisos</span>
-              </TabsTrigger>
-              <TabsTrigger value="whatsapp" className="gap-1.5 text-xs sm:text-sm py-2.5 px-1 sm:px-3 flex-col sm:flex-row">
-                <MessageCircle className="w-4 h-4" />
-                <span className="hidden xs:inline sm:inline">WhatsApp</span>
-              </TabsTrigger>
-              <TabsTrigger value="hours" className="gap-1.5 text-xs sm:text-sm py-2.5 px-1 sm:px-3 flex-col sm:flex-row">
-                <Clock className="w-4 h-4" />
-                <span className="hidden xs:inline sm:inline">Horários</span>
-              </TabsTrigger>
-              <TabsTrigger value="schedules" className="gap-1.5 text-xs sm:text-sm py-2.5 px-1 sm:px-3 flex-col sm:flex-row">
-                <UserCog className="w-4 h-4" />
-                <span className="hidden xs:inline sm:inline">Folgas</span>
-              </TabsTrigger>
-              <TabsTrigger value="professionals" className="gap-1.5 text-xs sm:text-sm py-2.5 px-1 sm:px-3 flex-col sm:flex-row">
-                <Users className="w-4 h-4" />
-                <span className="hidden xs:inline sm:inline">Profissionais</span>
-              </TabsTrigger>
-              <TabsTrigger value="services" className="gap-1.5 text-xs sm:text-sm py-2.5 px-1 sm:px-3 flex-col sm:flex-row">
-                <Sparkles className="w-4 h-4" />
-                <span className="hidden xs:inline sm:inline">Serviços</span>
-              </TabsTrigger>
-              <TabsTrigger value="branding" className="gap-1.5 text-xs sm:text-sm py-2.5 px-1 sm:px-3 flex-col sm:flex-row">
-                <ImageIcon className="w-4 h-4" />
-                <span className="hidden xs:inline sm:inline">Logo</span>
-              </TabsTrigger>
-              <TabsTrigger value="theme" className="gap-1.5 text-xs sm:text-sm py-2.5 px-1 sm:px-3 flex-col sm:flex-row">
-                <Palette className="w-4 h-4" />
-                <span className="hidden xs:inline sm:inline">Cores</span>
-              </TabsTrigger>
-              <TabsTrigger value="users" className="gap-1.5 text-xs sm:text-sm py-2.5 px-1 sm:px-3 flex-col sm:flex-row">
-                <UsersRound className="w-4 h-4" />
-                <span className="hidden xs:inline sm:inline">Clientes</span>
-              </TabsTrigger>
-            </TabsList>
+        {/* Main area */}
+        <div className="flex-1 min-w-0">
+          {/* Mobile Header */}
+          <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50 md:hidden">
+            <div className="px-4 py-3 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
+                  <SheetTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-9 w-9">
+                      <Menu className="w-5 h-5" />
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="left" className="w-72 p-0">
+                    <div className="p-4 border-b border-border/50 flex items-center gap-2">
+                      <Shield className="w-5 h-5 text-primary" />
+                      <h2 className="font-bold gradient-text">Painel Admin</h2>
+                    </div>
+                    <nav className="py-2">
+                      {MENU_ITEMS.map((item) => {
+                        const Icon = item.icon;
+                        const isActive = activeTab === item.value;
+                        return (
+                          <button
+                            key={item.value}
+                            onClick={() => {
+                              setActiveTab(item.value);
+                              setMenuOpen(false);
+                            }}
+                            className={`w-full flex items-center gap-3 px-5 py-3.5 text-sm transition-colors ${
+                              isActive
+                                ? "bg-primary/10 text-primary font-semibold border-l-3 border-primary"
+                                : "text-muted-foreground hover:bg-accent hover:text-foreground"
+                            }`}
+                          >
+                            <Icon className="w-5 h-5 shrink-0" />
+                            {item.label}
+                          </button>
+                        );
+                      })}
+                    </nav>
+                    <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-border/50 space-y-1 bg-background">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => { setMenuOpen(false); navigate("/"); }}
+                        className="w-full justify-start gap-2"
+                      >
+                        <Home className="w-4 h-4" />
+                        Início
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => { setMenuOpen(false); handleLogout(); }}
+                        className="w-full justify-start gap-2 text-destructive hover:text-destructive"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        Sair
+                      </Button>
+                    </div>
+                  </SheetContent>
+                </Sheet>
+                <div className="flex items-center gap-2">
+                  <ActiveIcon className="w-5 h-5 text-primary" />
+                  <h1 className="text-lg font-semibold">{activeItem?.label}</h1>
+                </div>
+              </div>
+              <div className="flex items-center gap-1">
+                <Button variant="ghost" size="icon" onClick={() => navigate("/")} className="h-9 w-9">
+                  <Home className="w-4 h-4" />
+                </Button>
+                <Button variant="ghost" size="icon" onClick={handleLogout} className="h-9 w-9">
+                  <LogOut className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          </header>
 
-            <TabsContent value="bookings">
-              <AdminBookings />
-            </TabsContent>
+          {/* Desktop Header */}
+          <header className="hidden md:block sticky top-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border/50">
+            <div className="px-6 py-3 flex items-center gap-2">
+              <ActiveIcon className="w-5 h-5 text-primary" />
+              <h2 className="text-lg font-semibold">{activeItem?.label}</h2>
+            </div>
+          </header>
 
-            <TabsContent value="notifications">
-              <AdminNotifications />
-            </TabsContent>
-
-            <TabsContent value="whatsapp">
-              <AdminWhatsAppTemplate />
-            </TabsContent>
-
-            <TabsContent value="hours">
-              <AdminWorkHours />
-            </TabsContent>
-
-            <TabsContent value="schedules">
-              <AdminProfessionalSchedule />
-            </TabsContent>
-
-            <TabsContent value="professionals">
-              <AdminProfessionals />
-            </TabsContent>
-
-            <TabsContent value="services">
-              <AdminServices />
-            </TabsContent>
-
-            <TabsContent value="branding">
-              <AdminBranding />
-            </TabsContent>
-
-            <TabsContent value="theme">
-              <AdminTheme />
-            </TabsContent>
-
-            <TabsContent value="users">
-              <AdminUsers />
-            </TabsContent>
-          </Tabs>
-        </main>
+          {/* Content */}
+          <main className="p-4 sm:p-6 max-w-5xl">
+            {TAB_CONTENT[activeTab]}
+          </main>
+        </div>
       </div>
     </div>
   );
