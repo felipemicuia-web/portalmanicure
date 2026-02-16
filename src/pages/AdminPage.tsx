@@ -15,6 +15,7 @@ import { AdminWorkHours } from "@/components/admin/AdminWorkHours";
 import { AdminProfessionalSchedule } from "@/components/admin/AdminProfessionalSchedule";
 import { AdminWhatsAppTemplate } from "@/components/admin/AdminWhatsAppTemplate";
 import { AdminBranding } from "@/components/admin/AdminBranding";
+import { AdminUsers } from "@/components/admin/AdminUsers";
 import {
   Users,
   Sparkles,
@@ -28,6 +29,7 @@ import {
   UserCog,
   MessageCircle,
   ImageIcon,
+  UsersRound,
 } from "lucide-react";
 
 export default function AdminPage() {
@@ -136,7 +138,7 @@ export default function AdminPage() {
         {/* Main Content */}
         <main className="max-w-6xl mx-auto px-4 py-6">
           <Tabs defaultValue="bookings" className="space-y-4 sm:space-y-6">
-            <TabsList className="grid w-full grid-cols-9 glass-panel p-1 h-auto">
+            <TabsList className="grid w-full grid-cols-10 glass-panel p-1 h-auto">
               <TabsTrigger value="bookings" className="gap-1.5 text-xs sm:text-sm py-2.5 px-1 sm:px-3 flex-col sm:flex-row">
                 <CalendarDays className="w-4 h-4" />
                 <span className="hidden xs:inline sm:inline">Agenda</span>
@@ -172,6 +174,10 @@ export default function AdminPage() {
               <TabsTrigger value="theme" className="gap-1.5 text-xs sm:text-sm py-2.5 px-1 sm:px-3 flex-col sm:flex-row">
                 <Palette className="w-4 h-4" />
                 <span className="hidden xs:inline sm:inline">Cores</span>
+              </TabsTrigger>
+              <TabsTrigger value="users" className="gap-1.5 text-xs sm:text-sm py-2.5 px-1 sm:px-3 flex-col sm:flex-row">
+                <UsersRound className="w-4 h-4" />
+                <span className="hidden xs:inline sm:inline">Clientes</span>
               </TabsTrigger>
             </TabsList>
 
@@ -209,6 +215,10 @@ export default function AdminPage() {
 
             <TabsContent value="theme">
               <AdminTheme />
+            </TabsContent>
+
+            <TabsContent value="users">
+              <AdminUsers />
             </TabsContent>
           </Tabs>
         </main>
