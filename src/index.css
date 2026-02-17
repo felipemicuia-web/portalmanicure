@@ -83,6 +83,13 @@
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  img {
+    image-rendering: -webkit-optimize-contrast;
   }
 }
 
@@ -94,6 +101,17 @@
   z-index: 0;
   overflow: hidden;
   background: linear-gradient(180deg, hsl(var(--background)), hsl(var(--background) / 0.95));
+  -webkit-backdrop-filter: blur(0);
+}
+
+/* Extra blur overlay for depth */
+.galaxy-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: hsl(var(--background) / 0.35);
+  backdrop-filter: blur(2px);
+  z-index: 1;
 }
 
 /* ===== THEMED BACKGROUND PARTICLES ===== */
@@ -282,19 +300,28 @@
 .glass-panel {
   background: linear-gradient(
     135deg,
-    rgba(255,255,255,.07) 0%,
-    rgba(255,255,255,.03) 50%,
-    rgba(255,255,255,.05) 100%
+    rgba(255,255,255,.09) 0%,
+    rgba(255,255,255,.04) 40%,
+    rgba(255,255,255,.06) 100%
   );
-  border: 1px solid rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.14);
   border-radius: var(--radius);
-  backdrop-filter: blur(16px) saturate(180%);
+  backdrop-filter: blur(24px) saturate(200%);
+  -webkit-backdrop-filter: blur(24px) saturate(200%);
   box-shadow: 
-    0 8px 32px rgba(0,0,0,.3),
-    0 0 0 1px rgba(255,255,255,.05) inset,
-    0 1px 0 rgba(255,255,255,.1) inset;
+    0 12px 40px rgba(0,0,0,.45),
+    0 2px 12px rgba(0,0,0,.25),
+    0 0 0 1px rgba(255,255,255,.06) inset,
+    0 1px 0 rgba(255,255,255,.12) inset;
   position: relative;
   overflow: hidden;
+  padding: 1.25rem;
+}
+
+@media (min-width: 640px) {
+  .glass-panel {
+    padding: 1.75rem;
+  }
 }
 
 .glass-panel::before {
@@ -460,6 +487,7 @@ input:focus, select:focus, textarea:focus {
 .btn-glow {
   position: relative;
   overflow: hidden;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease;
 }
 
 .btn-glow::before {
@@ -468,9 +496,9 @@ input:focus, select:focus, textarea:focus {
   inset: 0;
   background: linear-gradient(
     135deg,
-    rgba(255,255,255,.2) 0%,
+    rgba(255,255,255,.25) 0%,
     transparent 50%,
-    rgba(255,255,255,.1) 100%
+    rgba(255,255,255,.12) 100%
   );
   opacity: 0;
   transition: opacity 0.3s ease;
@@ -478,6 +506,15 @@ input:focus, select:focus, textarea:focus {
 
 .btn-glow:hover::before {
   opacity: 1;
+}
+
+.btn-glow:hover {
+  transform: translateY(-1px) scale(1.01);
+  box-shadow: 0 8px 30px hsl(var(--primary) / 0.5), 0 0 60px hsl(var(--primary) / 0.2);
+}
+
+.btn-glow:active {
+  transform: translateY(0) scale(0.98);
 }
 
 /* ===== FLOATING PARTICLES ===== */
