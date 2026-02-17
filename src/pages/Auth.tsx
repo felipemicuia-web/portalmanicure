@@ -40,15 +40,18 @@ const Auth = () => {
   const { toast } = useToast();
   const { tenantId } = useTenant();
 
+  // Get redirect URL from query params
+  const redirectTo = new URLSearchParams(window.location.search).get("redirect") || "/";
+
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
-        navigate("/");
+        navigate(redirectTo);
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, [navigate, redirectTo]);
 
   const handlePhoneChange = (value: string) => {
     const digits = normalizePhone(value);
