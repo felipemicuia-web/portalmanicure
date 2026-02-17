@@ -16,6 +16,7 @@ import { AdminProfessionalSchedule } from "@/components/admin/AdminProfessionalS
 import { AdminWhatsAppTemplate } from "@/components/admin/AdminWhatsAppTemplate";
 import { AdminBranding } from "@/components/admin/AdminBranding";
 import { AdminUsers } from "@/components/admin/AdminUsers";
+import { AdminCoupons } from "@/components/admin/AdminCoupons";
 import {
   Users,
   Sparkles,
@@ -32,6 +33,7 @@ import {
   UsersRound,
   Menu,
   ChevronLeft,
+  Ticket,
   type LucideIcon,
 } from "lucide-react";
 
@@ -45,6 +47,7 @@ const MENU_ITEMS: { value: string; label: string; icon: LucideIcon }[] = [
   { value: "services", label: "Serviços", icon: Sparkles },
   { value: "branding", label: "Logo", icon: ImageIcon },
   { value: "theme", label: "Cores", icon: Palette },
+  { value: "coupons", label: "Cupons", icon: Ticket },
   { value: "users", label: "Clientes", icon: UsersRound },
 ];
 
@@ -58,6 +61,7 @@ const TAB_CONTENT: Record<string, React.ReactNode> = {
   services: <AdminServices />,
   branding: <AdminBranding />,
   theme: <AdminTheme />,
+  coupons: <AdminCoupons />,
   users: <AdminUsers />,
 };
 

@@ -10,7 +10,7 @@ import { BookingStepper } from "@/components/booking/BookingStepper";
 import { ProfessionalSelect } from "@/components/booking/ProfessionalSelect";
 import { ServiceList } from "@/components/booking/ServiceList";
 import { DateTimeSelect } from "@/components/booking/DateTimeSelect";
-import { BookingConfirm } from "@/components/booking/BookingConfirm";
+import { BookingConfirm, AppliedCoupon } from "@/components/booking/BookingConfirm";
 import { ProfilePage } from "@/components/profile/ProfilePage";
 import { MyBookings } from "@/components/booking/MyBookings";
 import { logger } from "@/lib/logger";
@@ -39,6 +39,9 @@ export default function BookingPage() {
   const [notes, setNotes] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [globalMessage, setGlobalMessage] = useState<{ text: string; type: "ok" | "bad" } | null>(null);
+  const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(null);
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [couponError, setCouponError] = useState<string | null>(null);
 
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -174,8 +177,47 @@ export default function BookingPage() {
     setSelectedServiceIds((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
-    // Reset time when services change
+    // Reset time and coupon when services change
     setSelectedTime("");
+    setAppliedCoupon(null);
+    setCouponError(null);
+  };
+
+  const handleApplyCoupon = async (code: string): Promise<AppliedCoupon | null> => {
+    setCouponLoading(true);
+    setCouponError(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("validate-coupon", {
+        body: { code, tenant_id: tenantId, total_price: totalPrice, action: "validate" },
+      });
+      if (error) throw error;
+      if (!data.valid) {
+        setCouponError(data.error || "Cupom inválido");
+        setCouponLoading(false);
+        return null;
+      }
+      const coupon: AppliedCoupon = {
+        coupon_id: data.coupon_id,
+        code: data.code,
+        discount_type: data.discount_type,
+        discount_value: data.discount_value,
+        discount_amount: data.discount_amount,
+        final_total: data.final_total,
+      };
+      setAppliedCoupon(coupon);
+      setCouponLoading(false);
+      return coupon;
+    } catch (err) {
+      logger.error("Coupon validation error:", err);
+      setCouponError("Erro ao validar cupom");
+      setCouponLoading(false);
+      return null;
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponError(null);
   };
 
   const handleSubmit = async () => {
@@ -235,6 +277,30 @@ export default function BookingPage() {
     setIsSubmitting(true);
 
     try {
+      // Revalidate and apply coupon server-side if one is applied
+      let couponData: AppliedCoupon | null = null;
+      if (appliedCoupon) {
+        const { data, error: fnError } = await supabase.functions.invoke("validate-coupon", {
+          body: { code: appliedCoupon.code, tenant_id: tenantId, total_price: totalPrice, action: "apply" },
+        });
+        if (fnError || !data?.valid) {
+          setAppliedCoupon(null);
+          setCouponError(data?.error || "Cupom inválido ao confirmar. Tente novamente.");
+          setIsSubmitting(false);
+          return;
+        }
+        couponData = {
+          coupon_id: data.coupon_id,
+          code: data.code,
+          discount_type: data.discount_type,
+          discount_value: data.discount_value,
+          discount_amount: data.discount_amount,
+          final_total: data.final_total,
+        };
+      }
+
+      const finalPrice = couponData ? couponData.final_total : totalPrice;
+
       // Create booking
       const { data: booking, error: bookingError } = await supabase
         .from("bookings")
@@ -244,16 +310,31 @@ export default function BookingPage() {
           booking_date: selectedDate,
           booking_time: selectedTime,
           duration_minutes: totalMinutes,
-          total_price: totalPrice,
+          total_price: finalPrice,
           client_name: name,
           client_phone: phoneDigits,
           notes: notes.trim() || null,
           tenant_id: tenantId,
+          coupon_id: couponData?.coupon_id || null,
+          coupon_code: couponData?.code || null,
+          discount_type: couponData?.discount_type || null,
+          discount_value: couponData?.discount_value || 0,
+          discount_amount: couponData?.discount_amount || 0,
         })
         .select()
         .single();
 
       if (bookingError) throw bookingError;
+
+      // Record coupon usage
+      if (couponData) {
+        await supabase.from("coupon_usage").insert({
+          coupon_id: couponData.coupon_id,
+          booking_id: booking.id,
+          user_id: user.id,
+          tenant_id: tenantId,
+        });
+      }
 
       // Create booking services
       const bookingServices = selectedServiceIds.map((serviceId) => ({
@@ -285,6 +366,8 @@ export default function BookingPage() {
       setSelectedServiceIds([]);
       setSelectedTime("");
       setNotes("");
+      setAppliedCoupon(null);
+      setCouponError(null);
       setGlobalMessage({ text: "Agendamento confirmado com sucesso!", type: "ok" });
     } catch (error) {
       logger.error("Booking error:", error);
@@ -392,6 +475,11 @@ export default function BookingPage() {
                     onPrev={() => goToStep(3)}
                     onSubmit={handleSubmit}
                     isSubmitting={isSubmitting}
+                    appliedCoupon={appliedCoupon}
+                    onApplyCoupon={handleApplyCoupon}
+                    onRemoveCoupon={handleRemoveCoupon}
+                    couponLoading={couponLoading}
+                    couponError={couponError}
                   />
                 )}
               </div>
