@@ -88,19 +88,18 @@ export function ProfessionalSelect({
                           {p.subtitle}
                         </span>
                       )}
+                      <button
+                        type="button"
+                        onClick={(e) => handleViewProfile(e, p.id)}
+                        className="flex items-center gap-1 mt-1 text-xs text-primary hover:text-primary/80 transition-colors"
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                        <span>Ver perfil</span>
+                      </button>
                     </div>
                   </button>
                   
-                  <div className="flex items-center gap-2 shrink-0">
-                    <button
-                      type="button"
-                      onClick={(e) => handleViewProfile(e, p.id)}
-                      className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-muted/50 transition-colors text-muted-foreground hover:text-primary text-xs"
-                      title="Ver perfil"
-                    >
-                      <ExternalLink className="w-3.5 h-3.5" />
-                      <span>Ver perfil</span>
-                    </button>
+                  <div className="flex items-center shrink-0">
                     <ChevronRight className={cn(
                       "w-5 h-5 transition-transform",
                       isSelected ? "text-primary translate-x-1" : "text-muted-foreground"
