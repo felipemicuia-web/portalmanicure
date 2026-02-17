@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useTenant } from "@/contexts/TenantContext";
 import { logger } from "@/lib/logger";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -81,6 +82,7 @@ export function AdminServices() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const isMobile = useIsMobile();
+  const { tenantId } = useTenant();
 
   const fetchServices = async () => {
     const { data, error } = await supabase
@@ -203,6 +205,7 @@ export function AdminServices() {
       duration_minutes: form.duration_minutes,
       price: form.price,
       image_url: form.image_url,
+      tenant_id: tenantId,
     };
 
     if (editingService) {

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useTenant } from "@/contexts/TenantContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -44,6 +45,7 @@ export function AdminUsers() {
   const [deleteUserId, setDeleteUserId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
   const { toast } = useToast();
+  const { tenantId } = useTenant();
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -91,7 +93,7 @@ export function AdminUsers() {
       const token = sessionData.session?.access_token;
 
       const response = await supabase.functions.invoke("delete-user", {
-        body: { user_id: deleteUserId },
+        body: { user_id: deleteUserId, tenant_id: tenantId },
       });
 
       if (response.error) {

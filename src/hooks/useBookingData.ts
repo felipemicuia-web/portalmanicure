@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Professional, Service } from "@/types/booking";
 import { useWorkSettings, WorkSettings } from "@/hooks/useWorkSettings";
+import { useTenant } from "@/contexts/TenantContext";
 
 export { useWorkSettings };
 
@@ -9,14 +10,23 @@ export function useBookingData() {
   const [professionals, setProfessionals] = useState<Professional[]>([]);
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
+  const { tenantId, loading: tenantLoading } = useTenant();
 
   useEffect(() => {
     async function fetchData() {
+      if (tenantLoading || !tenantId) return;
+      
       setLoading(true);
       
+      let profsQuery = supabase.from("professionals").select("*").eq("active", true);
+      let servicesQuery = supabase.from("services").select("*").eq("active", true);
+      
+      profsQuery = profsQuery.eq("tenant_id", tenantId);
+      servicesQuery = servicesQuery.eq("tenant_id", tenantId);
+
       const [profsResult, servicesResult] = await Promise.all([
-        supabase.from("professionals").select("*").eq("active", true),
-        supabase.from("services").select("*").eq("active", true),
+        profsQuery,
+        servicesQuery,
       ]);
 
       if (profsResult.data) setProfessionals(profsResult.data);
@@ -26,9 +36,9 @@ export function useBookingData() {
     }
 
     fetchData();
-  }, []);
+  }, [tenantId, tenantLoading]);
 
-  return { professionals, services, loading };
+  return { professionals, services, loading: loading || tenantLoading };
 }
 
 export function useAvailableTimes(
@@ -49,7 +59,6 @@ export function useAvailableTimes(
 
       setLoading(true);
 
-      // Fetch professional's working days and blocked dates along with bookings
       const [bookingsResult, professionalResult, blockedResult] = await Promise.all([
         supabase
           .from("bookings")
@@ -69,14 +78,12 @@ export function useAvailableTimes(
           .eq("blocked_date", date),
       ]);
 
-      // Check if date is blocked for this professional
       if (blockedResult.data && blockedResult.data.length > 0) {
         setTimes([]);
         setLoading(false);
         return;
       }
 
-      // Use professional's working days if set, otherwise use global settings
       const effectiveWorkingDays = professionalResult.data?.working_days ?? workSettings.working_days;
 
       const busy = (bookingsResult.data || []).map((b) => ({
@@ -121,13 +128,12 @@ function buildAvailableTimes(
   workSettings: WorkSettings,
   selectedDate?: string
 ): string[] {
-  // Se uma data foi selecionada, verifica se é um dia de trabalho
   if (selectedDate) {
-    const dateObj = new Date(selectedDate + "T12:00:00"); // Adiciona horário para evitar problemas de timezone
-    const dayOfWeek = dateObj.getDay(); // 0 = domingo, 1 = segunda, etc.
+    const dateObj = new Date(selectedDate + "T12:00:00");
+    const dayOfWeek = dateObj.getDay();
     
     if (!workSettings.working_days.includes(dayOfWeek)) {
-      return []; // Retorna vazio se não é dia de trabalho
+      return [];
     }
   }
 
@@ -135,7 +141,6 @@ function buildAvailableTimes(
   const end = toMinutes(workSettings.end_time);
   const intervalMinutes = workSettings.interval_minutes;
 
-  // Calcula o período de almoço se existir
   let lunchStart: number | null = null;
   let lunchEnd: number | null = null;
   if (workSettings.lunch_start && workSettings.lunch_end) {
@@ -143,10 +148,7 @@ function buildAvailableTimes(
     lunchEnd = toMinutes(workSettings.lunch_end);
   }
 
-  // Usa a duração real do serviço (não arredonda mais para 60min)
   const serviceDuration = totalServiceMinutes;
-  
-  // Gera slots a cada 30 minutos para mais opções
   const slotStep = 30;
 
   const slots: string[] = [];
@@ -155,19 +157,15 @@ function buildAvailableTimes(
     const slotStart = t;
     const slotEnd = t + serviceDuration;
     
-    // Verifica se o slot conflita com o horário de almoço
     if (lunchStart !== null && lunchEnd !== null) {
       if (overlaps(slotStart, slotEnd, lunchStart, lunchEnd)) {
-        continue; // Pula este horário pois está no almoço
+        continue;
       }
     }
 
-    // Período bloqueado inclui o intervalo após o serviço
     const blockedEnd = slotEnd + intervalMinutes;
 
-    // Verifica conflito com outros agendamentos (considerando intervalo)
     const conflict = bookings.some((b) => {
-      // O booking também tem um período de intervalo após ele
       const bookingBlockedEnd = b.end + intervalMinutes;
       return overlaps(slotStart, blockedEnd, b.start, bookingBlockedEnd);
     });

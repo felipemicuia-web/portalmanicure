@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useTenant } from "@/contexts/TenantContext";
 import { logger } from "@/lib/logger";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -52,6 +53,7 @@ export function AdminProfessionalGallery({
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  const { tenantId } = useTenant();
 
   const fetchPhotos = async () => {
     setLoading(true);
@@ -126,6 +128,7 @@ export function AdminProfessionalGallery({
           professional_id: professionalId,
           image_url: urlData.publicUrl,
           caption: newCaption.trim() || null,
+          tenant_id: tenantId,
         });
 
       if (insertError) throw insertError;

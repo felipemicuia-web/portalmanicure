@@ -28,19 +28,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { data: isAdmin } = await supabaseAdmin.rpc("has_role", {
-      _user_id: caller.id,
-      _role: "admin",
-    });
-
-    if (!isAdmin) {
-      return new Response(JSON.stringify({ error: "Acesso negado" }), {
-        status: 403,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    const { user_id } = await req.json();
+    const { user_id, tenant_id } = await req.json();
 
     if (!user_id) {
       return new Response(JSON.stringify({ error: "user_id é obrigatório" }), {
@@ -55,6 +43,47 @@ Deno.serve(async (req) => {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
+    }
+
+    // Verify caller is admin of the same tenant
+    if (tenant_id) {
+      const { data: isCallerAdmin } = await supabaseAdmin.rpc("is_tenant_admin", {
+        _user_id: caller.id,
+        _tenant_id: tenant_id,
+      });
+
+      if (!isCallerAdmin) {
+        return new Response(JSON.stringify({ error: "Acesso negado" }), {
+          status: 403,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // Verify target user belongs to the same tenant
+      const { data: targetInTenant } = await supabaseAdmin.rpc("user_belongs_to_tenant", {
+        _user_id: user_id,
+        _tenant_id: tenant_id,
+      });
+
+      if (!targetInTenant) {
+        return new Response(JSON.stringify({ error: "Usuário não pertence a este tenant" }), {
+          status: 403,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    } else {
+      // Fallback: check global admin
+      const { data: isAdmin } = await supabaseAdmin.rpc("has_role", {
+        _user_id: caller.id,
+        _role: "admin",
+      });
+
+      if (!isAdmin) {
+        return new Response(JSON.stringify({ error: "Acesso negado" }), {
+          status: 403,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
     }
 
     const { error } = await supabaseAdmin.auth.admin.deleteUser(user_id);

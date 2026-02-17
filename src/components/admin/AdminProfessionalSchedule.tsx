@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useTenant } from "@/contexts/TenantContext";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -49,6 +50,7 @@ const WEEKDAYS = [
 ];
 
 export function AdminProfessionalSchedule() {
+  const { tenantId } = useTenant();
   const [professionals, setProfessionals] = useState<Professional[]>([]);
   const [selectedProfessionalId, setSelectedProfessionalId] = useState<string>("");
   const [blockedDates, setBlockedDates] = useState<BlockedDate[]>([]);
@@ -152,6 +154,7 @@ export function AdminProfessionalSchedule() {
         professional_id: selectedProfessionalId,
         blocked_date: dateStr,
         reason: blockReason || null,
+        tenant_id: tenantId,
       });
 
     if (error) {

@@ -4,6 +4,7 @@ import { User } from "@supabase/supabase-js";
 import { logger } from "@/lib/logger";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useAvailableTimes } from "@/hooks/useBookingData";
+import { useTenant } from "@/contexts/TenantContext";
 import { Calendar, Clock, User as UserIcon, Pencil, Trash2, RefreshCw } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -75,6 +76,7 @@ export function MyBookings({ user }: Props) {
   const [professionals, setProfessionals] = useState<Professional[]>([]);
   const [loading, setLoading] = useState(true);
   const isMobile = useIsMobile();
+  const { tenantId } = useTenant();
 
   // Edit state
   const [editingBooking, setEditingBooking] = useState<Booking | null>(null);
@@ -180,6 +182,7 @@ export function MyBookings({ user }: Props) {
         booking_id: booking.id,
         user_id: user.id,
         message,
+        tenant_id: tenantId,
       });
     } catch (error) {
       logger.error("Error creating notification:", error);

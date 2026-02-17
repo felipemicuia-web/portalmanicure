@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useTenant } from "@/contexts/TenantContext";
 
 export const FONT_OPTIONS = [
   { value: "Inter", label: "Inter", url: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" },
@@ -53,12 +54,16 @@ function applyFont(fontName: string) {
 export function useBranding() {
   const [branding, setBranding] = useState<Branding>(DEFAULT_BRANDING);
   const [loading, setLoading] = useState(true);
+  const { tenantId, loading: tenantLoading } = useTenant();
 
   useEffect(() => {
     async function fetch() {
+      if (tenantLoading || !tenantId) return;
+
       const { data } = await supabase
         .from("work_settings")
         .select("site_name, site_subtitle, logo_url, logo_display_mode, site_font")
+        .eq("tenant_id", tenantId)
         .limit(1)
         .single();
 
@@ -76,7 +81,7 @@ export function useBranding() {
       setLoading(false);
     }
     fetch();
-  }, []);
+  }, [tenantId, tenantLoading]);
 
-  return { branding, loading, applyFont };
+  return { branding, loading: loading || tenantLoading, applyFont };
 }
