@@ -51,12 +51,12 @@ export function BookingTopbar({
             ) : (
               <>
                 <div 
-                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-gradient-to-br from-white/20 to-white/5 border border-white/20 flex items-center justify-center overflow-hidden shadow-lg group-hover:scale-105 transition-transform duration-300 flex-shrink-0"
+                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-transparent border border-white/20 flex items-center justify-center overflow-hidden shadow-lg group-hover:scale-105 transition-transform duration-300 flex-shrink-0"
                   aria-hidden="true"
                   style={{ boxShadow: '0 8px 32px rgba(124,58,237,.3), inset 0 1px 0 rgba(255,255,255,.2)' }}
                 >
                   {branding.logoUrl ? (
-                    <img src={branding.logoUrl} alt="Logo" className="w-full h-full object-contain p-1" />
+                    <img src={branding.logoUrl} alt="Logo" className="w-full h-full object-contain p-0.5" style={{ background: "transparent" }} />
                   ) : (
                     <span className="text-xl sm:text-2xl">💅</span>
                   )}
