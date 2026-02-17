@@ -82,8 +82,8 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Check usage limit
-    if (coupon.current_uses >= coupon.max_uses) {
+    // Check usage limit (skip for unlimited coupons)
+    if (coupon.max_uses < 999999 && coupon.current_uses >= coupon.max_uses) {
       return new Response(
         JSON.stringify({ valid: false, error: "Este cupom já atingiu o limite de uso" }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -135,8 +135,8 @@ Deno.serve(async (req) => {
         );
       }
 
-      // Auto-deactivate if usage reached limit
-      if (coupon.current_uses + 1 >= coupon.max_uses) {
+      // Auto-deactivate if usage reached limit (skip for unlimited)
+      if (coupon.max_uses < 999999 && coupon.current_uses + 1 >= coupon.max_uses) {
         await adminClient
           .from("coupons")
           .update({ active: false })

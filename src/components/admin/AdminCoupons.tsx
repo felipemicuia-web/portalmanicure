@@ -52,6 +52,7 @@ export function AdminCoupons() {
   const [discountValue, setDiscountValue] = useState("");
   const [maxUses, setMaxUses] = useState("1");
   const [multipleUses, setMultipleUses] = useState(false);
+  const [unlimitedUses, setUnlimitedUses] = useState(false);
   const [active, setActive] = useState(true);
   const [expiresAt, setExpiresAt] = useState("");
 
@@ -76,6 +77,7 @@ export function AdminCoupons() {
     setDiscountValue("");
     setMaxUses("1");
     setMultipleUses(false);
+    setUnlimitedUses(false);
     setActive(true);
     setExpiresAt("");
     setDialogOpen(true);
@@ -87,7 +89,8 @@ export function AdminCoupons() {
     setDiscountType(c.discount_type);
     setDiscountValue(String(c.discount_value));
     setMaxUses(String(c.max_uses));
-    setMultipleUses(c.max_uses > 1);
+    setUnlimitedUses(c.max_uses >= 999999);
+    setMultipleUses(c.max_uses > 1 && c.max_uses < 999999);
     setActive(c.active);
     setExpiresAt(c.expires_at ? c.expires_at.slice(0, 16) : "");
     setDialogOpen(true);
@@ -101,7 +104,7 @@ export function AdminCoupons() {
     if (isNaN(val) || val <= 0) { toast({ title: "Erro", description: "Valor de desconto inválido", variant: "destructive" }); return; }
     if (discountType === "percentage" && (val < 1 || val > 100)) { toast({ title: "Erro", description: "Percentual deve ser entre 1 e 100", variant: "destructive" }); return; }
 
-    const uses = multipleUses ? parseInt(maxUses) || 1 : 1;
+    const uses = unlimitedUses ? 999999 : (multipleUses ? parseInt(maxUses) || 1 : 1);
     setSaving(true);
 
     const payload = {
@@ -146,7 +149,7 @@ export function AdminCoupons() {
   function getStatusBadge(c: Coupon) {
     if (!c.active) return <Badge variant="secondary" className="text-xs">Inativo</Badge>;
     if (c.expires_at && new Date(c.expires_at) < new Date()) return <Badge variant="destructive" className="text-xs">Expirado</Badge>;
-    if (c.current_uses >= c.max_uses) return <Badge variant="secondary" className="text-xs">Esgotado</Badge>;
+    if (c.max_uses < 999999 && c.current_uses >= c.max_uses) return <Badge variant="secondary" className="text-xs">Esgotado</Badge>;
     return <Badge className="text-xs bg-green-500/20 text-green-400 border-green-500/30">Ativo</Badge>;
   }
 
@@ -185,7 +188,7 @@ export function AdminCoupons() {
                   <span>
                     {c.discount_type === "fixed" ? `R$ ${formatPrice(c.discount_value)}` : `${c.discount_value}%`}
                   </span>
-                  <span>Uso: {c.current_uses}/{c.max_uses}</span>
+                  <span>Uso: {c.current_uses}/{c.max_uses >= 999999 ? "∞" : c.max_uses}</span>
                   {c.expires_at && (
                     <span>Expira: {new Date(c.expires_at).toLocaleDateString("pt-BR")}</span>
                   )}
@@ -263,14 +266,22 @@ export function AdminCoupons() {
             </div>
 
             <div className="flex items-center justify-between">
-              <Label className="text-sm">Múltiplos usos</Label>
-              <Switch checked={multipleUses} onCheckedChange={(v) => { setMultipleUses(v); if (!v) setMaxUses("1"); }} />
+              <Label className="text-sm">Uso ilimitado</Label>
+              <Switch checked={unlimitedUses} onCheckedChange={(v) => { setUnlimitedUses(v); if (v) { setMultipleUses(false); setMaxUses("1"); } }} />
             </div>
-            {multipleUses && (
-              <div>
-                <Label className="text-xs mb-1 block">Limite de usos</Label>
-                <Input type="number" min="2" value={maxUses} onChange={(e) => setMaxUses(e.target.value)} />
-              </div>
+            {!unlimitedUses && (
+              <>
+                <div className="flex items-center justify-between">
+                  <Label className="text-sm">Múltiplos usos</Label>
+                  <Switch checked={multipleUses} onCheckedChange={(v) => { setMultipleUses(v); if (!v) setMaxUses("1"); }} />
+                </div>
+                {multipleUses && (
+                  <div>
+                    <Label className="text-xs mb-1 block">Limite de usos</Label>
+                    <Input type="number" min="2" value={maxUses} onChange={(e) => setMaxUses(e.target.value)} />
+                  </div>
+                )}
+              </>
             )}
 
             <div className="flex items-center justify-between">
