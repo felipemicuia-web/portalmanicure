@@ -535,6 +535,7 @@ export type Database = {
           logo_url: string | null
           lunch_end: string | null
           lunch_start: string | null
+          site_font: string | null
           site_name: string | null
           site_subtitle: string | null
           start_time: string
@@ -550,6 +551,7 @@ export type Database = {
           logo_url?: string | null
           lunch_end?: string | null
           lunch_start?: string | null
+          site_font?: string | null
           site_name?: string | null
           site_subtitle?: string | null
           start_time?: string
@@ -565,6 +567,7 @@ export type Database = {
           logo_url?: string | null
           lunch_end?: string | null
           lunch_start?: string | null
+          site_font?: string | null
           site_name?: string | null
           site_subtitle?: string | null
           start_time?: string

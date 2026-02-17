@@ -1,0 +1,1 @@
+ALTER TABLE public.work_settings ADD COLUMN IF NOT EXISTS site_font text DEFAULT 'Inter';
