@@ -65,15 +65,9 @@ export default function BookingPage() {
     totalMinutes
   );
 
-  // Auth
+  // Auth - onAuthStateChange already fires INITIAL_SESSION
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
-
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
@@ -173,6 +167,22 @@ export default function BookingPage() {
       return;
     }
 
+    // Check if user is blocked
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("blocked")
+      .eq("user_id", user.id)
+      .single();
+
+    if (profile?.blocked) {
+      toast({
+        title: "Conta bloqueada",
+        description: "Sua conta está bloqueada. Entre em contato com o estabelecimento.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     // Validate form
     const name = clientName.trim();
     const phoneDigits = normalizePhone(clientPhone);
@@ -190,8 +200,6 @@ export default function BookingPage() {
     setIsSubmitting(true);
 
     try {
-      const roundedMinutes = Math.ceil(totalMinutes / 60) * 60;
-
       // Create booking
       const { data: booking, error: bookingError } = await supabase
         .from("bookings")
@@ -200,7 +208,7 @@ export default function BookingPage() {
           professional_id: professionalId,
           booking_date: selectedDate,
           booking_time: selectedTime,
-          duration_minutes: roundedMinutes,
+          duration_minutes: totalMinutes,
           total_price: totalPrice,
           client_name: name,
           client_phone: phoneDigits,
@@ -223,23 +231,10 @@ export default function BookingPage() {
 
       if (servicesError) throw servicesError;
 
-      // Update profile
-      const { data: existingProfile } = await supabase
+      // Update profile name and phone only (not notes - those are booking-specific)
+      await supabase
         .from("profiles")
-        .select("id")
-        .eq("user_id", user.id)
-        .single();
-
-      if (existingProfile) {
-        await supabase
-          .from("profiles")
-          .update({ name, phone: phoneDigits, notes: notes.trim() || null })
-          .eq("user_id", user.id);
-      } else {
-        await supabase
-          .from("profiles")
-          .insert({ user_id: user.id, name, phone: phoneDigits, notes: notes.trim() || null });
-      }
+        .upsert({ user_id: user.id, name, phone: phoneDigits }, { onConflict: "user_id" });
 
       toast({
         title: "Agendamento confirmado!",

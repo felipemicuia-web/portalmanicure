@@ -233,7 +233,20 @@ export function MyBookings({ user }: Props) {
 
     setDeleting(true);
 
-    // Create notification before deleting
+    // Update status to cancelled instead of deleting
+    const { error } = await supabase
+      .from("bookings")
+      .update({ status: "cancelled" })
+      .eq("id", deletingBooking.id);
+
+    if (error) {
+      logger.error("Error cancelling booking:", error);
+      toast.error("Erro ao cancelar agendamento");
+      setDeleting(false);
+      return;
+    }
+
+    // Create notification after successful cancellation
     const professional = getProfessionalName(deletingBooking.professional_id);
     await createNotification(
       "booking_cancelled",
@@ -241,22 +254,14 @@ export function MyBookings({ user }: Props) {
       `${deletingBooking.client_name} cancelou o agendamento de ${deletingBooking.booking_date} às ${deletingBooking.booking_time.slice(0, 5)} com ${professional}`
     );
 
-    const { error } = await supabase
-      .from("bookings")
-      .delete()
-      .eq("id", deletingBooking.id);
-
-    if (error) {
-      logger.error("Error deleting booking:", error);
-      toast.error("Erro ao cancelar agendamento");
-      setDeleting(false);
-      return;
-    }
-
     toast.success("Agendamento cancelado! O admin foi notificado.");
     setDeletingBooking(null);
     setDeleting(false);
-    setBookings((prev) => prev.filter((b) => b.id !== deletingBooking.id));
+    setBookings((prev) =>
+      prev.map((b) =>
+        b.id === deletingBooking.id ? { ...b, status: "cancelled" } : b
+      )
+    );
   };
 
   if (loading) {
