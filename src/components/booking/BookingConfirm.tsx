@@ -1,10 +1,20 @@
+import { useState } from "react";
 import { Professional, Service } from "@/types/booking";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, User, Briefcase, Calendar, Wallet, Phone, CheckCircle } from "lucide-react";
+import { ArrowLeft, User, Briefcase, Calendar, Wallet, Phone, CheckCircle, Ticket, X, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+export interface AppliedCoupon {
+  coupon_id: string;
+  code: string;
+  discount_type: "fixed" | "percentage";
+  discount_value: number;
+  discount_amount: number;
+  final_total: number;
+}
 
 interface BookingConfirmProps {
   professional: Professional | undefined;
@@ -23,6 +33,11 @@ interface BookingConfirmProps {
   onSubmit: () => void;
   isSubmitting: boolean;
   isConfirmed?: boolean;
+  appliedCoupon: AppliedCoupon | null;
+  onApplyCoupon: (code: string) => Promise<AppliedCoupon | null>;
+  onRemoveCoupon: () => void;
+  couponLoading: boolean;
+  couponError: string | null;
 }
 
 function formatPrice(value: number): string {
@@ -61,12 +76,28 @@ export function BookingConfirm({
   onSubmit,
   isSubmitting,
   isConfirmed = false,
+  appliedCoupon,
+  onApplyCoupon,
+  onRemoveCoupon,
+  couponLoading,
+  couponError,
 }: BookingConfirmProps) {
+  const [couponCode, setCouponCode] = useState("");
+
   const handleNotesChange = (value: string) => {
     if (value.length <= MAX_NOTES_LENGTH) {
       onNotesChange(value);
     }
   };
+
+  const handleApplyCoupon = async () => {
+    const trimmed = couponCode.trim();
+    if (!trimmed) return;
+    const result = await onApplyCoupon(trimmed);
+    if (result) setCouponCode("");
+  };
+
+  const displayTotal = appliedCoupon ? appliedCoupon.final_total : totalPrice;
 
   return (
     <div className="glass-panel p-4 sm:p-6 space-y-4 sm:space-y-6">
@@ -129,18 +160,101 @@ export function BookingConfirm({
         
         <div className="relative flex items-center justify-between gap-2 sm:gap-3 py-2">
           <div className="flex items-center gap-2 sm:gap-3 text-muted-foreground min-w-0">
-            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-green-500/20 flex items-center justify-center flex-shrink-0">
-              <Wallet className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-400" />
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-primary/20 flex items-center justify-center flex-shrink-0">
+              <Wallet className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary" />
             </div>
-            <span className="font-medium text-xs sm:text-sm">Total</span>
+            <span className="font-medium text-xs sm:text-sm">
+              {appliedCoupon ? "Subtotal" : "Total"}
+            </span>
           </div>
-          <span className="font-bold text-lg sm:text-xl bg-gradient-to-r from-green-400 to-green-300 bg-clip-text text-transparent">
+          <span className={cn(
+            "font-bold text-sm sm:text-base",
+            appliedCoupon ? "text-muted-foreground line-through" : "text-lg sm:text-xl bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent"
+          )}>
             {selectedServices.length > 0 
               ? `R$ ${formatPrice(totalPrice)}` 
               : "—"}
           </span>
         </div>
+
+        {appliedCoupon && (
+          <>
+            <div className="relative flex items-center justify-between gap-2 sm:gap-3 py-2 border-t border-border/30">
+              <div className="flex items-center gap-2 sm:gap-3 text-muted-foreground min-w-0">
+                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-primary/20 flex items-center justify-center flex-shrink-0">
+                  <Ticket className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="font-medium text-xs sm:text-sm">Desconto</span>
+                  <span className="text-[10px] text-muted-foreground">
+                    {appliedCoupon.code} ({appliedCoupon.discount_type === "percentage" ? `${appliedCoupon.discount_value}%` : `R$ ${formatPrice(appliedCoupon.discount_value)}`})
+                  </span>
+                </div>
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="font-bold text-sm sm:text-base text-primary">
+                  -R$ {formatPrice(appliedCoupon.discount_amount)}
+                </span>
+                <Button variant="ghost" size="icon" className="h-6 w-6" onClick={onRemoveCoupon}>
+                  <X className="w-3 h-3" />
+                </Button>
+              </div>
+            </div>
+            <div className="relative flex items-center justify-between gap-2 sm:gap-3 py-2 border-t border-border/30">
+              <div className="flex items-center gap-2 sm:gap-3 text-muted-foreground min-w-0">
+                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-primary/20 flex items-center justify-center flex-shrink-0">
+                  <Wallet className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary" />
+                </div>
+                <span className="font-medium text-xs sm:text-sm">Total Final</span>
+              </div>
+              <span className="font-bold text-lg sm:text-xl bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+                R$ {formatPrice(displayTotal)}
+              </span>
+            </div>
+          </>
+        )}
       </div>
+
+      {/* Coupon Input */}
+      {!isConfirmed && (
+        <div className="border border-border/40 bg-card/40 rounded-xl p-3 sm:p-4 space-y-2">
+          <Label className="text-xs sm:text-sm font-medium flex items-center gap-1.5">
+            <Ticket className="w-3.5 h-3.5" />
+            Cupom de desconto
+          </Label>
+          {!appliedCoupon ? (
+            <div className="flex gap-2">
+              <Input
+                value={couponCode}
+                onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                placeholder="CODIGO10"
+                className="font-mono uppercase bg-input/80 border-border/60 h-10 text-sm"
+                maxLength={20}
+                onKeyDown={(e) => e.key === "Enter" && handleApplyCoupon()}
+              />
+              <Button
+                onClick={handleApplyCoupon}
+                disabled={couponLoading || !couponCode.trim()}
+                variant="outline"
+                className="h-10 px-4 shrink-0"
+              >
+                {couponLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Aplicar"}
+              </Button>
+            </div>
+          ) : (
+            <div className="flex items-center justify-between bg-primary/10 rounded-lg px-3 py-2">
+              <span className="text-sm font-mono font-semibold text-primary">{appliedCoupon.code}</span>
+              <Button variant="ghost" size="sm" onClick={onRemoveCoupon} className="h-7 px-2 text-muted-foreground">
+                <X className="w-3.5 h-3.5 mr-1" />
+                Remover
+              </Button>
+            </div>
+          )}
+          {couponError && (
+            <p className="text-xs text-destructive">{couponError}</p>
+          )}
+        </div>
+      )}
 
       {/* Form - Stack on mobile */}
       <div className="space-y-4 sm:space-y-5">

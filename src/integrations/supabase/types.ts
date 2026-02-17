@@ -114,7 +114,12 @@ export type Database = {
           booking_time: string
           client_name: string
           client_phone: string
+          coupon_code: string | null
+          coupon_id: string | null
           created_at: string
+          discount_amount: number | null
+          discount_type: string | null
+          discount_value: number | null
           duration_minutes: number
           id: string
           notes: string | null
@@ -129,7 +134,12 @@ export type Database = {
           booking_time: string
           client_name: string
           client_phone: string
+          coupon_code?: string | null
+          coupon_id?: string | null
           created_at?: string
+          discount_amount?: number | null
+          discount_type?: string | null
+          discount_value?: number | null
           duration_minutes: number
           id?: string
           notes?: string | null
@@ -144,7 +154,12 @@ export type Database = {
           booking_time?: string
           client_name?: string
           client_phone?: string
+          coupon_code?: string | null
+          coupon_id?: string | null
           created_at?: string
+          discount_amount?: number | null
+          discount_type?: string | null
+          discount_value?: number | null
           duration_minutes?: number
           id?: string
           notes?: string | null
@@ -156,6 +171,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "bookings_coupon_id_fkey"
+            columns: ["coupon_id"]
+            isOneToOne: false
+            referencedRelation: "coupons"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "bookings_professional_id_fkey"
             columns: ["professional_id"]
             isOneToOne: false
@@ -164,6 +186,105 @@ export type Database = {
           },
           {
             foreignKeyName: "bookings_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      coupon_usage: {
+        Row: {
+          booking_id: string
+          coupon_id: string
+          created_at: string
+          id: string
+          tenant_id: string
+          user_id: string
+        }
+        Insert: {
+          booking_id: string
+          coupon_id: string
+          created_at?: string
+          id?: string
+          tenant_id: string
+          user_id: string
+        }
+        Update: {
+          booking_id?: string
+          coupon_id?: string
+          created_at?: string
+          id?: string
+          tenant_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coupon_usage_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "coupon_usage_coupon_id_fkey"
+            columns: ["coupon_id"]
+            isOneToOne: false
+            referencedRelation: "coupons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "coupon_usage_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      coupons: {
+        Row: {
+          active: boolean
+          code: string
+          created_at: string
+          current_uses: number
+          discount_type: string
+          discount_value: number
+          expires_at: string | null
+          id: string
+          max_uses: number
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          code: string
+          created_at?: string
+          current_uses?: number
+          discount_type: string
+          discount_value: number
+          expires_at?: string | null
+          id?: string
+          max_uses?: number
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          code?: string
+          created_at?: string
+          current_uses?: number
+          discount_type?: string
+          discount_value?: number
+          expires_at?: string | null
+          id?: string
+          max_uses?: number
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coupons_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"

@@ -11,6 +11,7 @@ export interface BookingDraft {
   notes: string;
   currentStep: number;
   tenantId: string;
+  couponCode?: string;
   savedAt: number;
 }
 
