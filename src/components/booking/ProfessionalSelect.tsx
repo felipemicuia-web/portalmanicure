@@ -118,11 +118,11 @@ export function ProfessionalSelect({
           </div>
         </div>
 
-        <div className="flex justify-end pt-2">
+        <div className="flex justify-end pt-3">
           <Button
             onClick={onNext}
             disabled={!selectedId}
-            className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg shadow-primary/25 px-5 sm:px-6 h-11 sm:h-12 font-semibold text-sm sm:text-base w-full sm:w-auto"
+            className="btn-glow bg-gradient-to-r from-primary via-primary/90 to-primary/70 hover:from-primary hover:to-primary/80 shadow-xl shadow-primary/30 px-6 sm:px-8 h-12 sm:h-14 font-extrabold text-sm sm:text-base tracking-wide w-full sm:w-auto rounded-xl"
           >
             Continuar
           </Button>
