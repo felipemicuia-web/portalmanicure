@@ -49,6 +49,36 @@ export function useAvailableTimes(
   const [times, setTimes] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const { settings: workSettings, loading: settingsLoading } = useWorkSettings();
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  // Realtime subscription: refresh slots when bookings change for this professional+date
+  useEffect(() => {
+    if (!professionalId || !date) return;
+
+    const channel = supabase
+      .channel(`bookings-slots-${professionalId}-${date}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'bookings',
+          filter: `professional_id=eq.${professionalId}`,
+        },
+        (payload) => {
+          // Only refresh if the change is for the same date
+          const row = (payload.new as any) || (payload.old as any);
+          if (row?.booking_date === date) {
+            setRefreshKey((k) => k + 1);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [professionalId, date]);
 
   useEffect(() => {
     async function fetchTimes() {
@@ -102,7 +132,7 @@ export function useAvailableTimes(
     }
 
     fetchTimes();
-  }, [professionalId, date, totalMinutes, workSettings, settingsLoading]);
+  }, [professionalId, date, totalMinutes, workSettings, settingsLoading, refreshKey]);
 
   return { times, loading: loading || settingsLoading };
 }
