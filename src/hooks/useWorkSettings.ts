@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useTenant } from "@/contexts/TenantContext";
 
 export interface WorkSettings {
   start_time: string;
@@ -16,19 +17,25 @@ const DEFAULT_SETTINGS: WorkSettings = {
   interval_minutes: 10,
   lunch_start: null,
   lunch_end: null,
-  working_days: [1, 2, 3, 4, 5, 6], // Segunda a Sábado por padrão
+  working_days: [1, 2, 3, 4, 5, 6],
 };
 
 export function useWorkSettings() {
   const [settings, setSettings] = useState<WorkSettings>(DEFAULT_SETTINGS);
   const [loading, setLoading] = useState(true);
+  const { tenantId, loading: tenantLoading } = useTenant();
 
   useEffect(() => {
     async function fetchSettings() {
-      const { data, error } = await supabase
+      if (tenantLoading || !tenantId) return;
+
+      let query = supabase
         .from("work_settings")
         .select("start_time, end_time, interval_minutes, lunch_start, lunch_end, working_days")
+        .eq("tenant_id", tenantId)
         .maybeSingle();
+
+      const { data, error } = await query;
 
       if (!error && data) {
         setSettings({
@@ -44,7 +51,7 @@ export function useWorkSettings() {
     }
 
     fetchSettings();
-  }, []);
+  }, [tenantId, tenantLoading]);
 
-  return { settings, loading };
+  return { settings, loading: loading || tenantLoading };
 }

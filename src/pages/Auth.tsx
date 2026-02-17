@@ -10,6 +10,7 @@ import { Eye, EyeOff, Mail, Lock, User, ArrowLeft, Phone } from "lucide-react";
 import { z } from "zod";
 import { isValidBrazilianPhone, normalizePhone, formatPhone } from "@/lib/validation";
 import { logger } from "@/lib/logger";
+import { useTenant } from "@/contexts/TenantContext";
 
 const emailSchema = z.string().email("Email inválido");
 const passwordSchema = z.string().min(6, "Senha deve ter pelo menos 6 caracteres");
@@ -37,6 +38,7 @@ const Auth = () => {
   const [errors, setErrors] = useState<FormErrors>({});
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { tenantId } = useTenant();
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -158,6 +160,7 @@ const Auth = () => {
             user_id: data.user.id,
             name: fullName,
             phone: normalizedPhone,
+            tenant_id: tenantId,
           });
 
           if (profileError) {
@@ -168,6 +171,16 @@ const Auth = () => {
               variant: "destructive",
             });
           } else {
+            // Associate user with tenant
+            if (tenantId) {
+              await supabase.from("tenant_users").upsert({
+                tenant_id: tenantId,
+                user_id: data.user.id,
+                role: "user",
+              }, { onConflict: "tenant_id,user_id" }).then(({ error: tuError }) => {
+                if (tuError) logger.error("Tenant user creation error:", tuError);
+              });
+            }
             toast({
               title: "Conta criada!",
               description: "Cadastro realizado com sucesso",

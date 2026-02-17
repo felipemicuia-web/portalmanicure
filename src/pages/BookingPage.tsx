@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { User, Session } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
 import { useBookingData, useAvailableTimes } from "@/hooks/useBookingData";
+import { useTenant } from "@/contexts/TenantContext";
 import { BookingTopbar } from "@/components/booking/BookingTopbar";
 import { BookingStepper } from "@/components/booking/BookingStepper";
 import { ProfessionalSelect } from "@/components/booking/ProfessionalSelect";
@@ -40,6 +41,7 @@ export default function BookingPage() {
 
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { tenantId } = useTenant();
   const { professionals, services, loading: dataLoading } = useBookingData();
 
   // Calculate totals
@@ -213,6 +215,7 @@ export default function BookingPage() {
           client_name: name,
           client_phone: phoneDigits,
           notes: notes.trim() || null,
+          tenant_id: tenantId,
         })
         .select()
         .single();
@@ -223,6 +226,7 @@ export default function BookingPage() {
       const bookingServices = selectedServiceIds.map((serviceId) => ({
         booking_id: booking.id,
         service_id: serviceId,
+        tenant_id: tenantId,
       }));
 
       const { error: servicesError } = await supabase
@@ -234,7 +238,7 @@ export default function BookingPage() {
       // Update profile name and phone only (not notes - those are booking-specific)
       await supabase
         .from("profiles")
-        .upsert({ user_id: user.id, name, phone: phoneDigits }, { onConflict: "user_id" });
+        .upsert({ user_id: user.id, name, phone: phoneDigits, tenant_id: tenantId }, { onConflict: "user_id" });
 
       toast({
         title: "Agendamento confirmado!",

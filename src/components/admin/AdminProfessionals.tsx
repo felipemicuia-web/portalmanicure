@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useTenant } from "@/contexts/TenantContext";
 import { logger } from "@/lib/logger";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -79,6 +80,7 @@ export function AdminProfessionals() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const isMobile = useIsMobile();
+  const { tenantId } = useTenant();
 
   const fetchProfessionals = async () => {
     const { data, error } = await supabase
@@ -114,7 +116,7 @@ export function AdminProfessionals() {
 
     const { error } = await supabase
       .from("professionals")
-      .insert({ name: newName.trim() });
+      .insert({ name: newName.trim(), tenant_id: tenantId });
 
     if (error) {
       logger.error("Error adding professional:", error);
@@ -156,7 +158,7 @@ export function AdminProfessionals() {
       await supabase.from("professional_services").delete().eq("professional_id", editingProfessional.id);
       if (selectedServiceIds.length > 0) {
         await supabase.from("professional_services").insert(
-          selectedServiceIds.map(sid => ({ professional_id: editingProfessional.id, service_id: sid }))
+          selectedServiceIds.map(sid => ({ professional_id: editingProfessional.id, service_id: sid, tenant_id: tenantId }))
         );
       }
       toast({ title: "Profissional atualizado!" });
