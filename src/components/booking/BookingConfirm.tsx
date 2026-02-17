@@ -139,11 +139,15 @@ export function BookingConfirm({
             </div>
             <span className="font-medium text-xs sm:text-sm">Serviços</span>
           </div>
-          <span className="font-bold text-right text-sm sm:text-base max-w-[140px] sm:max-w-[200px] truncate">
+          <div className="text-right min-w-0 flex-1">
             {selectedServices.length > 0 
-              ? `${selectedServices.length} serviço${selectedServices.length > 1 ? 's' : ''}`
-              : "—"}
-          </span>
+              ? selectedServices.map((s, i) => (
+                  <span key={s.id} className="font-bold text-sm sm:text-base block truncate">
+                    {s.name}
+                  </span>
+                ))
+              : <span className="font-bold text-sm sm:text-base">—</span>}
+          </div>
         </div>
         
         <div className="relative flex items-center justify-between gap-2 sm:gap-3 py-2 border-b border-border/30">
