@@ -333,6 +333,7 @@ export function AdminBookings() {
           id="client_name"
           value={editForm.client_name}
           onChange={(e) => setEditForm((f) => ({ ...f, client_name: e.target.value }))}
+          maxLength={100}
         />
       </div>
       <div className="space-y-2">
@@ -341,6 +342,7 @@ export function AdminBookings() {
           id="client_phone"
           value={editForm.client_phone}
           onChange={(e) => setEditForm((f) => ({ ...f, client_phone: e.target.value }))}
+          maxLength={20}
         />
       </div>
       <div className="grid grid-cols-2 gap-3">
@@ -383,6 +385,7 @@ export function AdminBookings() {
           value={editForm.notes}
           onChange={(e) => setEditForm((f) => ({ ...f, notes: e.target.value }))}
           rows={3}
+          maxLength={500}
         />
       </div>
     </div>

@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Eye, EyeOff, Mail, Lock, User, ArrowLeft, Phone } from "lucide-react";
 import { z } from "zod";
 import { isValidBrazilianPhone, normalizePhone, formatPhone } from "@/lib/validation";
+import { logger } from "@/lib/logger";
 
 const emailSchema = z.string().email("Email inválido");
 const passwordSchema = z.string().min(6, "Senha deve ter pelo menos 6 caracteres");
@@ -38,13 +39,7 @@ const Auth = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session?.user) {
-        navigate("/");
-      }
-    });
-
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
         navigate("/");
       }
@@ -159,16 +154,25 @@ const Auth = () => {
           const fullName = `${firstName.trim()} ${lastName.trim()}`;
           const normalizedPhone = normalizePhone(phone);
           
-          await supabase.from("profiles").upsert({
+          const { error: profileError } = await supabase.from("profiles").upsert({
             user_id: data.user.id,
             name: fullName,
             phone: normalizedPhone,
           });
 
-          toast({
-            title: "Conta criada!",
-            description: "Cadastro realizado com sucesso",
-          });
+          if (profileError) {
+            logger.error("Profile creation error:", profileError);
+            toast({
+              title: "Conta criada, mas houve um problema",
+              description: "Seu perfil pode estar incompleto. Atualize seus dados no perfil.",
+              variant: "destructive",
+            });
+          } else {
+            toast({
+              title: "Conta criada!",
+              description: "Cadastro realizado com sucesso",
+            });
+          }
         }
       }
     } catch (error) {
