@@ -99,7 +99,7 @@ export function ProfessionalSelect({
                       title="Ver perfil"
                     >
                       <ExternalLink className="w-3.5 h-3.5" />
-                      <span className="hidden sm:inline">Ver perfil</span>
+                      <span>Ver perfil</span>
                     </button>
                     <ChevronRight className={cn(
                       "w-5 h-5 transition-transform",
