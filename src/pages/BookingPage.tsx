@@ -277,7 +277,36 @@ export default function BookingPage() {
     setIsSubmitting(true);
 
     try {
-      // Revalidate and apply coupon server-side if one is applied
+      // 1. Server-side slot validation: check if the time is still available
+      const { data: existingBookings } = await supabase
+        .from("bookings")
+        .select("booking_time, duration_minutes")
+        .eq("professional_id", professionalId)
+        .eq("booking_date", selectedDate)
+        .neq("status", "cancelled");
+
+      const toMin = (t: string) => { const [h, m] = t.split(":").map(Number); return h * 60 + m; };
+      const newStart = toMin(selectedTime);
+      const newEnd = newStart + totalMinutes;
+      const hasConflict = (existingBookings || []).some((b) => {
+        const bStart = toMin(b.booking_time);
+        const bEnd = bStart + Number(b.duration_minutes || 0);
+        return newStart < bEnd && bStart < newEnd;
+      });
+
+      if (hasConflict) {
+        toast({
+          title: "Horário indisponível",
+          description: "Este horário já foi reservado. Escolha outro horário.",
+          variant: "destructive",
+        });
+        setCurrentStep(3);
+        setSelectedTime("");
+        setIsSubmitting(false);
+        return;
+      }
+
+      // 2. Revalidate and apply coupon server-side if one is applied
       let couponData: AppliedCoupon | null = null;
       if (appliedCoupon) {
         const { data, error: fnError } = await supabase.functions.invoke("validate-coupon", {
@@ -301,7 +330,7 @@ export default function BookingPage() {
 
       const finalPrice = couponData ? couponData.final_total : totalPrice;
 
-      // Create booking
+      // 3. Create booking (unique index prevents duplicates at DB level)
       const { data: booking, error: bookingError } = await supabase
         .from("bookings")
         .insert({
@@ -324,7 +353,21 @@ export default function BookingPage() {
         .select()
         .single();
 
-      if (bookingError) throw bookingError;
+      if (bookingError) {
+        // Handle unique constraint violation (race condition)
+        if (bookingError.code === "23505") {
+          toast({
+            title: "Horário indisponível",
+            description: "Este horário acabou de ser reservado por outro cliente. Escolha outro.",
+            variant: "destructive",
+          });
+          setCurrentStep(3);
+          setSelectedTime("");
+          setIsSubmitting(false);
+          return;
+        }
+        throw bookingError;
+      }
 
       // Record coupon usage
       if (couponData) {
