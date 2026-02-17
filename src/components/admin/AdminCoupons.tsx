@@ -265,27 +265,39 @@ export function AdminCoupons() {
               />
             </div>
 
-            <div className="flex items-center justify-between">
-              <Label className="text-sm">Uso ilimitado</Label>
-              <Switch checked={unlimitedUses} onCheckedChange={(v) => { setUnlimitedUses(v); if (v) { setMultipleUses(false); setMaxUses("1"); } }} />
-            </div>
-            {!unlimitedUses && (
-              <>
-                <div className="flex items-center justify-between">
-                  <Label className="text-sm">Múltiplos usos</Label>
-                  <Switch checked={multipleUses} onCheckedChange={(v) => { setMultipleUses(v); if (!v) setMaxUses("1"); }} />
+            <div className="rounded-lg border border-border/60 p-3 space-y-3">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Limite de uso</p>
+              <div className="flex items-center justify-between rounded-md bg-muted/40 px-3 py-2.5">
+                <div>
+                  <Label className="text-sm font-medium">Uso ilimitado</Label>
+                  <p className="text-xs text-muted-foreground mt-0.5">Cupom fica ativo até ser excluído</p>
                 </div>
-                {multipleUses && (
-                  <div>
-                    <Label className="text-xs mb-1 block">Limite de usos</Label>
-                    <Input type="number" min="2" value={maxUses} onChange={(e) => setMaxUses(e.target.value)} />
+                <Switch checked={unlimitedUses} onCheckedChange={(v) => { setUnlimitedUses(v); if (v) { setMultipleUses(false); setMaxUses("1"); } }} />
+              </div>
+              {!unlimitedUses && (
+                <>
+                  <div className="flex items-center justify-between rounded-md bg-muted/40 px-3 py-2.5">
+                    <div>
+                      <Label className="text-sm font-medium">Múltiplos usos</Label>
+                      <p className="text-xs text-muted-foreground mt-0.5">Permitir que vários clientes usem</p>
+                    </div>
+                    <Switch checked={multipleUses} onCheckedChange={(v) => { setMultipleUses(v); if (!v) setMaxUses("1"); }} />
                   </div>
-                )}
-              </>
-            )}
+                  {multipleUses && (
+                    <div className="pl-1">
+                      <Label className="text-xs mb-1 block">Limite de usos</Label>
+                      <Input type="number" min="2" value={maxUses} onChange={(e) => setMaxUses(e.target.value)} />
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
 
-            <div className="flex items-center justify-between">
-              <Label className="text-sm">Ativo</Label>
+            <div className="flex items-center justify-between rounded-md bg-muted/40 px-3 py-2.5">
+              <div>
+                <Label className="text-sm font-medium">Ativo</Label>
+                <p className="text-xs text-muted-foreground mt-0.5">Cupom disponível para uso</p>
+              </div>
               <Switch checked={active} onCheckedChange={setActive} />
             </div>
           </div>
