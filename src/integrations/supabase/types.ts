@@ -21,7 +21,7 @@ export type Database = {
           id: string
           message: string
           read: boolean
-          tenant_id: string | null
+          tenant_id: string
           type: string
           user_id: string
         }
@@ -31,7 +31,7 @@ export type Database = {
           id?: string
           message: string
           read?: boolean
-          tenant_id?: string | null
+          tenant_id: string
           type: string
           user_id: string
         }
@@ -41,7 +41,7 @@ export type Database = {
           id?: string
           message?: string
           read?: boolean
-          tenant_id?: string | null
+          tenant_id?: string
           type?: string
           user_id?: string
         }
@@ -68,21 +68,21 @@ export type Database = {
           created_at: string
           id: string
           service_id: string
-          tenant_id: string | null
+          tenant_id: string
         }
         Insert: {
           booking_id: string
           created_at?: string
           id?: string
           service_id: string
-          tenant_id?: string | null
+          tenant_id: string
         }
         Update: {
           booking_id?: string
           created_at?: string
           id?: string
           service_id?: string
-          tenant_id?: string | null
+          tenant_id?: string
         }
         Relationships: [
           {
@@ -120,7 +120,7 @@ export type Database = {
           notes: string | null
           professional_id: string
           status: string
-          tenant_id: string | null
+          tenant_id: string
           total_price: number
           user_id: string
         }
@@ -135,7 +135,7 @@ export type Database = {
           notes?: string | null
           professional_id: string
           status?: string
-          tenant_id?: string | null
+          tenant_id: string
           total_price?: number
           user_id: string
         }
@@ -150,7 +150,7 @@ export type Database = {
           notes?: string | null
           professional_id?: string
           status?: string
-          tenant_id?: string | null
+          tenant_id?: string
           total_price?: number
           user_id?: string
         }
@@ -176,21 +176,21 @@ export type Database = {
           created_at: string
           id: string
           professional_id: string
-          tenant_id: string | null
+          tenant_id: string
           user_id: string
         }
         Insert: {
           created_at?: string
           id?: string
           professional_id: string
-          tenant_id?: string | null
+          tenant_id: string
           user_id: string
         }
         Update: {
           created_at?: string
           id?: string
           professional_id?: string
-          tenant_id?: string | null
+          tenant_id?: string
           user_id?: string
         }
         Relationships: [
@@ -216,7 +216,7 @@ export type Database = {
           created_at: string
           id: string
           image_url: string
-          tenant_id: string | null
+          tenant_id: string
           user_id: string
         }
         Insert: {
@@ -224,7 +224,7 @@ export type Database = {
           created_at?: string
           id?: string
           image_url: string
-          tenant_id?: string | null
+          tenant_id: string
           user_id: string
         }
         Update: {
@@ -232,7 +232,7 @@ export type Database = {
           created_at?: string
           id?: string
           image_url?: string
-          tenant_id?: string | null
+          tenant_id?: string
           user_id?: string
         }
         Relationships: [
@@ -251,7 +251,7 @@ export type Database = {
           created_at: string
           id: string
           photo_id: string
-          tenant_id: string | null
+          tenant_id: string
           user_id: string
         }
         Insert: {
@@ -259,7 +259,7 @@ export type Database = {
           created_at?: string
           id?: string
           photo_id: string
-          tenant_id?: string | null
+          tenant_id: string
           user_id: string
         }
         Update: {
@@ -267,7 +267,7 @@ export type Database = {
           created_at?: string
           id?: string
           photo_id?: string
-          tenant_id?: string | null
+          tenant_id?: string
           user_id?: string
         }
         Relationships: [
@@ -292,21 +292,21 @@ export type Database = {
           created_at: string
           id: string
           photo_id: string
-          tenant_id: string | null
+          tenant_id: string
           user_id: string
         }
         Insert: {
           created_at?: string
           id?: string
           photo_id: string
-          tenant_id?: string | null
+          tenant_id: string
           user_id: string
         }
         Update: {
           created_at?: string
           id?: string
           photo_id?: string
-          tenant_id?: string | null
+          tenant_id?: string
           user_id?: string
         }
         Relationships: [
@@ -333,7 +333,7 @@ export type Database = {
           id: string
           professional_id: string
           reason: string | null
-          tenant_id: string | null
+          tenant_id: string
         }
         Insert: {
           blocked_date: string
@@ -341,7 +341,7 @@ export type Database = {
           id?: string
           professional_id: string
           reason?: string | null
-          tenant_id?: string | null
+          tenant_id: string
         }
         Update: {
           blocked_date?: string
@@ -349,7 +349,7 @@ export type Database = {
           id?: string
           professional_id?: string
           reason?: string | null
-          tenant_id?: string | null
+          tenant_id?: string
         }
         Relationships: [
           {
@@ -375,7 +375,7 @@ export type Database = {
           id: string
           image_url: string
           professional_id: string
-          tenant_id: string | null
+          tenant_id: string
         }
         Insert: {
           caption?: string | null
@@ -383,7 +383,7 @@ export type Database = {
           id?: string
           image_url: string
           professional_id: string
-          tenant_id?: string | null
+          tenant_id: string
         }
         Update: {
           caption?: string | null
@@ -391,7 +391,7 @@ export type Database = {
           id?: string
           image_url?: string
           professional_id?: string
-          tenant_id?: string | null
+          tenant_id?: string
         }
         Relationships: [
           {
@@ -416,21 +416,21 @@ export type Database = {
           id: string
           professional_id: string
           service_id: string
-          tenant_id: string | null
+          tenant_id: string
         }
         Insert: {
           created_at?: string
           id?: string
           professional_id: string
           service_id: string
-          tenant_id?: string | null
+          tenant_id: string
         }
         Update: {
           created_at?: string
           id?: string
           professional_id?: string
           service_id?: string
-          tenant_id?: string | null
+          tenant_id?: string
         }
         Relationships: [
           {
@@ -466,7 +466,7 @@ export type Database = {
           name: string
           photo_url: string | null
           subtitle: string | null
-          tenant_id: string | null
+          tenant_id: string
           working_days: number[] | null
         }
         Insert: {
@@ -478,7 +478,7 @@ export type Database = {
           name: string
           photo_url?: string | null
           subtitle?: string | null
-          tenant_id?: string | null
+          tenant_id: string
           working_days?: number[] | null
         }
         Update: {
@@ -490,7 +490,7 @@ export type Database = {
           name?: string
           photo_url?: string | null
           subtitle?: string | null
-          tenant_id?: string | null
+          tenant_id?: string
           working_days?: number[] | null
         }
         Relationships: [
@@ -512,7 +512,7 @@ export type Database = {
           name: string | null
           notes: string | null
           phone: string | null
-          tenant_id: string | null
+          tenant_id: string
           updated_at: string
           user_id: string
         }
@@ -524,7 +524,7 @@ export type Database = {
           name?: string | null
           notes?: string | null
           phone?: string | null
-          tenant_id?: string | null
+          tenant_id: string
           updated_at?: string
           user_id: string
         }
@@ -536,7 +536,7 @@ export type Database = {
           name?: string | null
           notes?: string | null
           phone?: string | null
-          tenant_id?: string | null
+          tenant_id?: string
           updated_at?: string
           user_id?: string
         }
@@ -558,7 +558,7 @@ export type Database = {
           id: string
           professional_id: string
           rating: number
-          tenant_id: string | null
+          tenant_id: string
           user_id: string
         }
         Insert: {
@@ -568,7 +568,7 @@ export type Database = {
           id?: string
           professional_id: string
           rating: number
-          tenant_id?: string | null
+          tenant_id: string
           user_id: string
         }
         Update: {
@@ -578,7 +578,7 @@ export type Database = {
           id?: string
           professional_id?: string
           rating?: number
-          tenant_id?: string | null
+          tenant_id?: string
           user_id?: string
         }
         Relationships: [
@@ -615,7 +615,7 @@ export type Database = {
           image_url: string | null
           name: string
           price: number
-          tenant_id: string | null
+          tenant_id: string
         }
         Insert: {
           active?: boolean
@@ -626,7 +626,7 @@ export type Database = {
           image_url?: string | null
           name: string
           price?: number
-          tenant_id?: string | null
+          tenant_id: string
         }
         Update: {
           active?: boolean
@@ -637,7 +637,7 @@ export type Database = {
           image_url?: string | null
           name?: string
           price?: number
-          tenant_id?: string | null
+          tenant_id?: string
         }
         Relationships: [
           {
@@ -722,21 +722,21 @@ export type Database = {
           created_at: string
           id: string
           role: Database["public"]["Enums"]["app_role"]
-          tenant_id: string | null
+          tenant_id: string
           user_id: string
         }
         Insert: {
           created_at?: string
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
-          tenant_id?: string | null
+          tenant_id: string
           user_id: string
         }
         Update: {
           created_at?: string
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
-          tenant_id?: string | null
+          tenant_id?: string
           user_id?: string
         }
         Relationships: [
@@ -762,7 +762,7 @@ export type Database = {
           site_name: string | null
           site_subtitle: string | null
           start_time: string
-          tenant_id: string | null
+          tenant_id: string
           updated_at: string
           whatsapp_template: string | null
           working_days: number[]
@@ -779,7 +779,7 @@ export type Database = {
           site_name?: string | null
           site_subtitle?: string | null
           start_time?: string
-          tenant_id?: string | null
+          tenant_id: string
           updated_at?: string
           whatsapp_template?: string | null
           working_days?: number[]
@@ -796,7 +796,7 @@ export type Database = {
           site_name?: string | null
           site_subtitle?: string | null
           start_time?: string
-          tenant_id?: string | null
+          tenant_id?: string
           updated_at?: string
           whatsapp_template?: string | null
           working_days?: number[]
