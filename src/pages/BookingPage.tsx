@@ -15,6 +15,7 @@ import { ProfilePage } from "@/components/profile/ProfilePage";
 import { MyBookings } from "@/components/booking/MyBookings";
 import { logger } from "@/lib/logger";
 import { normalizePhone, isValidBrazilianPhone, isValidName } from "@/lib/validation";
+import { saveBookingDraft, loadBookingDraft, clearBookingDraft } from "@/lib/bookingDraft";
 
 function getTodayISO(): string {
   const d = new Date();
@@ -43,6 +44,7 @@ export default function BookingPage() {
   const { toast } = useToast();
   const { tenantId } = useTenant();
   const { professionals, services, loading: dataLoading } = useBookingData();
+  const [draftRestored, setDraftRestored] = useState(false);
 
   // Calculate totals
   const selectedServices = useMemo(
@@ -77,6 +79,24 @@ export default function BookingPage() {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  // Restore booking draft after login
+  useEffect(() => {
+    if (!tenantId || draftRestored || dataLoading) return;
+    const draft = loadBookingDraft(tenantId);
+    if (draft) {
+      setProfessionalId(draft.professionalId);
+      setSelectedServiceIds(draft.selectedServiceIds);
+      setSelectedDate(draft.selectedDate);
+      setSelectedTime(draft.selectedTime);
+      if (draft.clientName) setClientName(draft.clientName);
+      if (draft.clientPhone) setClientPhone(draft.clientPhone);
+      if (draft.notes) setNotes(draft.notes);
+      setCurrentStep(draft.currentStep);
+      setActivePage("booking");
+    }
+    setDraftRestored(true);
+  }, [tenantId, draftRestored, dataLoading]);
 
   // Load profile data when user is logged in
   useEffect(() => {
@@ -160,12 +180,25 @@ export default function BookingPage() {
 
   const handleSubmit = async () => {
     if (!user) {
+      // Save draft before redirecting to auth
+      if (tenantId) {
+        saveBookingDraft({
+          professionalId,
+          selectedServiceIds,
+          selectedDate,
+          selectedTime,
+          clientName,
+          clientPhone,
+          notes,
+          currentStep: 4,
+          tenantId,
+        });
+      }
       toast({
         title: "Login necessário",
-        description: "Faça login para confirmar o agendamento.",
-        variant: "destructive",
+        description: "Faça login para confirmar o agendamento. Seus dados serão preservados.",
       });
-      navigate("/auth");
+      navigate("/auth?redirect=/");
       return;
     }
 
@@ -245,7 +278,8 @@ export default function BookingPage() {
         description: `${selectedDate} às ${selectedTime}`,
       });
 
-      // Reset form
+      // Clear draft and reset form
+      if (tenantId) clearBookingDraft(tenantId);
       setCurrentStep(1);
       setProfessionalId("");
       setSelectedServiceIds([]);
