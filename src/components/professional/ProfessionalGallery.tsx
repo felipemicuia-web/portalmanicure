@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
+import { useTenant } from "@/contexts/TenantContext";
 import { useToast } from "@/hooks/use-toast";
 import { logger } from "@/lib/logger";
 import { Button } from "@/components/ui/button";
@@ -48,6 +49,7 @@ export function ProfessionalGallery({ professionalId, user }: ProfessionalGaller
   const [submitting, setSubmitting] = useState(false);
   const [loadingComments, setLoadingComments] = useState(false);
   const { toast } = useToast();
+  const { tenantId } = useTenant();
 
   const fetchPhotos = async () => {
     setLoading(true);
@@ -162,7 +164,7 @@ export function ProfessionalGallery({ professionalId, user }: ProfessionalGaller
       } else {
         await supabase
           .from("photo_likes")
-          .insert({ photo_id: photoId, user_id: user.id });
+          .insert({ photo_id: photoId, user_id: user.id, tenant_id: tenantId! });
 
         setUserLikes(prev => ({ ...prev, [photoId]: true }));
         setLikeCounts(prev => ({ ...prev, [photoId]: (prev[photoId] || 0) + 1 }));
@@ -192,6 +194,7 @@ export function ProfessionalGallery({ professionalId, user }: ProfessionalGaller
           photo_id: selectedPhoto.id,
           user_id: user.id,
           content: newComment.trim(),
+          tenant_id: tenantId!,
         });
 
       if (error) throw error;

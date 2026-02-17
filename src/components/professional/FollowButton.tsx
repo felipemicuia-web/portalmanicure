@@ -6,6 +6,7 @@ import { logger } from "@/lib/logger";
 import { Button } from "@/components/ui/button";
 import { Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useTenant } from "@/contexts/TenantContext";
 
 interface FollowButtonProps {
   professionalId: string;
@@ -24,6 +25,7 @@ export function FollowButton({
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { tenantId } = useTenant();
 
   useEffect(() => {
     if (!user) {
@@ -80,6 +82,7 @@ export function FollowButton({
           .insert({
             user_id: user.id,
             professional_id: professionalId,
+            tenant_id: tenantId!,
           });
 
         if (error) throw error;
