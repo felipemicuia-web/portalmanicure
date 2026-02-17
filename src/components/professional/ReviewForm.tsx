@@ -2,6 +2,7 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { logger } from "@/lib/logger";
+import { useTenant } from "@/contexts/TenantContext";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Star } from "lucide-react";
@@ -17,6 +18,7 @@ export function ReviewForm({ professionalId, userId, onSubmitted }: ReviewFormPr
   const [hoverRating, setHoverRating] = useState(0);
   const [comment, setComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { tenantId } = useTenant();
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -41,6 +43,7 @@ export function ReviewForm({ professionalId, userId, onSubmitted }: ReviewFormPr
           professional_id: professionalId,
           rating,
           comment: comment.trim() || null,
+          tenant_id: tenantId!,
         });
 
       if (error) throw error;

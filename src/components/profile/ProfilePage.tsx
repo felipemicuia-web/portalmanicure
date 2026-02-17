@@ -3,6 +3,7 @@ import { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { ProfileHeader } from "./ProfileHeader";
 import { FollowingList } from "@/components/professional/FollowingList";
+import { useTenant } from "@/contexts/TenantContext";
 
 interface Profile {
   id: string;
@@ -20,6 +21,7 @@ export function ProfilePage({ user }: ProfilePageProps) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [bookingCount, setBookingCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const { tenantId } = useTenant();
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -35,7 +37,7 @@ export function ProfilePage({ user }: ProfilePageProps) {
     if (!profileData) {
       const { data: newProfile } = await supabase
         .from("profiles")
-        .insert({ user_id: user.id })
+        .insert({ user_id: user.id, tenant_id: tenantId! })
         .select()
         .single();
       
