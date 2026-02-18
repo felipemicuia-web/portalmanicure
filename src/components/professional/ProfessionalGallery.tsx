@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { useTenant } from "@/contexts/TenantContext";
@@ -7,7 +7,16 @@ import { formatDateBR } from "@/lib/dateFormat";
 import { logger } from "@/lib/logger";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Heart, MessageCircle, Send, Trash2, X, Image as ImageIcon } from "lucide-react";
+import {
+  Heart,
+  MessageCircle,
+  Send,
+  Trash2,
+  Image as ImageIcon,
+  ChevronLeft,
+  ChevronRight,
+  X,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   Dialog,
@@ -17,6 +26,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -47,7 +66,7 @@ interface ProfessionalGalleryProps {
 export function ProfessionalGallery({ professionalId, user, isAdmin }: ProfessionalGalleryProps) {
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState<number>(-1);
   const [likeCounts, setLikeCounts] = useState<Record<string, number>>({});
   const [userLikes, setUserLikes] = useState<Record<string, boolean>>({});
   const [comments, setComments] = useState<Comment[]>([]);
@@ -58,6 +77,8 @@ export function ProfessionalGallery({ professionalId, user, isAdmin }: Professio
   const [deletingComment, setDeletingComment] = useState(false);
   const { toast } = useToast();
   const { tenantId } = useTenant();
+
+  const selectedPhoto = selectedIndex >= 0 ? photos[selectedIndex] : null;
 
   const fetchPhotos = async () => {
     setLoading(true);
@@ -71,19 +92,19 @@ export function ProfessionalGallery({ professionalId, user, isAdmin }: Professio
       logger.error("Error fetching photos:", error);
     } else {
       setPhotos(data || []);
-      
+
       if (data && data.length > 0) {
         const counts: Record<string, number> = {};
         const likes: Record<string, boolean> = {};
-        
+
         for (const photo of data) {
           const { count } = await supabase
             .from("photo_likes")
             .select("*", { count: "exact", head: true })
             .eq("photo_id", photo.id);
-          
+
           counts[photo.id] = count || 0;
-          
+
           if (user) {
             const { data: likeData } = await supabase
               .from("photo_likes")
@@ -91,11 +112,11 @@ export function ProfessionalGallery({ professionalId, user, isAdmin }: Professio
               .eq("photo_id", photo.id)
               .eq("user_id", user.id)
               .maybeSingle();
-            
+
             likes[photo.id] = !!likeData;
           }
         }
-        
+
         setLikeCounts(counts);
         setUserLikes(likes);
       }
@@ -115,17 +136,17 @@ export function ProfessionalGallery({ professionalId, user, isAdmin }: Professio
       logger.error("Error fetching comments:", error);
       setComments([]);
     } else if (data && data.length > 0) {
-      const userIds = [...new Set(data.map(c => c.user_id))];
+      const userIds = [...new Set(data.map((c) => c.user_id))];
       const { data: profiles } = await supabase
         .from("profiles")
         .select("user_id, name, avatar_url")
         .in("user_id", userIds);
 
-      const commentsWithProfiles = data.map(comment => ({
+      const commentsWithProfiles = data.map((comment) => ({
         ...comment,
-        profile: profiles?.find(p => p.user_id === comment.user_id) || null,
+        profile: profiles?.find((p) => p.user_id === comment.user_id) || null,
       }));
-      
+
       setComments(commentsWithProfiles);
     } else {
       setComments([]);
@@ -140,8 +161,10 @@ export function ProfessionalGallery({ professionalId, user, isAdmin }: Professio
   useEffect(() => {
     if (selectedPhoto) {
       fetchComments(selectedPhoto.id);
+    } else {
+      setComments([]);
     }
-  }, [selectedPhoto]);
+  }, [selectedIndex]);
 
   const handleLike = async (photoId: string) => {
     if (!user) {
@@ -163,15 +186,15 @@ export function ProfessionalGallery({ professionalId, user, isAdmin }: Professio
           .eq("photo_id", photoId)
           .eq("user_id", user.id);
 
-        setUserLikes(prev => ({ ...prev, [photoId]: false }));
-        setLikeCounts(prev => ({ ...prev, [photoId]: Math.max(0, (prev[photoId] || 0) - 1) }));
+        setUserLikes((prev) => ({ ...prev, [photoId]: false }));
+        setLikeCounts((prev) => ({ ...prev, [photoId]: Math.max(0, (prev[photoId] || 0) - 1) }));
       } else {
         await supabase
           .from("photo_likes")
           .insert({ photo_id: photoId, user_id: user.id, tenant_id: tenantId! });
 
-        setUserLikes(prev => ({ ...prev, [photoId]: true }));
-        setLikeCounts(prev => ({ ...prev, [photoId]: (prev[photoId] || 0) + 1 }));
+        setUserLikes((prev) => ({ ...prev, [photoId]: true }));
+        setLikeCounts((prev) => ({ ...prev, [photoId]: (prev[photoId] || 0) + 1 }));
       }
     } catch (error) {
       logger.error("Error toggling like:", error);
@@ -192,14 +215,12 @@ export function ProfessionalGallery({ professionalId, user, isAdmin }: Professio
 
     setSubmitting(true);
     try {
-      const { error } = await supabase
-        .from("photo_comments")
-        .insert({
-          photo_id: selectedPhoto.id,
-          user_id: user.id,
-          content: newComment.trim(),
-          tenant_id: tenantId!,
-        });
+      const { error } = await supabase.from("photo_comments").insert({
+        photo_id: selectedPhoto.id,
+        user_id: user.id,
+        content: newComment.trim(),
+        tenant_id: tenantId!,
+      });
 
       if (error) throw error;
 
@@ -246,13 +267,25 @@ export function ProfessionalGallery({ professionalId, user, isAdmin }: Professio
     }
   };
 
-  const getCommentCount = async (photoId: string): Promise<number> => {
-    const { count } = await supabase
-      .from("photo_comments")
-      .select("*", { count: "exact", head: true })
-      .eq("photo_id", photoId);
-    return count || 0;
+  const navigatePhoto = (direction: "prev" | "next") => {
+    setSelectedIndex((prev) => {
+      if (direction === "prev") return prev > 0 ? prev - 1 : photos.length - 1;
+      return prev < photos.length - 1 ? prev + 1 : 0;
+    });
+    setNewComment("");
   };
+
+  // Keyboard navigation
+  useEffect(() => {
+    if (selectedIndex < 0) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") navigatePhoto("prev");
+      else if (e.key === "ArrowRight") navigatePhoto("next");
+      else if (e.key === "Escape") setSelectedIndex(-1);
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [selectedIndex, photos.length]);
 
   if (loading) {
     return (
@@ -274,29 +307,36 @@ export function ProfessionalGallery({ professionalId, user, isAdmin }: Professio
 
   return (
     <div className="glass-panel p-4 sm:p-6">
+      {/* Header */}
       <div className="flex items-center gap-2 mb-4">
         <ImageIcon className="w-5 h-5 text-primary" />
         <h3 className="font-semibold">Galeria</h3>
         <span className="text-sm text-muted-foreground">({photos.length} fotos)</span>
       </div>
 
-      <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-        {photos.map((photo) => (
+      {/* Instagram-style Grid: 2 cols mobile, 3 cols desktop */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-1 sm:gap-1.5">
+        {photos.map((photo, index) => (
           <button
             key={photo.id}
-            onClick={() => setSelectedPhoto(photo)}
-            className="relative group aspect-square rounded-lg overflow-hidden bg-muted"
+            onClick={() => setSelectedIndex(index)}
+            className="relative group aspect-square rounded-md overflow-hidden bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           >
             <img
               src={photo.image_url}
               alt={photo.caption || "Foto"}
-              className="w-full h-full object-cover transition-transform group-hover:scale-105"
+              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+              loading="lazy"
             />
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-              <div className="flex items-center gap-2 text-white text-xs">
-                <span className="flex items-center gap-0.5">
-                  <Heart className={cn("w-3 h-3", userLikes[photo.id] && "fill-current text-red-500")} />
+            {/* Overlay on hover */}
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
+              <div className="flex items-center gap-4 text-white font-semibold text-sm">
+                <span className="flex items-center gap-1">
+                  <Heart className={cn("w-5 h-5", userLikes[photo.id] && "fill-current")} />
                   {likeCounts[photo.id] || 0}
+                </span>
+                <span className="flex items-center gap-1">
+                  <MessageCircle className="w-5 h-5" />
                 </span>
               </div>
             </div>
@@ -304,45 +344,73 @@ export function ProfessionalGallery({ professionalId, user, isAdmin }: Professio
         ))}
       </div>
 
-      {/* Photo Detail Dialog */}
-      <Dialog open={!!selectedPhoto} onOpenChange={() => setSelectedPhoto(null)}>
-        <DialogContent className="max-w-3xl p-0 overflow-hidden">
+      {/* Lightbox Modal */}
+      <Dialog open={selectedIndex >= 0} onOpenChange={(open) => !open && setSelectedIndex(-1)}>
+        <DialogContent className="max-w-4xl w-[95vw] p-0 overflow-hidden gap-0 border-border/50">
           {selectedPhoto && (
             <div className="flex flex-col md:flex-row max-h-[90vh]">
-              {/* Image */}
-              <div className="md:w-1/2 bg-black flex items-center justify-center">
+              {/* Image section with carousel arrows */}
+              <div className="relative md:w-3/5 bg-black flex items-center justify-center min-h-[250px] md:min-h-[500px]">
                 <img
                   src={selectedPhoto.image_url}
                   alt={selectedPhoto.caption || "Foto"}
-                  className="max-h-[40vh] md:max-h-[90vh] w-full object-contain"
+                  className="max-h-[40vh] md:max-h-[90vh] w-full object-contain select-none"
+                  draggable={false}
                 />
+
+                {/* Carousel arrows */}
+                {photos.length > 1 && (
+                  <>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); navigatePhoto("prev"); }}
+                      className="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/60 hover:bg-black/80 text-white flex items-center justify-center transition-colors backdrop-blur-sm"
+                      aria-label="Foto anterior"
+                    >
+                      <ChevronLeft className="w-5 h-5" />
+                    </button>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); navigatePhoto("next"); }}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/60 hover:bg-black/80 text-white flex items-center justify-center transition-colors backdrop-blur-sm"
+                      aria-label="Próxima foto"
+                    >
+                      <ChevronRight className="w-5 h-5" />
+                    </button>
+                  </>
+                )}
+
+                {/* Photo counter */}
+                {photos.length > 1 && (
+                  <span className="absolute bottom-3 left-1/2 -translate-x-1/2 text-xs text-white/80 bg-black/50 px-2.5 py-1 rounded-full backdrop-blur-sm">
+                    {selectedIndex + 1} / {photos.length}
+                  </span>
+                )}
               </div>
 
               {/* Comments Section */}
-              <div className="md:w-1/2 flex flex-col bg-background max-h-[50vh] md:max-h-[90vh]">
-                {/* Header */}
-                <div className="p-4 border-b border-border">
+              <div className="md:w-2/5 flex flex-col bg-background max-h-[50vh] md:max-h-[90vh]">
+                {/* Header with like/comment counts */}
+                <div className="p-4 border-b border-border/50">
                   {selectedPhoto.caption && (
-                    <p className="text-sm">{selectedPhoto.caption}</p>
+                    <p className="text-sm mb-2">{selectedPhoto.caption}</p>
                   )}
-                  <div className="flex items-center gap-4 mt-2">
+                  <div className="flex items-center gap-4">
                     <button
                       onClick={() => handleLike(selectedPhoto.id)}
-                      className="flex items-center gap-1 text-sm"
+                      className="flex items-center gap-1.5 text-sm transition-colors"
                     >
                       <Heart
                         className={cn(
-                          "w-5 h-5 transition-colors",
+                          "w-6 h-6 transition-all",
                           userLikes[selectedPhoto.id]
-                            ? "fill-red-500 text-red-500"
+                            ? "fill-red-500 text-red-500 scale-110"
                             : "text-muted-foreground hover:text-foreground"
                         )}
                       />
-                      <span>{likeCounts[selectedPhoto.id] || 0}</span>
+                      <span className="font-medium">{likeCounts[selectedPhoto.id] || 0}</span>
                     </button>
-                    <span className="flex items-center gap-1 text-sm text-muted-foreground">
+                    <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
                       <MessageCircle className="w-5 h-5" />
-                      {comments.length}
+                      <span>{comments.length}</span>
                     </span>
                   </div>
                 </div>
@@ -369,13 +437,13 @@ export function ProfessionalGallery({ professionalId, user, isAdmin }: Professio
                               {comment.profile?.avatar_url && (
                                 <AvatarImage src={comment.profile.avatar_url} />
                               )}
-                              <AvatarFallback className="text-xs">
+                              <AvatarFallback className="text-xs bg-muted">
                                 {comment.profile?.name?.[0]?.toUpperCase() || "U"}
                               </AvatarFallback>
                             </Avatar>
                             <div className="flex-1 min-w-0">
                               <p className="text-sm">
-                                <span className="font-medium mr-1">
+                                <span className="font-semibold mr-1">
                                   {comment.profile?.name || "Usuário"}
                                 </span>
                                 {comment.content}
@@ -387,9 +455,10 @@ export function ProfessionalGallery({ professionalId, user, isAdmin }: Professio
                             {canDelete && (
                               <button
                                 onClick={() => setDeleteCommentTarget(comment.id)}
-                                className="opacity-0 group-hover:opacity-100 sm:opacity-0 sm:group-hover:opacity-100 max-sm:opacity-100 text-muted-foreground hover:text-destructive transition-opacity shrink-0"
+                                className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-opacity shrink-0 p-1"
+                                title="Excluir comentário"
                               >
-                                <Trash2 className="w-4 h-4" />
+                                <Trash2 className="w-3.5 h-3.5" />
                               </button>
                             )}
                           </div>
@@ -401,7 +470,7 @@ export function ProfessionalGallery({ professionalId, user, isAdmin }: Professio
 
                 {/* Add Comment */}
                 {user ? (
-                  <div className="p-3 border-t border-border">
+                  <div className="p-3 border-t border-border/50">
                     <div className="flex gap-2">
                       <Input
                         value={newComment}
@@ -421,7 +490,7 @@ export function ProfessionalGallery({ professionalId, user, isAdmin }: Professio
                         disabled={submitting || !newComment.trim()}
                       >
                         {submitting ? (
-                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
                         ) : (
                           <Send className="w-4 h-4" />
                         )}
@@ -429,7 +498,7 @@ export function ProfessionalGallery({ professionalId, user, isAdmin }: Professio
                     </div>
                   </div>
                 ) : (
-                  <div className="p-3 border-t border-border text-center">
+                  <div className="p-3 border-t border-border/50 text-center">
                     <p className="text-sm text-muted-foreground">
                       Faça login para comentar
                     </p>
@@ -441,25 +510,27 @@ export function ProfessionalGallery({ professionalId, user, isAdmin }: Professio
         </DialogContent>
       </Dialog>
 
-      {/* Delete Comment Confirmation Dialog */}
-      <Dialog open={!!deleteCommentTarget} onOpenChange={(open) => !open && setDeleteCommentTarget(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Excluir comentário</DialogTitle>
-            <DialogDescription>
+      {/* Delete Comment Confirmation */}
+      <AlertDialog open={!!deleteCommentTarget} onOpenChange={(open) => !open && setDeleteCommentTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir comentário?</AlertDialogTitle>
+            <AlertDialogDescription>
               Tem certeza que deseja excluir este comentário? Esta ação não pode ser desfeita.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteCommentTarget(null)} disabled={deletingComment}>
-              Cancelar
-            </Button>
-            <Button variant="destructive" onClick={handleDeleteComment} disabled={deletingComment}>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deletingComment}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteComment}
+              disabled={deletingComment}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
               {deletingComment ? "Excluindo..." : "Excluir"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
