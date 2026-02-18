@@ -333,7 +333,7 @@ export default function ProfessionalProfilePage() {
           </div>
 
           {/* Gallery */}
-          {id && <ProfessionalGallery professionalId={id} user={user} />}
+          {id && <ProfessionalGallery professionalId={id} user={user} isAdmin={isAdmin} />}
 
           {/* Review Form */}
           {canReview && id && (
