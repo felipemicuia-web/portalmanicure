@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { logger } from "@/lib/logger";
+import { formatDateWeekdayBR, formatDateBR } from "@/lib/dateFormat";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useAvailableTimes } from "@/hooks/useBookingData";
 import { useTenant } from "@/contexts/TenantContext";
@@ -131,15 +132,7 @@ export function MyBookings({ user }: Props) {
     return professionals.find((p) => p.id === id)?.name || "—";
   };
 
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr + "T00:00:00");
-    return date.toLocaleDateString("pt-BR", {
-      weekday: "short",
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    });
-  };
+  const formatDate = (dateStr: string) => formatDateWeekdayBR(dateStr);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("pt-BR", {
@@ -215,7 +208,7 @@ export function MyBookings({ user }: Props) {
     await createNotification(
       "booking_updated",
       editingBooking,
-      `${editingBooking.client_name} alterou o agendamento com ${professional} para ${editForm.booking_date} às ${editForm.booking_time}`
+      `${editingBooking.client_name} alterou o agendamento com ${professional} para ${formatDateBR(editForm.booking_date)} às ${editForm.booking_time}`
     );
 
     toast.success("Agendamento atualizado! O admin foi notificado.");

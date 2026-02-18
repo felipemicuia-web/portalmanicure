@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { formatDateBR } from "@/lib/dateFormat";
 
 interface Professional {
   id: string;
@@ -175,7 +176,7 @@ export function AdminProfessionalSchedule() {
     } else {
       toast({
         title: "Folga adicionada!",
-        description: `${format(selectedDate, "dd/MM/yyyy")} marcado como folga.`,
+        description: `${formatDateBR(selectedDate)} marcado como folga.`,
       });
       setSelectedDate(undefined);
       setBlockReason("");
@@ -360,7 +361,7 @@ export function AdminProfessionalSchedule() {
                     </div>
                     <Button onClick={handleAddBlockedDate} className="w-full gap-2">
                       <Plus className="w-4 h-4" />
-                      Adicionar {format(selectedDate, "dd/MM/yyyy")}
+                      Adicionar {formatDateBR(selectedDate)}
                     </Button>
                   </div>
                 )}
@@ -382,7 +383,7 @@ export function AdminProfessionalSchedule() {
                       >
                         <div>
                           <p className="font-medium">
-                            {format(parseISO(bd.blocked_date), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                            {formatDateBR(bd.blocked_date)}
                           </p>
                           {bd.reason && (
                             <p className="text-sm text-muted-foreground">{bd.reason}</p>

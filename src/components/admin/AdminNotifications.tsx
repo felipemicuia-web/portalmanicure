@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { logger } from "@/lib/logger";
+import { formatDateTimeBR } from "@/lib/dateFormat";
 import { Bell, Check, Trash2, RefreshCw, Calendar, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -72,16 +73,7 @@ export function AdminNotifications() {
     };
   }, []);
 
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString("pt-BR", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
+  const formatDate = (dateStr: string) => formatDateTimeBR(dateStr);
 
   const getTypeIcon = (type: string) => {
     switch (type) {

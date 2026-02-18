@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, User, Briefcase, Calendar, Wallet, Phone, CheckCircle, Ticket, X, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { formatDateBR } from "@/lib/dateFormat";
 
 export interface AppliedCoupon {
   coupon_id: string;
@@ -53,8 +54,7 @@ function formatDateDisplay(dateStr: string): string {
     return "Hoje";
   }
   
-  const [year, month, day] = dateStr.split("-");
-  return `${day}/${month}`;
+  return formatDateBR(dateStr);
 }
 
 const MAX_NOTES_LENGTH = 500;

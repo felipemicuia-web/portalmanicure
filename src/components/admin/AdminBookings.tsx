@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { logger } from "@/lib/logger";
 import { formatPhone } from "@/lib/validation";
+import { formatDateBR } from "@/lib/dateFormat";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Calendar, Clock, User, Phone, CalendarDays, Pencil, Trash2, MessageCircle } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -195,22 +196,9 @@ export function AdminBookings() {
     return `https://web.whatsapp.com/send?phone=${phone}&text=${encodedText}&app_absent=0`;
   };
 
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr + "T00:00:00");
-    return date.toLocaleDateString("pt-BR", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    });
-  };
+  const formatDate = (dateStr: string) => formatDateBR(dateStr);
 
-  const formatDateShort = (dateStr: string) => {
-    const date = new Date(dateStr + "T00:00:00");
-    return date.toLocaleDateString("pt-BR", {
-      day: "2-digit",
-      month: "2-digit",
-    });
-  };
+  const formatDateShort = (dateStr: string) => formatDateBR(dateStr);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("pt-BR", {

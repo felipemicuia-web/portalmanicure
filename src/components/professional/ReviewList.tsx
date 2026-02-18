@@ -10,8 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Star, User, Trash2 } from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import { formatDateBR } from "@/lib/dateFormat";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -104,10 +103,7 @@ export function ReviewList({ reviews, currentUserId, isAdmin, onReviewDeleted }:
                       <span className="font-medium text-sm truncate">{name}</span>
                       <div className="flex items-center gap-1 shrink-0">
                         <span className="text-xs text-muted-foreground">
-                          {formatDistanceToNow(new Date(review.created_at), {
-                            addSuffix: true,
-                            locale: ptBR,
-                          })}
+                          {formatDateBR(review.created_at)}
                         </span>
                         {canDelete && (
                           <Button

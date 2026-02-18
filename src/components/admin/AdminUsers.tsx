@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { formatDateBR } from "@/lib/dateFormat";
 import { useTenant } from "@/contexts/TenantContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,8 +26,6 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Search, Trash2, ShieldBan, ShieldCheck, User, Phone, Calendar } from "lucide-react";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
 
 interface ProfileUser {
   id: string;
@@ -186,7 +185,7 @@ export function AdminUsers() {
                   <TableCell className="hidden md:table-cell">
                     <span className="flex items-center gap-1 text-sm text-muted-foreground">
                       <Calendar className="w-3.5 h-3.5" />
-                      {format(new Date(user.created_at), "dd/MM/yyyy", { locale: ptBR })}
+                      {formatDateBR(user.created_at)}
                     </span>
                   </TableCell>
                   <TableCell className="hidden sm:table-cell">

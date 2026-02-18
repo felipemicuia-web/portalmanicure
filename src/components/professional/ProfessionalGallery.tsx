@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { useTenant } from "@/contexts/TenantContext";
 import { useToast } from "@/hooks/use-toast";
+import { formatDateBR } from "@/lib/dateFormat";
 import { logger } from "@/lib/logger";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -380,7 +381,7 @@ export function ProfessionalGallery({ professionalId, user, isAdmin }: Professio
                                 {comment.content}
                               </p>
                               <p className="text-xs text-muted-foreground mt-0.5">
-                                {new Date(comment.created_at).toLocaleDateString("pt-BR")}
+                                {formatDateBR(comment.created_at)}
                               </p>
                             </div>
                             {canDelete && (
