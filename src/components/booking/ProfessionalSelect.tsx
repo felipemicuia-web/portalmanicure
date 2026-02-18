@@ -1,4 +1,5 @@
 import { Professional } from "@/types/booking";
+import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { User, ChevronRight, ExternalLink } from "lucide-react";
@@ -26,93 +27,105 @@ export function ProfessionalSelect({
   };
 
   return (
-    <div className="glass-panel space-y-6">
+    <div className="glass-panel p-4 sm:p-6 space-y-4 sm:space-y-5">
       <div>
-        <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-1">
-          Escolha seu profissional
+        <h2 className="text-xl sm:text-2xl font-bold mb-1 sm:mb-2 bg-gradient-to-r from-foreground via-foreground/90 to-foreground/70 bg-clip-text">
+          Selecione um profissional
         </h2>
-        <p className="text-muted-foreground text-sm">Selecione quem vai te atender</p>
+        <p className="text-muted-foreground text-xs sm:text-sm">Escolha quem vai te atender.</p>
       </div>
 
-      <div className="flex flex-col gap-3">
-        {professionals.map((p) => {
-          const isSelected = selectedId === p.id;
-          const initials = p.name
-            .split(" ")
-            .map((n) => n[0])
-            .join("")
-            .slice(0, 2)
-            .toUpperCase();
+      <div className="flex flex-col gap-3 sm:gap-4">
+        <div className="w-full">
+          <Label htmlFor="professional" className="text-xs sm:text-sm opacity-90 mb-2 sm:mb-3 block font-medium">
+            Profissional
+          </Label>
+          <div id="professional" className="grid grid-cols-1 gap-2 sm:gap-3">
+            {professionals.map((p) => {
+              const isSelected = selectedId === p.id;
+              const initials = p.name
+                .split(" ")
+                .map((n) => n[0])
+                .join("")
+                .slice(0, 2)
+                .toUpperCase();
 
-          return (
-            <button
-              key={p.id}
-              type="button"
-              onClick={() => onSelect(p.id)}
-              className={cn(
-                "flex items-center gap-4 p-4 sm:p-5 rounded-2xl border transition-all duration-300 w-full text-left group",
-                isSelected
-                  ? "border-primary/60 bg-primary/10 shadow-lg shadow-primary/10 ring-1 ring-primary/30"
-                  : "border-border/30 bg-card/30 hover:border-border/50 hover:bg-card/50 active:scale-[0.98]"
-              )}
-            >
-              <Avatar className={cn(
-                "rounded-2xl border-2 flex-shrink-0 transition-all duration-300",
-                "h-14 w-14 sm:h-16 sm:w-16",
-                isSelected ? "border-primary/50" : "border-border/30"
-              )}>
-                {p.photo_url ? (
-                  <AvatarImage src={p.photo_url} alt={p.name} className="object-cover" />
-                ) : null}
-                <AvatarFallback className="rounded-2xl bg-muted text-muted-foreground text-base sm:text-lg font-semibold">
-                  {initials || <User className="w-5 h-5 sm:w-6 sm:h-6" />}
-                </AvatarFallback>
-              </Avatar>
-
-              <div className="flex-1 min-w-0">
-                <span className={cn(
-                  "font-bold text-base sm:text-lg block truncate transition-colors",
-                  isSelected ? "text-primary" : "text-foreground"
-                )}>
-                  {p.name}
-                </span>
-                {p.subtitle && (
-                  <span className="text-xs sm:text-sm text-muted-foreground block truncate mt-0.5">
-                    {p.subtitle}
-                  </span>
-                )}
-                <span
-                  onClick={(e) => handleViewProfile(e, p.id)}
-                  className="inline-flex items-center gap-1 mt-1.5 text-xs text-primary/80 hover:text-primary transition-colors"
+              return (
+                <div
+                  key={p.id}
+                  className={cn(
+                    "flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl border-2 transition-all duration-200 w-full",
+                    isSelected
+                      ? "bg-primary/20 border-primary shadow-lg shadow-primary/25 ring-2 ring-primary/40"
+                      : "bg-transparent border-border/40 hover:border-border hover:bg-muted/30"
+                  )}
                 >
-                  <ExternalLink className="w-3 h-3" />
-                  Ver perfil
-                </span>
+                  <button
+                    type="button"
+                    onClick={() => onSelect(p.id)}
+                    className="flex items-start gap-3 sm:gap-4 flex-1 min-w-0 active:scale-[0.98]"
+                  >
+                    <Avatar className={cn(
+                      "rounded-lg border-2 border-background/50 flex-shrink-0",
+                      "h-12 w-12 sm:h-16 sm:w-16"
+                    )}>
+                      {p.photo_url ? (
+                        <AvatarImage src={p.photo_url} alt={p.name} className="object-cover" />
+                      ) : null}
+                      <AvatarFallback className="rounded-lg bg-muted text-muted-foreground text-sm sm:text-lg font-semibold">
+                        {initials || <User className="w-5 h-5 sm:w-6 sm:h-6" />}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <span className={cn(
+                        "font-semibold text-sm sm:text-base text-left truncate block",
+                        isSelected ? "text-primary" : "text-foreground"
+                      )}>
+                        {p.name}
+                      </span>
+                      {p.subtitle && (
+                        <span className="text-xs text-muted-foreground text-left truncate block mt-0.5">
+                          {p.subtitle}
+                        </span>
+                      )}
+                      <button
+                        type="button"
+                        onClick={(e) => handleViewProfile(e, p.id)}
+                        className="flex items-center gap-1 mt-1 text-xs text-primary hover:text-primary/80 transition-colors"
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                        <span>Ver perfil</span>
+                      </button>
+                    </div>
+                  </button>
+                  
+                  <div className="flex items-center shrink-0">
+                    <ChevronRight className={cn(
+                      "w-5 h-5 transition-transform",
+                      isSelected ? "text-primary translate-x-1" : "text-muted-foreground"
+                    )} />
+                  </div>
+                </div>
+              );
+            })}
+
+            {professionals.length === 0 && (
+              <div className="col-span-full text-sm text-muted-foreground text-center py-4">
+                Nenhum profissional disponível no momento.
               </div>
-              
-              <ChevronRight className={cn(
-                "w-5 h-5 shrink-0 transition-all duration-300",
-                isSelected ? "text-primary translate-x-1" : "text-muted-foreground/40 group-hover:text-muted-foreground"
-              )} />
-            </button>
-          );
-        })}
-
-        {professionals.length === 0 && (
-          <div className="text-sm text-muted-foreground text-center py-8">
-            Nenhum profissional disponível no momento.
+            )}
           </div>
-        )}
-      </div>
+        </div>
 
-      <div className="pt-2">
-        <Button
-          onClick={onNext}
-          disabled={!selectedId}
-          className="btn-glow w-full h-13 sm:h-14 text-base font-bold rounded-2xl bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg shadow-primary/20 disabled:opacity-40 disabled:shadow-none"
-        >
-          Continuar
-        </Button>
+        <div className="flex justify-end pt-3">
+          <Button
+            onClick={onNext}
+            disabled={!selectedId}
+            className="btn-glow bg-gradient-to-r from-primary via-primary/90 to-primary/70 hover:from-primary hover:to-primary/80 shadow-xl shadow-primary/30 px-6 sm:px-8 h-12 sm:h-14 font-extrabold text-sm sm:text-base tracking-wide w-full sm:w-auto rounded-xl"
+          >
+            Continuar
+          </Button>
+        </div>
       </div>
     </div>
   );

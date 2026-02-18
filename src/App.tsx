@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -6,7 +7,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ThemedBackground } from "@/components/backgrounds/ThemedBackground";
 import { TenantProvider } from "@/contexts/TenantContext";
-import { useTenantTheme } from "@/hooks/useTheme";
 import BookingPage from "./pages/BookingPage";
 import Auth from "./pages/Auth";
 import AdminPage from "./pages/AdminPage";
@@ -15,9 +15,31 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-// Loads and subscribes to theme from DB per tenant
+// Theme loader component
 function ThemeLoader() {
-  useTenantTheme();
+  useEffect(() => {
+    const stored = localStorage.getItem("site-theme-colors");
+    if (stored) {
+      try {
+        const colors = JSON.parse(stored);
+        const root = document.documentElement;
+        root.style.setProperty("--primary", colors.primary);
+        root.style.setProperty("--secondary", colors.secondary);
+        root.style.setProperty("--accent", colors.accent);
+        root.style.setProperty("--background", colors.background);
+        root.style.setProperty("--card", colors.card);
+        root.style.setProperty("--muted", colors.muted || "240 10% 20%");
+        root.style.setProperty("--border", colors.border || "240 10% 20%");
+        root.style.setProperty("--ring", colors.primary);
+        root.style.setProperty("--sidebar-primary", colors.primary);
+        root.style.setProperty("--sidebar-accent", colors.secondary);
+        root.style.setProperty("--popover", colors.card);
+        root.style.setProperty("--input", colors.background);
+      } catch {
+        // Use default theme
+      }
+    }
+  }, []);
   return null;
 }
 

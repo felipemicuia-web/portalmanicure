@@ -884,7 +884,6 @@ export type Database = {
           site_subtitle: string | null
           start_time: string
           tenant_id: string
-          theme_id: string
           updated_at: string
           whatsapp_template: string | null
           working_days: number[]
@@ -902,7 +901,6 @@ export type Database = {
           site_subtitle?: string | null
           start_time?: string
           tenant_id: string
-          theme_id?: string
           updated_at?: string
           whatsapp_template?: string | null
           working_days?: number[]
@@ -920,7 +918,6 @@ export type Database = {
           site_subtitle?: string | null
           start_time?: string
           tenant_id?: string
-          theme_id?: string
           updated_at?: string
           whatsapp_template?: string | null
           working_days?: number[]

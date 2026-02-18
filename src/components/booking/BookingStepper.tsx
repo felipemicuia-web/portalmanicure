@@ -1,5 +1,4 @@
 import { cn } from "@/lib/utils";
-import { Check } from "lucide-react";
 
 interface BookingStepperProps {
   currentStep: number;
@@ -7,67 +6,53 @@ interface BookingStepperProps {
 }
 
 const steps = [
-  { number: 1, label: "Profissional" },
-  { number: 2, label: "Serviços" },
-  { number: 3, label: "Horário" },
-  { number: 4, label: "Confirmar" },
+  { number: 1, label: "Profissional", shortLabel: "Prof." },
+  { number: 2, label: "Serviços", shortLabel: "Serv." },
+  { number: 3, label: "Horário", shortLabel: "Hora" },
+  { number: 4, label: "Confirmar", shortLabel: "Ok" },
 ];
 
 export function BookingStepper({ currentStep, onStepClick }: BookingStepperProps) {
   return (
-    <div className="glass-panel p-4 sm:p-5 mb-3">
-      <div className="flex items-center w-full">
+    <div className="glass-panel p-3 sm:p-4 mb-2">
+      <div className="flex items-center justify-between gap-1 sm:gap-3">
         {steps.map((step, index) => (
-          <div key={step.number} className="flex items-center flex-1 last:flex-none">
-            {/* Step circle + label */}
+          <div key={step.number} className="flex items-center gap-1 sm:gap-3 flex-1">
             <button
               type="button"
               onClick={() => step.number <= currentStep && onStepClick(step.number)}
               className={cn(
-                "flex flex-col items-center gap-1.5 transition-all duration-300 group",
-                step.number <= currentStep ? "cursor-pointer" : "cursor-not-allowed",
+                "flex items-center gap-1.5 sm:gap-3 px-1 sm:px-2 py-1.5 sm:py-2 bg-transparent border-0 text-foreground cursor-pointer transition-all duration-300 min-w-0",
+                step.number <= currentStep ? "opacity-100" : "opacity-40",
+                step.number > currentStep && "cursor-not-allowed",
+                step.number === currentStep && "scale-105"
               )}
             >
               <span
                 className={cn(
-                  "step-dot w-9 h-9 sm:w-10 sm:h-10 text-xs sm:text-sm flex-shrink-0",
+                  "step-dot w-7 h-7 sm:w-8 sm:h-8 text-xs sm:text-sm flex-shrink-0",
                   step.number === currentStep && "active",
-                  step.number < currentStep && "completed",
+                  step.number < currentStep && "bg-primary/30 border-primary/50"
                 )}
               >
-                {step.number < currentStep ? (
-                  <Check className="w-4 h-4" />
-                ) : (
-                  step.number
-                )}
+                {step.number < currentStep ? "✓" : step.number}
               </span>
               <span className={cn(
-                "text-[10px] sm:text-xs font-medium transition-colors leading-tight text-center",
-                step.number === currentStep
-                  ? "text-primary font-semibold"
-                  : step.number < currentStep
-                    ? "text-foreground/70"
-                    : "text-muted-foreground/50"
+                "text-[10px] sm:text-sm whitespace-nowrap font-medium transition-all hidden xs:inline",
+                step.number === currentStep && "text-accent font-bold"
               )}>
-                {step.label}
+                <span className="hidden sm:inline">{step.label}</span>
+                <span className="sm:hidden">{step.shortLabel}</span>
               </span>
             </button>
             
-            {/* Connector line */}
             {index < steps.length - 1 && (
-              <div className="flex-1 mx-2 sm:mx-3 h-[2px] rounded-full relative overflow-hidden mt-[-1rem]">
-                <div className="absolute inset-0 bg-border/30 rounded-full" />
-                <div
-                  className={cn(
-                    "absolute inset-y-0 left-0 rounded-full transition-all duration-500 ease-out",
-                    step.number < currentStep
-                      ? "w-full bg-gradient-to-r from-primary to-primary/60"
-                      : step.number === currentStep
-                        ? "w-1/2 bg-gradient-to-r from-primary to-transparent"
-                        : "w-0"
-                  )}
-                />
-              </div>
+              <div className={cn(
+                "flex-1 h-0.5 min-w-2 sm:min-w-8 rounded-full transition-all duration-500",
+                step.number < currentStep 
+                  ? "bg-gradient-to-r from-primary to-primary/50" 
+                  : "bg-border/30"
+              )} />
             )}
           </div>
         ))}
