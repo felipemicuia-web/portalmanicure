@@ -968,6 +968,10 @@ export type Database = {
         }[]
       }
       get_user_tenant_id: { Args: { _user_id: string }; Returns: string }
+      hard_delete_booking: {
+        Args: { p_booking_id: string }
+        Returns: undefined
+      }
       has_liked_photo: {
         Args: { p_photo_id: string; p_user_id: string }
         Returns: boolean
