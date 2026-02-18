@@ -262,10 +262,9 @@ export function AdminBookings() {
     if (!hardDeletingBooking) return;
     setHardDeleting(true);
 
-    const { error } = await supabase
-      .from("bookings")
-      .delete()
-      .eq("id", hardDeletingBooking.id);
+    const { error } = await supabase.rpc("hard_delete_booking", {
+      p_booking_id: hardDeletingBooking.id,
+    });
 
     setHardDeleting(false);
     if (error) {
