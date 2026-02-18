@@ -882,6 +882,7 @@ export type Database = {
           site_font: string | null
           site_name: string | null
           site_subtitle: string | null
+          slot_step_minutes: number
           start_time: string
           tenant_id: string
           theme_id: string
@@ -900,6 +901,7 @@ export type Database = {
           site_font?: string | null
           site_name?: string | null
           site_subtitle?: string | null
+          slot_step_minutes?: number
           start_time?: string
           tenant_id: string
           theme_id?: string
@@ -918,6 +920,7 @@ export type Database = {
           site_font?: string | null
           site_name?: string | null
           site_subtitle?: string | null
+          slot_step_minutes?: number
           start_time?: string
           tenant_id?: string
           theme_id?: string

@@ -1,0 +1,1 @@
+ALTER TABLE public.work_settings ADD COLUMN slot_step_minutes integer NOT NULL DEFAULT 30;
