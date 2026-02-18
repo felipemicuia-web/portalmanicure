@@ -171,8 +171,8 @@ export function AdminWorkHours() {
           {/* Passo da agenda */}
           <div className="space-y-2">
             <Label htmlFor="slot_step">Passo da agenda (minutos)</Label>
-            <div className="flex flex-wrap gap-2">
-              {[10, 15, 20, 30, 40, 50, 60].map((v) => (
+            <div className="flex flex-wrap gap-2 mb-2">
+              {[10, 20, 30, 40, 50, 60].map((v) => (
                 <button
                   key={v}
                   type="button"
@@ -187,6 +187,21 @@ export function AdminWorkHours() {
                 </button>
               ))}
             </div>
+            <Input
+              id="slot_step"
+              type="number"
+              min="5"
+              max="120"
+              value={settings.slot_step_minutes}
+              onChange={(e) =>
+                setSettings({
+                  ...settings,
+                  slot_step_minutes: parseInt(e.target.value) || 30,
+                })
+              }
+              className="bg-background max-w-[200px]"
+              placeholder="Ex: 45"
+            />
             <p className="text-xs text-muted-foreground">
               Define de quanto em quanto tempo os horários aparecem (ex: 50 → 08:00, 08:50, 09:40…)
             </p>
