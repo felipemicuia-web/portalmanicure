@@ -179,7 +179,7 @@ function buildAvailableTimes(
   }
 
   const serviceDuration = totalServiceMinutes;
-  const slotStep = 30;
+  const slotStep = workSettings.slot_step_minutes || 30;
 
   const slots: string[] = [];
   

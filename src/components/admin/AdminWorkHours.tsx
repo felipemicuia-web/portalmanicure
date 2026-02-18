@@ -13,6 +13,7 @@ interface WorkSettings {
   start_time: string;
   end_time: string;
   interval_minutes: number;
+  slot_step_minutes: number;
   lunch_start: string | null;
   lunch_end: string | null;
   working_days: number[];
@@ -69,6 +70,7 @@ export function AdminWorkHours() {
       start_time: settings.start_time,
       end_time: settings.end_time,
       interval_minutes: settings.interval_minutes,
+      slot_step_minutes: settings.slot_step_minutes,
       lunch_start: hasLunch ? settings.lunch_start : null,
       lunch_end: hasLunch ? settings.lunch_end : null,
       working_days: settings.working_days,
@@ -164,6 +166,30 @@ export function AdminWorkHours() {
                 className="bg-background"
               />
             </div>
+          </div>
+
+          {/* Passo da agenda */}
+          <div className="space-y-2">
+            <Label htmlFor="slot_step">Passo da agenda (minutos)</Label>
+            <div className="flex flex-wrap gap-2">
+              {[10, 15, 20, 30, 40, 50, 60].map((v) => (
+                <button
+                  key={v}
+                  type="button"
+                  onClick={() => setSettings({ ...settings, slot_step_minutes: v })}
+                  className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-all ${
+                    settings.slot_step_minutes === v
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border/50 bg-background hover:border-primary/50"
+                  }`}
+                >
+                  {v} min
+                </button>
+              ))}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Define de quanto em quanto tempo os horários aparecem (ex: 50 → 08:00, 08:50, 09:40…)
+            </p>
           </div>
 
           {/* Intervalo entre serviços */}
@@ -292,6 +318,9 @@ export function AdminWorkHours() {
           <p>
             🕐 Atendimento: <span className="text-foreground font-medium">{settings.start_time}</span> às{" "}
             <span className="text-foreground font-medium">{settings.end_time}</span>
+          </p>
+          <p>
+            📊 Passo da agenda: <span className="text-foreground font-medium">{settings.slot_step_minutes} min</span>
           </p>
           <p>
             ⏱️ Intervalo entre serviços: <span className="text-foreground font-medium">{settings.interval_minutes} min</span>

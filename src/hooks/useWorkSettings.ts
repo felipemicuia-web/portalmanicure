@@ -6,6 +6,7 @@ export interface WorkSettings {
   start_time: string;
   end_time: string;
   interval_minutes: number;
+  slot_step_minutes: number;
   lunch_start: string | null;
   lunch_end: string | null;
   working_days: number[];
@@ -15,6 +16,7 @@ const DEFAULT_SETTINGS: WorkSettings = {
   start_time: "09:00",
   end_time: "18:00",
   interval_minutes: 10,
+  slot_step_minutes: 30,
   lunch_start: null,
   lunch_end: null,
   working_days: [1, 2, 3, 4, 5, 6],
@@ -31,7 +33,7 @@ export function useWorkSettings() {
 
       let query = supabase
         .from("work_settings")
-        .select("start_time, end_time, interval_minutes, lunch_start, lunch_end, working_days")
+        .select("start_time, end_time, interval_minutes, slot_step_minutes, lunch_start, lunch_end, working_days")
         .eq("tenant_id", tenantId)
         .maybeSingle();
 
@@ -42,6 +44,7 @@ export function useWorkSettings() {
           start_time: data.start_time,
           end_time: data.end_time,
           interval_minutes: data.interval_minutes,
+          slot_step_minutes: data.slot_step_minutes ?? 30,
           lunch_start: data.lunch_start,
           lunch_end: data.lunch_end,
           working_days: data.working_days || [1, 2, 3, 4, 5, 6],
