@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useTenant } from "@/contexts/TenantContext";
 import { useToast } from "@/hooks/use-toast";
+import { formatDateBR } from "@/lib/dateFormat";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -190,7 +191,7 @@ export function AdminCoupons() {
                   </span>
                   <span>Uso: {c.current_uses}/{c.max_uses >= 999999 ? "∞" : c.max_uses}</span>
                   {c.expires_at && (
-                    <span>Expira: {new Date(c.expires_at).toLocaleDateString("pt-BR")}</span>
+                    <span>Expira: {formatDateBR(c.expires_at)}</span>
                   )}
                 </div>
               </div>
