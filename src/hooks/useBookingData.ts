@@ -181,11 +181,26 @@ function buildAvailableTimes(
   const serviceDuration = totalServiceMinutes;
   const slotStep = workSettings.slot_step_minutes || 30;
 
+  // Determine minimum slot start if selected date is today
+  let minSlotStart = 0;
+  if (selectedDate) {
+    const now = new Date();
+    const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+    if (selectedDate === todayStr) {
+      minSlotStart = now.getHours() * 60 + now.getMinutes();
+    }
+  }
+
   const slots: string[] = [];
   
   for (let t = start; t + serviceDuration <= end; t += slotStep) {
     const slotStart = t;
     const slotEnd = t + serviceDuration;
+
+    // Skip past slots for today
+    if (slotStart <= minSlotStart) {
+      continue;
+    }
     
     if (lunchStart !== null && lunchEnd !== null) {
       if (overlaps(slotStart, slotEnd, lunchStart, lunchEnd)) {
