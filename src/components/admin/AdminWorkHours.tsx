@@ -171,22 +171,6 @@ export function AdminWorkHours() {
           {/* Passo da agenda */}
           <div className="space-y-2">
             <Label htmlFor="slot_step">Passo da agenda (minutos)</Label>
-            <div className="flex flex-wrap gap-2 mb-2">
-              {[10, 20, 30, 40, 50, 60].map((v) => (
-                <button
-                  key={v}
-                  type="button"
-                  onClick={() => setSettings({ ...settings, slot_step_minutes: v })}
-                  className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-all ${
-                    settings.slot_step_minutes === v
-                      ? "border-primary bg-primary/10 text-primary"
-                      : "border-border/50 bg-background hover:border-primary/50"
-                  }`}
-                >
-                  {v} min
-                </button>
-              ))}
-            </div>
             <Input
               id="slot_step"
               type="number"
