@@ -11,6 +11,10 @@ import { cn } from "@/lib/utils";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -36,9 +40,10 @@ interface Comment {
 interface ProfessionalGalleryProps {
   professionalId: string;
   user: User | null;
+  isAdmin?: boolean;
 }
 
-export function ProfessionalGallery({ professionalId, user }: ProfessionalGalleryProps) {
+export function ProfessionalGallery({ professionalId, user, isAdmin }: ProfessionalGalleryProps) {
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
@@ -48,6 +53,8 @@ export function ProfessionalGallery({ professionalId, user }: ProfessionalGaller
   const [newComment, setNewComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [loadingComments, setLoadingComments] = useState(false);
+  const [deleteCommentTarget, setDeleteCommentTarget] = useState<string | null>(null);
+  const [deletingComment, setDeletingComment] = useState(false);
   const { toast } = useToast();
   const { tenantId } = useTenant();
 
@@ -64,13 +71,11 @@ export function ProfessionalGallery({ professionalId, user }: ProfessionalGaller
     } else {
       setPhotos(data || []);
       
-      // Fetch like counts for all photos
       if (data && data.length > 0) {
         const counts: Record<string, number> = {};
         const likes: Record<string, boolean> = {};
         
         for (const photo of data) {
-          // Get like count
           const { count } = await supabase
             .from("photo_likes")
             .select("*", { count: "exact", head: true })
@@ -78,7 +83,6 @@ export function ProfessionalGallery({ professionalId, user }: ProfessionalGaller
           
           counts[photo.id] = count || 0;
           
-          // Check if user liked
           if (user) {
             const { data: likeData } = await supabase
               .from("photo_likes")
@@ -110,7 +114,6 @@ export function ProfessionalGallery({ professionalId, user }: ProfessionalGaller
       logger.error("Error fetching comments:", error);
       setComments([]);
     } else if (data && data.length > 0) {
-      // Fetch profiles for comments
       const userIds = [...new Set(data.map(c => c.user_id))];
       const { data: profiles } = await supabase
         .from("profiles")
@@ -213,20 +216,32 @@ export function ProfessionalGallery({ professionalId, user }: ProfessionalGaller
     }
   };
 
-  const handleDeleteComment = async (commentId: string) => {
+  const handleDeleteComment = async () => {
+    if (!deleteCommentTarget) return;
+    setDeletingComment(true);
+
     try {
       const { error } = await supabase
         .from("photo_comments")
         .delete()
-        .eq("id", commentId);
+        .eq("id", deleteCommentTarget);
 
       if (error) throw error;
 
+      toast({ title: "Comentário excluído" });
       if (selectedPhoto) {
         fetchComments(selectedPhoto.id);
       }
     } catch (error) {
       logger.error("Error deleting comment:", error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível excluir o comentário.",
+        variant: "destructive",
+      });
+    } finally {
+      setDeletingComment(false);
+      setDeleteCommentTarget(null);
     }
   };
 
@@ -343,37 +358,42 @@ export function ProfessionalGallery({ professionalId, user }: ProfessionalGaller
                     </p>
                   ) : (
                     <div className="space-y-3">
-                      {comments.map((comment) => (
-                        <div key={comment.id} className="flex gap-2 group">
-                          <Avatar className="w-8 h-8 shrink-0">
-                            {comment.profile?.avatar_url && (
-                              <AvatarImage src={comment.profile.avatar_url} />
+                      {comments.map((comment) => {
+                        const canDelete =
+                          (user && user.id === comment.user_id) || isAdmin;
+
+                        return (
+                          <div key={comment.id} className="flex gap-2 group">
+                            <Avatar className="w-8 h-8 shrink-0">
+                              {comment.profile?.avatar_url && (
+                                <AvatarImage src={comment.profile.avatar_url} />
+                              )}
+                              <AvatarFallback className="text-xs">
+                                {comment.profile?.name?.[0]?.toUpperCase() || "U"}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm">
+                                <span className="font-medium mr-1">
+                                  {comment.profile?.name || "Usuário"}
+                                </span>
+                                {comment.content}
+                              </p>
+                              <p className="text-xs text-muted-foreground mt-0.5">
+                                {new Date(comment.created_at).toLocaleDateString("pt-BR")}
+                              </p>
+                            </div>
+                            {canDelete && (
+                              <button
+                                onClick={() => setDeleteCommentTarget(comment.id)}
+                                className="opacity-0 group-hover:opacity-100 sm:opacity-0 sm:group-hover:opacity-100 max-sm:opacity-100 text-muted-foreground hover:text-destructive transition-opacity shrink-0"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
                             )}
-                            <AvatarFallback className="text-xs">
-                              {comment.profile?.name?.[0]?.toUpperCase() || "U"}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm">
-                              <span className="font-medium mr-1">
-                                {comment.profile?.name || "Usuário"}
-                              </span>
-                              {comment.content}
-                            </p>
-                            <p className="text-xs text-muted-foreground mt-0.5">
-                              {new Date(comment.created_at).toLocaleDateString("pt-BR")}
-                            </p>
                           </div>
-                          {user && user.id === comment.user_id && (
-                            <button
-                              onClick={() => handleDeleteComment(comment.id)}
-                              className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-opacity"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          )}
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   )}
                 </ScrollArea>
@@ -417,6 +437,26 @@ export function ProfessionalGallery({ professionalId, user }: ProfessionalGaller
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Comment Confirmation Dialog */}
+      <Dialog open={!!deleteCommentTarget} onOpenChange={(open) => !open && setDeleteCommentTarget(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Excluir comentário</DialogTitle>
+            <DialogDescription>
+              Tem certeza que deseja excluir este comentário? Esta ação não pode ser desfeita.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteCommentTarget(null)} disabled={deletingComment}>
+              Cancelar
+            </Button>
+            <Button variant="destructive" onClick={handleDeleteComment} disabled={deletingComment}>
+              {deletingComment ? "Excluindo..." : "Excluir"}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
