@@ -8,13 +8,13 @@ interface ThemeBackground {
 }
 
 const THEME_BACKGROUNDS: Record<string, ThemeBackground> = {
-  "galaxy": { type: "stars", particleCount: 50 },
-  "rosa": { type: "petals", particleCount: 20 },
-  "oceano": { type: "bubbles", particleCount: 30 },
-  "floresta": { type: "leaves", particleCount: 25 },
-  "pordosol": { type: "rays", particleCount: 15 },
-  "meianoite": { type: "snow", particleCount: 40 },
-  "lavanda": { type: "butterflies", particleCount: 12 },
+  "galaxy": { type: "stars", particleCount: 20 },
+  "rosa": { type: "petals", particleCount: 10 },
+  "oceano": { type: "bubbles", particleCount: 12 },
+  "floresta": { type: "leaves", particleCount: 10 },
+  "pordosol": { type: "rays", particleCount: 6 },
+  "meianoite": { type: "snow", particleCount: 15 },
+  "lavanda": { type: "butterflies", particleCount: 6 },
 };
 
 function getThemeId(): string {
