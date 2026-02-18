@@ -301,7 +301,7 @@ export function AdminBookings() {
     setDeleting(true);
     const { error } = await supabase
       .from("bookings")
-      .delete()
+      .update({ status: "cancelled" })
       .eq("id", deletingBooking.id);
     
     setDeleting(false);
@@ -312,7 +312,7 @@ export function AdminBookings() {
       return;
     }
     
-    toast.success("Agendamento excluído!");
+    toast.success("Agendamento cancelado!");
     setDeletingBooking(null);
     setBookings((prev) => prev.filter((b) => b.id !== deletingBooking.id));
   };
