@@ -19,6 +19,7 @@ import { ReviewList } from "@/components/professional/ReviewList";
 import { ReviewForm } from "@/components/professional/ReviewForm";
 import { ProfessionalServices } from "@/components/professional/ProfessionalServices";
 import { ProfessionalGallery } from "@/components/professional/ProfessionalGallery";
+import { useAdmin } from "@/hooks/useAdmin";
 
 interface Professional {
   id: string;
@@ -56,6 +57,7 @@ export default function ProfessionalProfilePage() {
   const { toast } = useToast();
   
   const [user, setUser] = useState<User | null>(null);
+  const { isAdmin } = useAdmin(user);
   const [professional, setProfessional] = useState<Professional | null>(null);
   const [services, setServices] = useState<Service[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -343,7 +345,12 @@ export default function ProfessionalProfilePage() {
           )}
 
           {/* Reviews */}
-          <ReviewList reviews={reviews} />
+          <ReviewList
+            reviews={reviews}
+            currentUserId={user?.id}
+            isAdmin={isAdmin}
+            onReviewDeleted={handleReviewSubmitted}
+          />
         </main>
       </div>
     </div>
