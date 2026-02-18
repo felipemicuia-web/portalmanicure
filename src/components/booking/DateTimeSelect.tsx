@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, ChevronLeft, ChevronRight, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { formatDateBR } from "@/lib/dateFormat";
 import { useWorkSettings } from "@/hooks/useWorkSettings";
 import { useProfessionalSchedule } from "@/hooks/useProfessionalSchedule";
 
@@ -194,7 +195,9 @@ export function DateTimeSelect({
         ) : availableTimes.length === 0 ? (
           <div className="p-4 rounded-xl bg-destructive/10 border border-destructive/20">
             <p className="text-sm text-destructive text-center">
-              Não há horários disponíveis para esta data.
+              {selectedDate === formatDateISO(today)
+                ? "Não há mais horários disponíveis hoje. Escolha outra data."
+                : "Não há horários disponíveis para esta data."}
             </p>
           </div>
         ) : (
@@ -222,7 +225,7 @@ export function DateTimeSelect({
       {selectedTime && selectedDate && (
         <div className="p-3 sm:p-4 rounded-xl bg-primary/10 border border-primary/20">
           <p className="text-sm text-primary font-medium text-center">
-            ✨ <span className="font-bold">{selectedDate.split('-').reverse().join('/')}</span> às <span className="font-bold">{selectedTime}</span>
+            ✨ <span className="font-bold">{formatDateBR(selectedDate)}</span> às <span className="font-bold">{selectedTime}</span>
           </p>
         </div>
       )}
