@@ -48,11 +48,40 @@ export default function BookingPage() {
   const { tenantId } = useTenant();
   const { professionals, services, loading: dataLoading } = useBookingData();
   const [draftRestored, setDraftRestored] = useState(false);
+  const [professionalServiceIds, setProfessionalServiceIds] = useState<string[]>([]);
+
+  // Fetch services linked to selected professional
+  useEffect(() => {
+    async function fetchProfessionalServices() {
+      if (!professionalId) {
+        setProfessionalServiceIds([]);
+        return;
+      }
+      const { data } = await supabase
+        .from("professional_services")
+        .select("service_id")
+        .eq("professional_id", professionalId);
+      
+      if (data && data.length > 0) {
+        setProfessionalServiceIds(data.map(d => d.service_id));
+      } else {
+        // If no services linked, show all (backwards compatibility)
+        setProfessionalServiceIds(services.map(s => s.id));
+      }
+    }
+    fetchProfessionalServices();
+  }, [professionalId, services]);
+
+  // Filter services by professional
+  const filteredServices = useMemo(
+    () => services.filter(s => professionalServiceIds.includes(s.id)),
+    [services, professionalServiceIds]
+  );
 
   // Calculate totals
   const selectedServices = useMemo(
-    () => services.filter((s) => selectedServiceIds.includes(s.id)),
-    [services, selectedServiceIds]
+    () => filteredServices.filter((s) => selectedServiceIds.includes(s.id)),
+    [filteredServices, selectedServiceIds]
   );
 
   const totalMinutes = useMemo(
@@ -469,14 +498,21 @@ export default function BookingPage() {
                   <ProfessionalSelect
                     professionals={professionals}
                     selectedId={professionalId}
-                    onSelect={setProfessionalId}
+                    onSelect={(id) => {
+                      if (id !== professionalId) {
+                        setProfessionalId(id);
+                        setSelectedServiceIds([]);
+                        setSelectedTime("");
+                        setAppliedCoupon(null);
+                      }
+                    }}
                     onNext={() => goToStep(2)}
                   />
                 )}
 
                 {currentStep === 2 && (
                   <ServiceList
-                    services={services}
+                    services={filteredServices}
                     selectedIds={selectedServiceIds}
                     onToggle={toggleService}
                     onPrev={() => goToStep(1)}
