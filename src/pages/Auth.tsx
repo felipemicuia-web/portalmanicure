@@ -11,6 +11,7 @@ import { z } from "zod";
 import { isValidBrazilianPhone, normalizePhone, formatPhone } from "@/lib/validation";
 import { logger } from "@/lib/logger";
 import { useTenant } from "@/contexts/TenantContext";
+import { TENANT_DEFAULT_ID } from "@/config/tenant";
 
 const emailSchema = z.string().email("Email inválido");
 const passwordSchema = z.string().min(6, "Senha deve ter pelo menos 6 caracteres");
@@ -38,7 +39,10 @@ const Auth = () => {
   const [errors, setErrors] = useState<FormErrors>({});
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { tenantId } = useTenant();
+  const { tenantId, loading: tenantLoading } = useTenant();
+  
+  // Guaranteed tenant ID - never null
+  const safeTenantId = tenantId || TENANT_DEFAULT_ID;
 
   // Get redirect URL from query params
   const redirectTo = new URLSearchParams(window.location.search).get("redirect") || "/";
@@ -163,7 +167,7 @@ const Auth = () => {
             user_id: data.user.id,
             name: fullName,
             phone: normalizedPhone,
-            tenant_id: tenantId,
+            tenant_id: safeTenantId,
           });
 
           if (profileError) {
@@ -175,9 +179,9 @@ const Auth = () => {
             });
           } else {
             // Associate user with tenant
-            if (tenantId) {
+            if (safeTenantId) {
               await supabase.from("tenant_users").upsert({
-                tenant_id: tenantId,
+                tenant_id: safeTenantId,
                 user_id: data.user.id,
                 role: "user",
               }, { onConflict: "tenant_id,user_id" }).then(({ error: tuError }) => {
@@ -374,7 +378,7 @@ const Auth = () => {
             <Button
               type="submit" 
               className="w-full h-11 font-semibold bg-primary hover:bg-primary/90 transition-all duration-200"
-              disabled={loading}
+              disabled={loading || tenantLoading}
             >
               {loading ? (
                 <div className="flex items-center gap-2">
