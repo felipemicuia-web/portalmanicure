@@ -159,7 +159,18 @@ const Auth = () => {
             });
           }
         } else if (data.user) {
-          // Create profile with name and phone
+          // IMPORTANT: Create tenant_users FIRST (RLS policies depend on it)
+          const { error: tuError } = await supabase.from("tenant_users").upsert({
+            tenant_id: safeTenantId,
+            user_id: data.user.id,
+            role: "user",
+          }, { onConflict: "tenant_id,user_id" });
+
+          if (tuError) {
+            logger.error("Tenant user creation error:", tuError);
+          }
+
+          // Now create profile (RLS can now resolve tenant via tenant_users)
           const fullName = `${firstName.trim()} ${lastName.trim()}`;
           const normalizedPhone = normalizePhone(phone);
           
@@ -178,16 +189,6 @@ const Auth = () => {
               variant: "destructive",
             });
           } else {
-            // Associate user with tenant
-            if (safeTenantId) {
-              await supabase.from("tenant_users").upsert({
-                tenant_id: safeTenantId,
-                user_id: data.user.id,
-                role: "user",
-              }, { onConflict: "tenant_id,user_id" }).then(({ error: tuError }) => {
-                if (tuError) logger.error("Tenant user creation error:", tuError);
-              });
-            }
             toast({
               title: "Conta criada!",
               description: "Cadastro realizado com sucesso",
