@@ -1,6 +1,12 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { logger } from "@/lib/logger";
+import {
+  MULTI_TENANT_MODE,
+  TENANT_DEFAULT_ID,
+  TENANT_DEFAULT_SLUG,
+  TENANT_DEFAULT_NAME,
+} from "@/config/tenant";
 
 interface TenantContextType {
   tenantId: string | null;
@@ -32,15 +38,13 @@ function resolveSlugFromUrl(): string {
 
   // Check for custom domain (not lovable.app, not localhost)
   if (!hostname.includes("lovable.app") && hostname !== "localhost" && !hostname.includes("127.0.0.1")) {
-    // Will resolve by custom_domain in the query below
     return `domain:${hostname}`;
   }
 
-  // Check subdomain pattern: <slug>.app.com or <slug>-preview--xxx.lovable.app
+  // Check subdomain pattern
   const parts = hostname.split(".");
   if (parts.length >= 3 && parts[0] !== "www") {
     const subdomain = parts[0];
-    // Ignore lovable preview subdomains
     if (!subdomain.includes("preview--") && !subdomain.includes("id-preview")) {
       return subdomain;
     }
@@ -62,17 +66,28 @@ export function TenantProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // ── SINGLE-TENANT MODE: skip DB lookup, use fixed values ──
+    if (!MULTI_TENANT_MODE) {
+      setTenantId(TENANT_DEFAULT_ID);
+      setTenantSlug(TENANT_DEFAULT_SLUG);
+      setTenantName(TENANT_DEFAULT_NAME);
+      setLoading(false);
+
+      if (import.meta.env.DEV) {
+        console.log(
+          `%c[Tenant] Single-tenant mode → ID: ${TENANT_DEFAULT_ID}`,
+          "color: #22c55e; font-weight: bold;"
+        );
+      }
+      return;
+    }
+
+    // ── MULTI-TENANT MODE: resolve from URL ──
     async function resolveTenant() {
       try {
         const slug = resolveSlugFromUrl();
 
-        let query = supabase
-          .from("tenants")
-          .select("id, slug, name")
-          .eq("active", true)
-          .limit(1)
-          .single();
-
+        let query;
         if (slug.startsWith("domain:")) {
           const domain = slug.replace("domain:", "");
           query = supabase
@@ -96,17 +111,10 @@ export function TenantProvider({ children }: { children: ReactNode }) {
 
         if (error || !data) {
           // Fallback to default tenant
-          const { data: defaultTenant } = await supabase
-            .from("tenants")
-            .select("id, slug, name")
-            .eq("slug", "default")
-            .single();
-
-          if (defaultTenant) {
-            setTenantId(defaultTenant.id);
-            setTenantSlug(defaultTenant.slug);
-            setTenantName(defaultTenant.name);
-          }
+          setTenantId(TENANT_DEFAULT_ID);
+          setTenantSlug(TENANT_DEFAULT_SLUG);
+          setTenantName(TENANT_DEFAULT_NAME);
+          logger.error("Tenant not found, falling back to default:", slug);
         } else {
           setTenantId(data.id);
           setTenantSlug(data.slug);
@@ -114,6 +122,10 @@ export function TenantProvider({ children }: { children: ReactNode }) {
         }
       } catch (err) {
         logger.error("Error resolving tenant:", err);
+        // Always fallback to default on error
+        setTenantId(TENANT_DEFAULT_ID);
+        setTenantSlug(TENANT_DEFAULT_SLUG);
+        setTenantName(TENANT_DEFAULT_NAME);
       } finally {
         setLoading(false);
       }
@@ -121,6 +133,16 @@ export function TenantProvider({ children }: { children: ReactNode }) {
 
     resolveTenant();
   }, []);
+
+  // Dev debug log
+  useEffect(() => {
+    if (import.meta.env.DEV && tenantId) {
+      console.log(
+        `%c[Tenant] Active → slug: ${tenantSlug} | id: ${tenantId}`,
+        "color: #3b82f6; font-weight: bold;"
+      );
+    }
+  }, [tenantId, tenantSlug]);
 
   return (
     <TenantContext.Provider value={{ tenantId, tenantSlug, tenantName, loading }}>
