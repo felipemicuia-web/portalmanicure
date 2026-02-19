@@ -164,7 +164,7 @@ const Auth = () => {
             tenant_id: safeTenantId,
             user_id: data.user.id,
             role: "user",
-          }, { onConflict: "tenant_id,user_id" });
+          }, { onConflict: "user_id" });
 
           if (tuError) {
             logger.error("Tenant user creation error:", tuError);
