@@ -21,6 +21,8 @@ export interface Branding {
   logoUrl: string | null;
   logoDisplayMode: "icon" | "banner";
   siteFont: string;
+  showBrandName: boolean;
+  logoSize: number;
 }
 
 const DEFAULT_BRANDING: Branding = {
@@ -29,6 +31,8 @@ const DEFAULT_BRANDING: Branding = {
   logoUrl: null,
   logoDisplayMode: "icon",
   siteFont: "Inter",
+  showBrandName: true,
+  logoSize: 80,
 };
 
 function loadFont(fontName: string) {
@@ -62,7 +66,7 @@ export function useBranding() {
 
       const { data } = await supabase
         .from("work_settings")
-        .select("site_name, site_subtitle, logo_url, logo_display_mode, site_font")
+        .select("site_name, site_subtitle, logo_url, logo_display_mode, site_font, show_brand_name, logo_size")
         .eq("tenant_id", tenantId)
         .limit(1)
         .single();
@@ -75,6 +79,8 @@ export function useBranding() {
           logoUrl: data.logo_url,
           logoDisplayMode: (data.logo_display_mode as "icon" | "banner") || "icon",
           siteFont: font,
+          showBrandName: (data as any).show_brand_name ?? true,
+          logoSize: (data as any).logo_size ?? 80,
         });
         applyFont(font);
       }
