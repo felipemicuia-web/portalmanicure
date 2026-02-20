@@ -883,9 +883,11 @@ export type Database = {
           id: string
           interval_minutes: number
           logo_display_mode: string
+          logo_size: number
           logo_url: string | null
           lunch_end: string | null
           lunch_start: string | null
+          show_brand_name: boolean
           site_font: string | null
           site_name: string | null
           site_subtitle: string | null
@@ -903,9 +905,11 @@ export type Database = {
           id?: string
           interval_minutes?: number
           logo_display_mode?: string
+          logo_size?: number
           logo_url?: string | null
           lunch_end?: string | null
           lunch_start?: string | null
+          show_brand_name?: boolean
           site_font?: string | null
           site_name?: string | null
           site_subtitle?: string | null
@@ -923,9 +927,11 @@ export type Database = {
           id?: string
           interval_minutes?: number
           logo_display_mode?: string
+          logo_size?: number
           logo_url?: string | null
           lunch_end?: string | null
           lunch_start?: string | null
+          show_brand_name?: boolean
           site_font?: string | null
           site_name?: string | null
           site_subtitle?: string | null

@@ -33,144 +33,166 @@ export function BookingTopbar({
     onLogout();
     setMobileMenuOpen(false);
   };
-  
-    const isBanner = branding.logoDisplayMode === "banner" && branding.logoUrl;
 
-    return (
+  const logoSizePx = branding.logoSize || 80;
+
+  return (
     <header className="sticky top-0 z-50 topbar-gradient">
-      <div className="max-w-6xl mx-auto px-3 sm:px-4 py-3 sm:py-4">
+      <div className="max-w-6xl mx-auto px-3 sm:px-4 py-4 sm:py-5">
         <div className="flex items-center justify-between gap-2 sm:gap-4">
-          {/* Brand */}
-          <div className="flex items-center gap-2 sm:gap-3 group min-w-0">
-            {isBanner ? (
-              <img 
-                src={branding.logoUrl!} 
-                alt={branding.siteName} 
-                className="h-14 sm:h-16 md:h-20 w-full max-w-[600px] sm:max-w-[800px] md:max-w-[1000px] object-contain"
-              />
-            ) : (
-              <>
-                <div 
-                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-transparent border border-white/20 flex items-center justify-center overflow-hidden shadow-lg group-hover:scale-105 transition-transform duration-300 flex-shrink-0"
-                  aria-hidden="true"
-                  style={{ boxShadow: '0 8px 32px rgba(124,58,237,.3), inset 0 1px 0 rgba(255,255,255,.2)' }}
+          {/* Left spacer for centering */}
+          <div className="flex items-center gap-2 md:min-w-[140px]">
+            {/* Mobile menu button on the left for balance - hidden, spacer only on desktop */}
+          </div>
+
+          {/* Centered Brand */}
+          <div className="flex-1 flex items-center justify-center">
+            <div className="flex flex-col items-center gap-1 group">
+              {branding.logoUrl && (
+                <div
+                  className="flex items-center justify-center overflow-hidden flex-shrink-0"
+                  style={{
+                    width: `${logoSizePx}px`,
+                    height: `${logoSizePx}px`,
+                  }}
                 >
-                  {branding.logoUrl ? (
-                    <img src={branding.logoUrl} alt="Logo" className="w-full h-full object-contain p-0.5" style={{ background: "transparent" }} />
-                  ) : (
-                    <span className="text-xl sm:text-2xl">💅</span>
-                  )}
+                  <img
+                    src={branding.logoUrl}
+                    alt={branding.siteName}
+                    className="w-full h-full object-contain"
+                    style={{
+                      imageRendering: "auto",
+                      background: "transparent",
+                    }}
+                  />
                 </div>
-                <div className="min-w-0">
-                  <div className="font-bold tracking-wide text-base sm:text-lg bg-gradient-to-r from-white via-white/90 to-white/80 bg-clip-text truncate">
+              )}
+              {!branding.logoUrl && (
+                <div
+                  className="rounded-2xl bg-transparent border border-white/20 flex items-center justify-center overflow-hidden shadow-lg group-hover:scale-105 transition-transform duration-300 flex-shrink-0"
+                  style={{
+                    width: `${Math.min(logoSizePx, 56)}px`,
+                    height: `${Math.min(logoSizePx, 56)}px`,
+                    boxShadow: '0 8px 32px rgba(124,58,237,.3), inset 0 1px 0 rgba(255,255,255,.2)',
+                  }}
+                >
+                  <span className="text-2xl sm:text-3xl">💅</span>
+                </div>
+              )}
+              {branding.showBrandName && (
+                <div className="text-center">
+                  <div className="font-bold tracking-wide text-base sm:text-lg bg-gradient-to-r from-white via-white/90 to-white/80 bg-clip-text">
                     {branding.siteName}
                   </div>
                   <div className="text-[10px] sm:text-xs text-white/70 hidden xs:block">
                     {branding.siteSubtitle}
                   </div>
                 </div>
-              </>
-            )}
+              )}
+            </div>
           </div>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-3 lg:gap-4">
-            {user ? (
-              <>
-                <button
-                  onClick={() => onPageChange("booking")}
-                  className={cn(
-                    "text-sm px-3 py-1.5 rounded-lg transition-all duration-200",
-                    activePage === "booking" 
-                      ? "bg-white/20 font-bold shadow-lg" 
-                      : "text-white/80 hover:bg-white/10 hover:text-white"
+          {/* Right side: Navigation */}
+          <div className="flex items-center gap-2 md:min-w-[140px] justify-end">
+            {/* Desktop Navigation */}
+            <nav className="hidden md:flex items-center gap-3 lg:gap-4">
+              {user ? (
+                <>
+                  <button
+                    onClick={() => onPageChange("booking")}
+                    className={cn(
+                      "text-sm px-3 py-1.5 rounded-lg transition-all duration-200",
+                      activePage === "booking" 
+                        ? "bg-white/20 font-bold shadow-lg" 
+                        : "text-white/80 hover:bg-white/10 hover:text-white"
+                    )}
+                  >
+                    Agendar
+                  </button>
+                  <button
+                    onClick={() => onPageChange("profile")}
+                    className={cn(
+                      "text-sm px-3 py-1.5 rounded-lg transition-all duration-200",
+                      activePage === "profile" 
+                        ? "bg-white/20 font-bold shadow-lg" 
+                        : "text-white/80 hover:bg-white/10 hover:text-white"
+                    )}
+                  >
+                    Perfil
+                  </button>
+                  <button
+                    onClick={() => onPageChange("my-bookings")}
+                    className={cn(
+                      "text-sm px-3 py-1.5 rounded-lg transition-all duration-200",
+                      activePage === "my-bookings" 
+                        ? "bg-white/20 font-bold shadow-lg" 
+                        : "text-white/80 hover:bg-white/10 hover:text-white"
+                    )}
+                  >
+                    Meus Agendamentos
+                  </button>
+                  {isAdmin && (
+                    <Link to="/admin">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="gap-1.5 text-white/80 hover:text-white hover:bg-white/10 border border-primary/30"
+                      >
+                        <Shield className="w-4 h-4" />
+                        Admin
+                      </Button>
+                    </Link>
                   )}
-                >
-                  Agendar
-                </button>
-                <button
-                  onClick={() => onPageChange("profile")}
-                  className={cn(
-                    "text-sm px-3 py-1.5 rounded-lg transition-all duration-200",
-                    activePage === "profile" 
-                      ? "bg-white/20 font-bold shadow-lg" 
-                      : "text-white/80 hover:bg-white/10 hover:text-white"
-                  )}
-                >
-                  Perfil
-                </button>
-                <button
-                  onClick={() => onPageChange("my-bookings")}
-                  className={cn(
-                    "text-sm px-3 py-1.5 rounded-lg transition-all duration-200",
-                    activePage === "my-bookings" 
-                      ? "bg-white/20 font-bold shadow-lg" 
-                      : "text-white/80 hover:bg-white/10 hover:text-white"
-                  )}
-                >
-                  Meus Agendamentos
-                </button>
-                {isAdmin && (
-                  <Link to="/admin">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="gap-1.5 text-white/80 hover:text-white hover:bg-white/10 border border-primary/30"
-                    >
-                      <Shield className="w-4 h-4" />
-                      Admin
-                    </Button>
-                  </Link>
-                )}
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={onLogout}
-                  className="gap-1.5 text-white/80 hover:text-white hover:bg-white/10 border border-white/10"
-                >
-                  <LogOut className="w-4 h-4" />
-                  Sair
-                </Button>
-              </>
-            ) : (
-              <Link to="/auth">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="gap-1.5 border-white/20 bg-white/10 text-white hover:bg-white/20 hover:border-white/30 shadow-lg"
-                >
-                  <UserIcon className="w-4 h-4" />
-                  Entrar
-                </Button>
-              </Link>
-            )}
-          </nav>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={onLogout}
+                    className="gap-1.5 text-white/80 hover:text-white hover:bg-white/10 border border-white/10"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Sair
+                  </Button>
+                </>
+              ) : (
+                <Link to="/auth">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="gap-1.5 border-white/20 bg-white/10 text-white hover:bg-white/20 hover:border-white/30 shadow-lg"
+                  >
+                    <UserIcon className="w-4 h-4" />
+                    Entrar
+                  </Button>
+                </Link>
+              )}
+            </nav>
 
-          {/* Mobile Menu Button */}
-          <div className="flex md:hidden items-center gap-2">
-            {!user && (
-              <Link to="/auth">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="gap-1.5 border-white/20 bg-white/10 text-white hover:bg-white/20 hover:border-white/30 shadow-lg h-9 px-3"
+            {/* Mobile buttons */}
+            <div className="flex md:hidden items-center gap-2">
+              {!user && (
+                <Link to="/auth">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="gap-1.5 border-white/20 bg-white/10 text-white hover:bg-white/20 hover:border-white/30 shadow-lg h-9 px-3"
+                  >
+                    <UserIcon className="w-4 h-4" />
+                    <span className="hidden xs:inline">Entrar</span>
+                  </Button>
+                </Link>
+              )}
+              {user && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  className="text-white/90 hover:bg-white/10 h-10 w-10 p-0"
+                  aria-label="Menu"
                 >
-                  <UserIcon className="w-4 h-4" />
-                  <span className="hidden xs:inline">Entrar</span>
+                  {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
                 </Button>
-              </Link>
-            )}
-            {user && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="text-white/90 hover:bg-white/10 h-10 w-10 p-0"
-                aria-label="Menu"
-              >
-                {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-              </Button>
-            )}
+              )}
+            </div>
           </div>
         </div>
 

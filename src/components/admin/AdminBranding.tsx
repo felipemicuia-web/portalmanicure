@@ -6,7 +6,8 @@ import { Image, Save, Upload, Trash2, Type } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Switch } from "@/components/ui/switch";
+import { Slider } from "@/components/ui/slider";
 import { FONT_OPTIONS } from "@/hooks/useBranding";
 
 export function AdminBranding() {
@@ -15,7 +16,12 @@ export function AdminBranding() {
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [logoDisplayMode, setLogoDisplayMode] = useState<"icon" | "banner">("icon");
   const [siteFont, setSiteFont] = useState("Inter");
-  const [originalData, setOriginalData] = useState({ siteName: "", siteSubtitle: "", logoUrl: "", logoDisplayMode: "icon", siteFont: "Inter" });
+  const [showBrandName, setShowBrandName] = useState(true);
+  const [logoSize, setLogoSize] = useState(80);
+  const [originalData, setOriginalData] = useState({
+    siteName: "", siteSubtitle: "", logoUrl: "", logoDisplayMode: "icon", siteFont: "Inter",
+    showBrandName: true, logoSize: 80,
+  });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -25,23 +31,28 @@ export function AdminBranding() {
     async function fetch() {
       const { data } = await supabase
         .from("work_settings")
-        .select("site_name, site_subtitle, logo_url, logo_display_mode, site_font")
+        .select("site_name, site_subtitle, logo_url, logo_display_mode, site_font, show_brand_name, logo_size")
         .limit(1)
         .single();
 
       if (data) {
-        const font = (data as any).site_font || "Inter";
-        setSiteName(data.site_name || "Agendamento");
-        setSiteSubtitle(data.site_subtitle || "Agende seu horário");
-        setLogoUrl(data.logo_url);
-        setLogoDisplayMode((data.logo_display_mode as "icon" | "banner") || "icon");
+        const d = data as any;
+        const font = d.site_font || "Inter";
+        setSiteName(d.site_name || "Agendamento");
+        setSiteSubtitle(d.site_subtitle || "Agende seu horário");
+        setLogoUrl(d.logo_url);
+        setLogoDisplayMode((d.logo_display_mode as "icon" | "banner") || "icon");
         setSiteFont(font);
+        setShowBrandName(d.show_brand_name ?? true);
+        setLogoSize(d.logo_size ?? 80);
         setOriginalData({
-          siteName: data.site_name || "Agendamento",
-          siteSubtitle: data.site_subtitle || "Agende seu horário",
-          logoUrl: data.logo_url || "",
-          logoDisplayMode: data.logo_display_mode || "icon",
+          siteName: d.site_name || "Agendamento",
+          siteSubtitle: d.site_subtitle || "Agende seu horário",
+          logoUrl: d.logo_url || "",
+          logoDisplayMode: d.logo_display_mode || "icon",
           siteFont: font,
+          showBrandName: d.show_brand_name ?? true,
+          logoSize: d.logo_size ?? 80,
         });
       }
       setLoading(false);
@@ -58,8 +69,8 @@ export function AdminBranding() {
       return;
     }
 
-    if (file.size > 2 * 1024 * 1024) {
-      toast.error("A imagem deve ter no máximo 2MB");
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("A imagem deve ter no máximo 5MB");
       return;
     }
 
@@ -69,7 +80,7 @@ export function AdminBranding() {
 
     const { error: uploadError } = await supabase.storage
       .from("avatars")
-      .upload(filePath, file, { upsert: true });
+      .upload(filePath, file, { upsert: true, contentType: file.type });
 
     if (uploadError) {
       logger.error("Logo upload error:", uploadError);
@@ -102,6 +113,8 @@ export function AdminBranding() {
         logo_url: logoUrl,
         logo_display_mode: logoDisplayMode,
         site_font: siteFont,
+        show_brand_name: showBrandName,
+        logo_size: logoSize,
       } as any)
       .not("id", "is", null);
 
@@ -111,8 +124,11 @@ export function AdminBranding() {
       toast.error("Erro ao salvar");
       return;
     }
-    setOriginalData({ siteName: siteName.trim(), siteSubtitle: siteSubtitle.trim(), logoUrl: logoUrl || "", logoDisplayMode, siteFont });
-    // Apply font globally
+    setOriginalData({
+      siteName: siteName.trim(), siteSubtitle: siteSubtitle.trim(),
+      logoUrl: logoUrl || "", logoDisplayMode, siteFont,
+      showBrandName, logoSize,
+    });
     const fallback = "ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif";
     document.documentElement.style.setProperty("--font-sans", `'${siteFont}', ${fallback}`);
     toast.success("Identidade visual salva!");
@@ -123,7 +139,9 @@ export function AdminBranding() {
     siteSubtitle !== originalData.siteSubtitle ||
     (logoUrl || "") !== originalData.logoUrl ||
     logoDisplayMode !== originalData.logoDisplayMode ||
-    siteFont !== originalData.siteFont;
+    siteFont !== originalData.siteFont ||
+    showBrandName !== originalData.showBrandName ||
+    logoSize !== originalData.logoSize;
 
   if (loading) {
     return (
@@ -133,6 +151,8 @@ export function AdminBranding() {
     );
   }
 
+  const previewLogoSize = logoSize;
+
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2">
@@ -141,13 +161,21 @@ export function AdminBranding() {
       </div>
 
       <div className="glass-panel p-4 space-y-5">
-        {/* Logo */}
+        {/* Logo Upload */}
         <div className="space-y-2">
           <Label>Logotipo</Label>
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-xl bg-muted/50 border border-border/50 flex items-center justify-center overflow-hidden flex-shrink-0">
+          <div className="flex items-start gap-4">
+            <div
+              className="rounded-xl bg-muted/50 border border-border/50 flex items-center justify-center overflow-hidden flex-shrink-0"
+              style={{ width: `${Math.max(previewLogoSize, 64)}px`, height: `${Math.max(previewLogoSize, 64)}px` }}
+            >
               {logoUrl ? (
-                <img src={logoUrl} alt="Logo" className="w-full h-full object-contain p-1" />
+                <img
+                  src={logoUrl}
+                  alt="Logo"
+                  className="w-full h-full object-contain"
+                  style={{ imageRendering: "auto" }}
+                />
               ) : (
                 <span className="text-3xl">💅</span>
               )}
@@ -156,7 +184,7 @@ export function AdminBranding() {
               <input
                 ref={fileInputRef}
                 type="file"
-                accept="image/*"
+                accept="image/png,image/jpeg,image/webp,image/svg+xml"
                 className="hidden"
                 onChange={handleUploadLogo}
               />
@@ -183,25 +211,43 @@ export function AdminBranding() {
               )}
             </div>
           </div>
-          <p className="text-xs text-muted-foreground">Recomendado: PNG transparente, máx. 2MB</p>
+          <p className="text-xs text-muted-foreground">
+            Recomendado: PNG transparente, até 2000×2000px, máx. 5MB
+          </p>
         </div>
 
-        {/* Display Mode */}
+        {/* Logo Size Slider */}
         {logoUrl && (
-          <div className="space-y-2">
-            <Label>Modo de exibição da logo</Label>
-            <RadioGroup value={logoDisplayMode} onValueChange={(v) => setLogoDisplayMode(v as "icon" | "banner")} className="flex gap-4">
-              <div className="flex items-center gap-2">
-                <RadioGroupItem value="icon" id="mode-icon" />
-                <Label htmlFor="mode-icon" className="font-normal cursor-pointer">Ícone pequeno + texto</Label>
-              </div>
-              <div className="flex items-center gap-2">
-                <RadioGroupItem value="banner" id="mode-banner" />
-                <Label htmlFor="mode-banner" className="font-normal cursor-pointer">Logo como banner</Label>
-              </div>
-            </RadioGroup>
+          <div className="space-y-3">
+            <Label>Tamanho do logo no cabeçalho: {logoSize}px</Label>
+            <Slider
+              value={[logoSize]}
+              onValueChange={(v) => setLogoSize(v[0])}
+              min={40}
+              max={160}
+              step={4}
+              className="w-full"
+            />
+            <div className="flex justify-between text-xs text-muted-foreground">
+              <span>40px</span>
+              <span>160px</span>
+            </div>
           </div>
         )}
+
+        {/* Show Brand Name Toggle */}
+        <div className="flex items-center justify-between">
+          <div className="space-y-0.5">
+            <Label>Mostrar nome da marca</Label>
+            <p className="text-xs text-muted-foreground">
+              Exibe o nome e subtítulo abaixo do logo
+            </p>
+          </div>
+          <Switch
+            checked={showBrandName}
+            onCheckedChange={setShowBrandName}
+          />
+        </div>
 
         {/* Site Name */}
         <div className="space-y-2">
@@ -235,8 +281,6 @@ export function AdminBranding() {
           </Label>
           <div className="grid grid-cols-2 gap-2">
             {FONT_OPTIONS.map((font) => {
-              // Load font for preview
-              const linkId = `font-preview-${font.value}`;
               if (!document.querySelector(`link[data-font="${font.value}"]`)) {
                 const link = document.createElement("link");
                 link.rel = "stylesheet";
@@ -272,25 +316,34 @@ export function AdminBranding() {
           </div>
         </div>
 
-        {/* Preview */}
+        {/* Live Preview */}
         <div className="space-y-2">
-          <Label>Pré-visualização</Label>
-          <div className="rounded-xl bg-gradient-to-r from-primary/30 to-primary/10 border border-border/50 p-4">
-            {logoDisplayMode === "banner" && logoUrl ? (
-              <img src={logoUrl} alt="Banner preview" className="h-12 max-w-[280px] object-contain bg-transparent" style={{ mixBlendMode: "normal" }} />
+          <Label>Pré-visualização do cabeçalho</Label>
+          <div className="rounded-xl bg-gradient-to-r from-primary/40 to-primary/20 border border-border/50 p-5 flex flex-col items-center gap-2">
+            {logoUrl ? (
+              <div
+                className="flex items-center justify-center overflow-hidden"
+                style={{ width: `${previewLogoSize}px`, height: `${previewLogoSize}px` }}
+              >
+                <img
+                  src={logoUrl}
+                  alt="Preview"
+                  className="w-full h-full object-contain"
+                  style={{ imageRendering: "auto" }}
+                />
+              </div>
             ) : (
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-transparent border border-white/20 flex items-center justify-center overflow-hidden shadow-lg flex-shrink-0">
-                  {logoUrl ? (
-                    <img src={logoUrl} alt="Logo preview" className="w-full h-full object-contain p-1" style={{ background: "transparent" }} />
-                  ) : (
-                    <span className="text-2xl">💅</span>
-                  )}
-                </div>
-                <div style={{ fontFamily: `'${siteFont}', sans-serif` }}>
-                  <div className="font-bold text-base sm:text-lg">{siteName || "Agendamento"}</div>
-                  <div className="text-xs text-muted-foreground">{siteSubtitle || "Agende seu horário"}</div>
-                </div>
+              <div
+                className="rounded-2xl bg-transparent border border-white/20 flex items-center justify-center overflow-hidden"
+                style={{ width: '48px', height: '48px' }}
+              >
+                <span className="text-2xl">💅</span>
+              </div>
+            )}
+            {showBrandName && (
+              <div className="text-center" style={{ fontFamily: `'${siteFont}', sans-serif` }}>
+                <div className="font-bold text-base sm:text-lg">{siteName || "Agendamento"}</div>
+                <div className="text-xs text-muted-foreground">{siteSubtitle || "Agende seu horário"}</div>
               </div>
             )}
           </div>
