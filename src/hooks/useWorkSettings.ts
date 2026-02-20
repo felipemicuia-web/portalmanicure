@@ -2,6 +2,11 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useTenant } from "@/contexts/TenantContext";
 
+export interface DaySchedule {
+  start_time: string;
+  end_time: string;
+}
+
 export interface WorkSettings {
   start_time: string;
   end_time: string;
@@ -10,11 +15,13 @@ export interface WorkSettings {
   lunch_start: string | null;
   lunch_end: string | null;
   working_days: number[];
+  day_schedules: Record<string, DaySchedule>;
 }
 
 const DEFAULT_SETTINGS: WorkSettings = {
   start_time: "09:00",
   end_time: "18:00",
+  day_schedules: {},
   interval_minutes: 10,
   slot_step_minutes: 30,
   lunch_start: null,
@@ -48,6 +55,7 @@ export function useWorkSettings() {
           lunch_start: data.lunch_start,
           lunch_end: data.lunch_end,
           working_days: data.working_days || [1, 2, 3, 4, 5, 6],
+          day_schedules: (data as any).day_schedules || {},
         });
       }
       setLoading(false);

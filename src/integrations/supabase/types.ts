@@ -878,6 +878,7 @@ export type Database = {
       }
       work_settings: {
         Row: {
+          day_schedules: Json
           end_time: string
           id: string
           interval_minutes: number
@@ -897,6 +898,7 @@ export type Database = {
           working_days: number[]
         }
         Insert: {
+          day_schedules?: Json
           end_time?: string
           id?: string
           interval_minutes?: number
@@ -916,6 +918,7 @@ export type Database = {
           working_days?: number[]
         }
         Update: {
+          day_schedules?: Json
           end_time?: string
           id?: string
           interval_minutes?: number

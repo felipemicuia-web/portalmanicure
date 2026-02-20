@@ -8,6 +8,11 @@ import { Switch } from "@/components/ui/switch";
 import { Clock, Coffee, Save, Loader2, Calendar } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 
+interface DaySchedule {
+  start_time: string;
+  end_time: string;
+}
+
 interface WorkSettings {
   id: string;
   start_time: string;
@@ -17,6 +22,7 @@ interface WorkSettings {
   lunch_start: string | null;
   lunch_end: string | null;
   working_days: number[];
+  day_schedules: Record<string, DaySchedule>;
 }
 
 const WEEKDAYS = [
@@ -55,7 +61,10 @@ export function AdminWorkHours() {
         variant: "destructive",
       });
     } else if (data) {
-      setSettings(data);
+      setSettings({
+        ...data,
+        day_schedules: (data as any).day_schedules || {},
+      });
       setHasLunch(!!data.lunch_start && !!data.lunch_end);
     }
     setLoading(false);
@@ -74,6 +83,7 @@ export function AdminWorkHours() {
       lunch_start: hasLunch ? settings.lunch_start : null,
       lunch_end: hasLunch ? settings.lunch_end : null,
       working_days: settings.working_days,
+      day_schedules: settings.day_schedules as any,
       updated_at: new Date().toISOString(),
     };
 
@@ -105,7 +115,38 @@ export function AdminWorkHours() {
     const newDays = days.includes(day)
       ? days.filter((d) => d !== day)
       : [...days, day].sort((a, b) => a - b);
-    setSettings({ ...settings, working_days: newDays });
+
+    // Remove custom schedule if day is being unchecked
+    const newSchedules = { ...settings.day_schedules };
+    if (!newDays.includes(day)) {
+      delete newSchedules[String(day)];
+    }
+
+    setSettings({ ...settings, working_days: newDays, day_schedules: newSchedules });
+  }
+
+  function toggleCustomSchedule(day: number, enabled: boolean) {
+    if (!settings) return;
+    const newSchedules = { ...settings.day_schedules };
+    if (enabled) {
+      newSchedules[String(day)] = {
+        start_time: settings.start_time,
+        end_time: settings.end_time,
+      };
+    } else {
+      delete newSchedules[String(day)];
+    }
+    setSettings({ ...settings, day_schedules: newSchedules });
+  }
+
+  function updateDaySchedule(day: number, field: "start_time" | "end_time", value: string) {
+    if (!settings) return;
+    const newSchedules = { ...settings.day_schedules };
+    newSchedules[String(day)] = {
+      ...newSchedules[String(day)],
+      [field]: value,
+    };
+    setSettings({ ...settings, day_schedules: newSchedules });
   }
 
   if (loading) {
@@ -140,10 +181,10 @@ export function AdminWorkHours() {
         </div>
 
         <div className="grid gap-6">
-          {/* Horário de funcionamento */}
+          {/* Horário padrão */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="start_time">Horário de Início</Label>
+              <Label htmlFor="start_time">Horário de Início (padrão)</Label>
               <Input
                 id="start_time"
                 type="time"
@@ -155,7 +196,7 @@ export function AdminWorkHours() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="end_time">Horário de Término</Label>
+              <Label htmlFor="end_time">Horário de Término (padrão)</Label>
               <Input
                 id="end_time"
                 type="time"
@@ -225,10 +266,7 @@ export function AdminWorkHours() {
                   </p>
                 </div>
               </div>
-              <Switch
-                checked={hasLunch}
-                onCheckedChange={setHasLunch}
-              />
+              <Switch checked={hasLunch} onCheckedChange={setHasLunch} />
             </div>
 
             {hasLunch && (
@@ -261,45 +299,92 @@ export function AdminWorkHours() {
             )}
           </div>
 
-          {/* Dias de funcionamento */}
+          {/* Dias de funcionamento + horários customizados */}
           <div className="border-t border-border/50 pt-6">
             <div className="flex items-center gap-3 mb-4">
               <Calendar className="w-5 h-5 text-muted-foreground" />
               <div>
                 <Label className="text-base">Dias de Funcionamento</Label>
                 <p className="text-xs text-muted-foreground">
-                  Selecione os dias da semana em que o estabelecimento funciona
+                  Selecione os dias e defina horários especiais se necessário
                 </p>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">
-              {WEEKDAYS.map((day) => (
-                <label
-                  key={day.value}
-                  className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all ${
-                    settings.working_days?.includes(day.value)
-                      ? "border-primary bg-primary/10"
-                      : "border-border/50 bg-background hover:border-primary/50"
-                  }`}
-                >
-                  <Checkbox
-                    checked={settings.working_days?.includes(day.value)}
-                    onCheckedChange={() => toggleDay(day.value)}
-                  />
-                  <span className="text-sm font-medium">{day.label}</span>
-                </label>
-              ))}
+            <div className="space-y-3 mt-4">
+              {WEEKDAYS.map((day) => {
+                const isActive = settings.working_days?.includes(day.value);
+                const hasCustom = !!settings.day_schedules[String(day.value)];
+                const schedule = settings.day_schedules[String(day.value)];
+
+                return (
+                  <div
+                    key={day.value}
+                    className={`rounded-lg border transition-all ${
+                      isActive
+                        ? "border-primary bg-primary/5"
+                        : "border-border/50 bg-background"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between p-3">
+                      <label className="flex items-center gap-3 cursor-pointer flex-1">
+                        <Checkbox
+                          checked={isActive}
+                          onCheckedChange={() => toggleDay(day.value)}
+                        />
+                        <span className="text-sm font-medium">{day.label}</span>
+                      </label>
+
+                      {isActive && (
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-muted-foreground">
+                            Horário especial
+                          </span>
+                          <Switch
+                            checked={hasCustom}
+                            onCheckedChange={(checked) =>
+                              toggleCustomSchedule(day.value, checked)
+                            }
+                          />
+                        </div>
+                      )}
+                    </div>
+
+                    {isActive && hasCustom && schedule && (
+                      <div className="grid grid-cols-2 gap-3 px-3 pb-3 pl-10">
+                        <div className="space-y-1">
+                          <Label className="text-xs text-muted-foreground">Início</Label>
+                          <Input
+                            type="time"
+                            value={schedule.start_time}
+                            onChange={(e) =>
+                              updateDaySchedule(day.value, "start_time", e.target.value)
+                            }
+                            className="bg-background h-8 text-sm"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs text-muted-foreground">Término</Label>
+                          <Input
+                            type="time"
+                            value={schedule.end_time}
+                            onChange={(e) =>
+                              updateDaySchedule(day.value, "end_time", e.target.value)
+                            }
+                            className="bg-background h-8 text-sm"
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
 
         <div className="flex justify-end mt-8">
-          <Button
-            onClick={handleSave}
-            disabled={saving}
-            className="gap-2"
-          >
+          <Button onClick={handleSave} disabled={saving} className="gap-2">
             {saving ? (
               <Loader2 className="w-4 h-4 animate-spin" />
             ) : (
@@ -315,18 +400,22 @@ export function AdminWorkHours() {
         <h3 className="font-semibold mb-3">Resumo</h3>
         <div className="text-sm text-muted-foreground space-y-1">
           <p>
-            🕐 Atendimento: <span className="text-foreground font-medium">{settings.start_time}</span> às{" "}
+            🕐 Atendimento padrão:{" "}
+            <span className="text-foreground font-medium">{settings.start_time}</span> às{" "}
             <span className="text-foreground font-medium">{settings.end_time}</span>
           </p>
           <p>
-            📊 Passo da agenda: <span className="text-foreground font-medium">{settings.slot_step_minutes} min</span>
+            📊 Passo da agenda:{" "}
+            <span className="text-foreground font-medium">{settings.slot_step_minutes} min</span>
           </p>
           <p>
-            ⏱️ Intervalo entre serviços: <span className="text-foreground font-medium">{settings.interval_minutes} min</span>
+            ⏱️ Intervalo entre serviços:{" "}
+            <span className="text-foreground font-medium">{settings.interval_minutes} min</span>
           </p>
           {hasLunch && settings.lunch_start && settings.lunch_end && (
             <p>
-              🍽️ Almoço: <span className="text-foreground font-medium">{settings.lunch_start}</span> às{" "}
+              🍽️ Almoço:{" "}
+              <span className="text-foreground font-medium">{settings.lunch_start}</span> às{" "}
               <span className="text-foreground font-medium">{settings.lunch_end}</span>
             </p>
           )}
@@ -338,7 +427,12 @@ export function AdminWorkHours() {
                 : settings.working_days?.length === 0
                 ? "Nenhum dia selecionado"
                 : WEEKDAYS.filter((d) => settings.working_days?.includes(d.value))
-                    .map((d) => d.short)
+                    .map((d) => {
+                      const custom = settings.day_schedules[String(d.value)];
+                      return custom
+                        ? `${d.short} (${custom.start_time}–${custom.end_time})`
+                        : d.short;
+                    })
                     .join(", ")}
             </span>
           </p>
