@@ -32,21 +32,12 @@ export function HeroHeader({ user, activePage, onPageChange, onLogout }: HeroHea
 
   return (
     <section className="relative w-full overflow-hidden">
-      {/* Background image */}
-      <div
-        className="absolute inset-0 bg-cover bg-center"
-        style={{
-          backgroundImage: "url('/hero-manicure.jpg')",
-          backgroundColor: "hsl(230 50% 15%)",
-        }}
-      />
-
-      {/* Dark gradient overlay */}
+      {/* Background */}
       <div
         className="absolute inset-0"
         style={{
           background:
-            "linear-gradient(180deg, rgba(10,25,55,0.6) 0%, rgba(10,25,55,0.8) 50%, rgba(10,25,55,0.95) 100%)",
+            "linear-gradient(180deg, hsl(230 50% 12%) 0%, hsl(230 50% 8%) 100%)",
         }}
       />
 
