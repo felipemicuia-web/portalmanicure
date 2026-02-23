@@ -14,6 +14,7 @@ import { AdminTheme } from "@/components/admin/AdminTheme";
 import { AdminWorkHours } from "@/components/admin/AdminWorkHours";
 import { AdminProfessionalSchedule } from "@/components/admin/AdminProfessionalSchedule";
 import { AdminWhatsAppTemplate } from "@/components/admin/AdminWhatsAppTemplate";
+import { AdminHeroHeader } from "@/components/admin/AdminHeroHeader";
 
 import { AdminUsers } from "@/components/admin/AdminUsers";
 import { AdminCoupons } from "@/components/admin/AdminCoupons";
@@ -29,7 +30,7 @@ import {
   Clock,
   UserCog,
   MessageCircle,
-  
+  Image,
   UsersRound,
   Menu,
   ChevronLeft,
@@ -45,7 +46,7 @@ const MENU_ITEMS: { value: string; label: string; icon: LucideIcon }[] = [
   { value: "schedules", label: "Folgas", icon: UserCog },
   { value: "professionals", label: "Profissionais", icon: Users },
   { value: "services", label: "Serviços", icon: Sparkles },
-  
+  { value: "hero", label: "Hero Header", icon: Image },
   { value: "theme", label: "Cores", icon: Palette },
   { value: "coupons", label: "Cupons", icon: Ticket },
   { value: "users", label: "Clientes", icon: UsersRound },
@@ -59,7 +60,7 @@ const TAB_CONTENT: Record<string, React.ReactNode> = {
   schedules: <AdminProfessionalSchedule />,
   professionals: <AdminProfessionals />,
   services: <AdminServices />,
-  
+  hero: <AdminHeroHeader />,
   theme: <AdminTheme />,
   coupons: <AdminCoupons />,
   users: <AdminUsers />,

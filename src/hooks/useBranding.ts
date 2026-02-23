@@ -23,6 +23,10 @@ export interface Branding {
   siteFont: string;
   showBrandName: boolean;
   logoSize: number;
+  heroTitle: string;
+  heroSubtitle: string;
+  heroFont: string;
+  heroBackgroundUrl: string | null;
 }
 
 const DEFAULT_BRANDING: Branding = {
@@ -33,6 +37,10 @@ const DEFAULT_BRANDING: Branding = {
   siteFont: "Inter",
   showBrandName: true,
   logoSize: 80,
+  heroTitle: "Manicures De Sucesso",
+  heroSubtitle: "Plataforma profissional para agendamentos premium",
+  heroFont: "Playfair Display",
+  heroBackgroundUrl: null,
 };
 
 function loadFont(fontName: string) {
@@ -66,21 +74,26 @@ export function useBranding() {
 
       const { data } = await supabase
         .from("work_settings")
-        .select("site_name, site_subtitle, logo_url, logo_display_mode, site_font, show_brand_name, logo_size")
+        .select("site_name, site_subtitle, logo_url, logo_display_mode, site_font, show_brand_name, logo_size, hero_title, hero_subtitle, hero_font, hero_background_url")
         .eq("tenant_id", tenantId)
         .limit(1)
         .single();
 
       if (data) {
         const font = (data as any).site_font || "Inter";
+        const d = data as any;
         setBranding({
           siteName: data.site_name || "Agendamento",
           siteSubtitle: data.site_subtitle || "Agende seu horário",
           logoUrl: data.logo_url,
           logoDisplayMode: (data.logo_display_mode as "icon" | "banner") || "icon",
           siteFont: font,
-          showBrandName: (data as any).show_brand_name ?? true,
-          logoSize: (data as any).logo_size ?? 80,
+          showBrandName: d.show_brand_name ?? true,
+          logoSize: d.logo_size ?? 80,
+          heroTitle: d.hero_title || "Manicures De Sucesso",
+          heroSubtitle: d.hero_subtitle || "Plataforma profissional para agendamentos premium",
+          heroFont: d.hero_font || "Playfair Display",
+          heroBackgroundUrl: d.hero_background_url || null,
         });
         applyFont(font);
       }
