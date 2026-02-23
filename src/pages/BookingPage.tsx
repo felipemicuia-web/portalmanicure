@@ -12,6 +12,7 @@ import { ServiceList } from "@/components/booking/ServiceList";
 import { DateTimeSelect } from "@/components/booking/DateTimeSelect";
 import { BookingConfirm, AppliedCoupon } from "@/components/booking/BookingConfirm";
 import { ProfilePage } from "@/components/profile/ProfilePage";
+import { HeroHeader } from "@/components/booking/HeroHeader";
 import { MyBookings } from "@/components/booking/MyBookings";
 import { logger } from "@/lib/logger";
 import { normalizePhone, isValidBrazilianPhone, isValidName } from "@/lib/validation";
@@ -479,6 +480,7 @@ export default function BookingPage() {
         <main className="max-w-6xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
           {activePage === "booking" && (
             <>
+              {currentStep === 1 && <HeroHeader />}
               <BookingStepper currentStep={currentStep} onStepClick={goToStep} />
 
               {globalMessage && (
