@@ -201,35 +201,6 @@ export function HeroHeader({ user, activePage, onPageChange, onLogout }: HeroHea
 
       {/* Hero content — logo + text */}
       <div className="relative z-10 flex flex-col items-center justify-center px-4 pt-4 pb-10 sm:pt-6 sm:pb-14 text-center">
-        {branding.logoUrl ? (
-          <div
-            className="mb-4 flex-shrink-0"
-            style={{
-              width: `${logoSizePx}px`,
-              height: `${logoSizePx}px`,
-              filter: "drop-shadow(0 0 18px rgba(255,255,255,0.25))",
-            }}
-          >
-            <img
-              src={branding.logoUrl}
-              alt={branding.siteName}
-              className="w-full h-full object-contain"
-              style={{ imageRendering: "auto", background: "transparent" }}
-            />
-          </div>
-        ) : (
-          <div
-            className="mb-4 rounded-2xl border border-white/20 flex items-center justify-center"
-            style={{
-              width: `${Math.min(logoSizePx, 72)}px`,
-              height: `${Math.min(logoSizePx, 72)}px`,
-              filter: "drop-shadow(0 0 18px rgba(255,255,255,0.25))",
-            }}
-          >
-            <span className="text-4xl">💅</span>
-          </div>
-        )}
-
         <h1
           className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-wide"
           style={{
