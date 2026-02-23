@@ -470,17 +470,25 @@ export default function BookingPage() {
       <div className="galaxy-bg" />
       
       <div className="relative z-10">
-        <BookingTopbar
-          user={user}
-          activePage={activePage}
-          onPageChange={setActivePage}
-          onLogout={handleLogout}
-        />
+        {activePage === "booking" ? (
+          <HeroHeader
+            user={user}
+            activePage={activePage}
+            onPageChange={setActivePage}
+            onLogout={handleLogout}
+          />
+        ) : (
+          <BookingTopbar
+            user={user}
+            activePage={activePage}
+            onPageChange={setActivePage}
+            onLogout={handleLogout}
+          />
+        )}
 
         <main className="max-w-6xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
           {activePage === "booking" && (
             <>
-              <HeroHeader />
               <BookingStepper currentStep={currentStep} onStepClick={goToStep} />
 
               {globalMessage && (
