@@ -39,61 +39,9 @@ export function BookingTopbar({
   return (
     <header className="sticky top-0 z-50 topbar-gradient">
       <div className="max-w-6xl mx-auto px-3 sm:px-4 py-4 sm:py-5">
-        <div className="flex items-center justify-between gap-2 sm:gap-4">
-          {/* Left spacer for centering */}
-          <div className="flex items-center gap-2 md:min-w-[140px]">
-            {/* Mobile menu button on the left for balance - hidden, spacer only on desktop */}
-          </div>
-
-          {/* Centered Brand */}
-          <div className="flex-1 flex items-center justify-center">
-            <div className="flex flex-col items-center gap-1 group">
-              {branding.logoUrl && (
-                <div
-                  className="flex items-center justify-center overflow-hidden flex-shrink-0"
-                  style={{
-                    width: `${logoSizePx}px`,
-                    height: `${logoSizePx}px`,
-                  }}
-                >
-                  <img
-                    src={branding.logoUrl}
-                    alt={branding.siteName}
-                    className="w-full h-full object-contain"
-                    style={{
-                      imageRendering: "auto",
-                      background: "transparent",
-                    }}
-                  />
-                </div>
-              )}
-              {!branding.logoUrl && (
-                <div
-                  className="rounded-2xl bg-transparent border border-white/20 flex items-center justify-center overflow-hidden shadow-lg group-hover:scale-105 transition-transform duration-300 flex-shrink-0"
-                  style={{
-                    width: `${Math.min(logoSizePx, 56)}px`,
-                    height: `${Math.min(logoSizePx, 56)}px`,
-                    boxShadow: '0 8px 32px rgba(124,58,237,.3), inset 0 1px 0 rgba(255,255,255,.2)',
-                  }}
-                >
-                  <span className="text-2xl sm:text-3xl">💅</span>
-                </div>
-              )}
-              {branding.showBrandName && (
-                <div className="text-center">
-                  <div className="font-bold tracking-wide text-base sm:text-lg bg-gradient-to-r from-white via-white/90 to-white/80 bg-clip-text">
-                    {branding.siteName}
-                  </div>
-                  <div className="text-[10px] sm:text-xs text-white/70 hidden xs:block">
-                    {branding.siteSubtitle}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Right side: Navigation */}
-          <div className="flex items-center gap-2 md:min-w-[140px] justify-end">
+        <div className="flex items-center justify-end gap-2 sm:gap-4">
+          {/* Navigation */}
+          <div className="flex items-center gap-2 justify-end">
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center gap-3 lg:gap-4">
               {user ? (
