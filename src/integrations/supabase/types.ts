@@ -880,6 +880,10 @@ export type Database = {
         Row: {
           day_schedules: Json
           end_time: string
+          hero_background_url: string | null
+          hero_font: string | null
+          hero_subtitle: string | null
+          hero_title: string | null
           id: string
           interval_minutes: number
           logo_display_mode: string
@@ -902,6 +906,10 @@ export type Database = {
         Insert: {
           day_schedules?: Json
           end_time?: string
+          hero_background_url?: string | null
+          hero_font?: string | null
+          hero_subtitle?: string | null
+          hero_title?: string | null
           id?: string
           interval_minutes?: number
           logo_display_mode?: string
@@ -924,6 +932,10 @@ export type Database = {
         Update: {
           day_schedules?: Json
           end_time?: string
+          hero_background_url?: string | null
+          hero_font?: string | null
+          hero_subtitle?: string | null
+          hero_title?: string | null
           id?: string
           interval_minutes?: number
           logo_display_mode?: string

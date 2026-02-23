@@ -4,8 +4,19 @@ import { LogOut, User as UserIcon, Shield, Menu, X, Calendar, CalendarCheck } fr
 import { Button } from "@/components/ui/button";
 import { useAdmin } from "@/hooks/useAdmin";
 import { useBranding } from "@/hooks/useBranding";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
+
+function loadHeroFont(fontName: string) {
+  const fontSlug = fontName.replace(/ /g, "+");
+  const id = `hero-font-${fontSlug}`;
+  if (document.getElementById(id)) return;
+  const link = document.createElement("link");
+  link.id = id;
+  link.rel = "stylesheet";
+  link.href = `https://fonts.googleapis.com/css2?family=${fontSlug}:wght@400;600;700;800;900&display=swap`;
+  document.head.appendChild(link);
+}
 
 interface HeroHeaderProps {
   user: User | null;
@@ -18,7 +29,10 @@ export function HeroHeader({ user, activePage, onPageChange, onLogout }: HeroHea
   const { branding } = useBranding();
   const { isAdmin } = useAdmin(user);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const logoSizePx = Math.round((branding.logoSize || 80) * 1.4);
+
+  useEffect(() => {
+    if (branding.heroFont) loadHeroFont(branding.heroFont);
+  }, [branding.heroFont]);
 
   const handlePageChange = (page: "booking" | "profile" | "my-bookings") => {
     onPageChange(page);
@@ -33,13 +47,20 @@ export function HeroHeader({ user, activePage, onPageChange, onLogout }: HeroHea
   return (
     <section className="relative w-full overflow-hidden">
       {/* Background */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background:
-            "linear-gradient(180deg, hsl(230 50% 12%) 0%, hsl(230 50% 8%) 100%)",
-        }}
-      />
+      {branding.heroBackgroundUrl ? (
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: `url('${branding.heroBackgroundUrl}')` }}
+        />
+      ) : (
+        <div
+          className="absolute inset-0"
+          style={{
+            background: "linear-gradient(180deg, hsl(230 50% 12%) 0%, hsl(230 50% 8%) 100%)",
+          }}
+        />
+      )}
+      {branding.heroBackgroundUrl && <div className="absolute inset-0 bg-black/30" />}
 
       {/* Top bar inside hero — menu button */}
       <div className="relative z-20 flex items-center justify-end px-3 sm:px-5 pt-3 sm:pt-4">
@@ -204,17 +225,18 @@ export function HeroHeader({ user, activePage, onPageChange, onLogout }: HeroHea
         <h1
           className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-wide"
           style={{
+            fontFamily: `'${branding.heroFont}', sans-serif`,
             background: "linear-gradient(135deg, #f5c6aa 0%, #e8b88a 40%, #d4a574 100%)",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
             filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.4))",
           }}
         >
-          Manicures De Sucesso
+          {branding.heroTitle}
         </h1>
 
         <p className="mt-2 text-sm sm:text-base text-white/70 max-w-md">
-          Plataforma profissional para agendamentos premium
+          {branding.heroSubtitle}
         </p>
       </div>
     </section>
