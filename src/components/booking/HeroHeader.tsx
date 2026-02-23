@@ -222,22 +222,26 @@ export function HeroHeader({ user, activePage, onPageChange, onLogout }: HeroHea
 
       {/* Hero content — logo + text */}
       <div className="relative z-10 flex flex-col items-center justify-center px-4 pt-4 pb-10 sm:pt-6 sm:pb-14 text-center">
-        <h1
-          className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-wide"
-          style={{
-            fontFamily: `'${branding.heroFont}', sans-serif`,
-            background: "linear-gradient(135deg, #f5c6aa 0%, #e8b88a 40%, #d4a574 100%)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.4))",
-          }}
-        >
-          {branding.heroTitle}
-        </h1>
+        {branding.heroTitle && (
+          <h1
+            className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-wide"
+            style={{
+              fontFamily: `'${branding.heroFont}', sans-serif`,
+              background: "linear-gradient(135deg, #f5c6aa 0%, #e8b88a 40%, #d4a574 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.4))",
+            }}
+          >
+            {branding.heroTitle}
+          </h1>
+        )}
 
-        <p className="mt-2 text-sm sm:text-base text-white/70 max-w-md">
-          {branding.heroSubtitle}
-        </p>
+        {branding.heroSubtitle && (
+          <p className="mt-2 text-sm sm:text-base text-white/70 max-w-md">
+            {branding.heroSubtitle}
+          </p>
+        )}
       </div>
     </section>
   );

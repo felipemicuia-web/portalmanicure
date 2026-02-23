@@ -164,21 +164,25 @@ export function AdminHeroHeader() {
             )}
             <div className="absolute inset-0 bg-black/30" />
             <div className="relative z-10 flex flex-col items-center justify-center px-4 py-10 text-center">
-              <h1
-                className="text-2xl sm:text-3xl font-extrabold tracking-wide"
-                style={{
-                  fontFamily: `'${heroFont}', sans-serif`,
-                  background: "linear-gradient(135deg, #f5c6aa 0%, #e8b88a 40%, #d4a574 100%)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.4))",
-                }}
-              >
-                {heroTitle}
-              </h1>
-              <p className="mt-2 text-sm text-white/70 max-w-md">
-                {heroSubtitle}
-              </p>
+              {heroTitle && (
+                <h1
+                  className="text-2xl sm:text-3xl font-extrabold tracking-wide"
+                  style={{
+                    fontFamily: `'${heroFont}', sans-serif`,
+                    background: "linear-gradient(135deg, #f5c6aa 0%, #e8b88a 40%, #d4a574 100%)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.4))",
+                  }}
+                >
+                  {heroTitle}
+                </h1>
+              )}
+              {heroSubtitle && (
+                <p className="mt-2 text-sm text-white/70 max-w-md">
+                  {heroSubtitle}
+                </p>
+              )}
             </div>
           </div>
         </CardContent>
@@ -238,11 +242,13 @@ export function AdminHeroHeader() {
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label>Título</Label>
-            <Input value={heroTitle} onChange={(e) => setHeroTitle(e.target.value)} placeholder="Título do hero" />
+            <Input value={heroTitle} onChange={(e) => setHeroTitle(e.target.value)} placeholder="Deixe vazio para ocultar" />
+            <p className="text-xs text-muted-foreground">Deixe em branco para não exibir título.</p>
           </div>
           <div className="space-y-2">
             <Label>Subtítulo</Label>
-            <Input value={heroSubtitle} onChange={(e) => setHeroSubtitle(e.target.value)} placeholder="Subtítulo do hero" />
+            <Input value={heroSubtitle} onChange={(e) => setHeroSubtitle(e.target.value)} placeholder="Deixe vazio para ocultar" />
+            <p className="text-xs text-muted-foreground">Deixe em branco para não exibir subtítulo.</p>
           </div>
           <div className="space-y-2">
             <Label>Fonte do Hero</Label>
