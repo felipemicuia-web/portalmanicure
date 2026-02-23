@@ -480,7 +480,7 @@ export default function BookingPage() {
         <main className="max-w-6xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
           {activePage === "booking" && (
             <>
-              {currentStep === 1 && <HeroHeader />}
+              <HeroHeader />
               <BookingStepper currentStep={currentStep} onStepClick={goToStep} />
 
               {globalMessage && (
