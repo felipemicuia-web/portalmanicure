@@ -12,7 +12,6 @@ import { ServiceList } from "@/components/booking/ServiceList";
 import { DateTimeSelect } from "@/components/booking/DateTimeSelect";
 import { BookingConfirm, AppliedCoupon } from "@/components/booking/BookingConfirm";
 import { ProfilePage } from "@/components/profile/ProfilePage";
-import { HeroHeader } from "@/components/booking/HeroHeader";
 import { MyBookings } from "@/components/booking/MyBookings";
 import { logger } from "@/lib/logger";
 import { normalizePhone, isValidBrazilianPhone, isValidName } from "@/lib/validation";
@@ -470,21 +469,12 @@ export default function BookingPage() {
       <div className="galaxy-bg" />
       
       <div className="relative z-10">
-        {activePage === "booking" ? (
-          <HeroHeader
-            user={user}
-            activePage={activePage}
-            onPageChange={setActivePage}
-            onLogout={handleLogout}
-          />
-        ) : (
-          <BookingTopbar
-            user={user}
-            activePage={activePage}
-            onPageChange={setActivePage}
-            onLogout={handleLogout}
-          />
-        )}
+        <BookingTopbar
+          user={user}
+          activePage={activePage}
+          onPageChange={setActivePage}
+          onLogout={handleLogout}
+        />
 
         <main className="max-w-6xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
           {activePage === "booking" && (
