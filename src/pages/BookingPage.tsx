@@ -6,6 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useBookingData, useAvailableTimes } from "@/hooks/useBookingData";
 import { useTenant } from "@/contexts/TenantContext";
 import { BookingTopbar } from "@/components/booking/BookingTopbar";
+import { HeroHeader } from "@/components/booking/HeroHeader";
 import { BookingStepper } from "@/components/booking/BookingStepper";
 import { ProfessionalSelect } from "@/components/booking/ProfessionalSelect";
 import { ServiceList } from "@/components/booking/ServiceList";
@@ -469,7 +470,7 @@ export default function BookingPage() {
       <div className="galaxy-bg" />
       
       <div className="relative z-10">
-        <BookingTopbar
+        <HeroHeader
           user={user}
           activePage={activePage}
           onPageChange={setActivePage}
