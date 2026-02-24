@@ -46,7 +46,7 @@ const MENU_ITEMS: { value: string; label: string; icon: LucideIcon }[] = [
   { value: "schedules", label: "Folgas", icon: UserCog },
   { value: "professionals", label: "Profissionais", icon: Users },
   { value: "services", label: "Serviços", icon: Sparkles },
-  { value: "hero", label: "Hero Header", icon: Image },
+  { value: "hero", label: "Logotipo", icon: Image },
   { value: "theme", label: "Cores", icon: Palette },
   { value: "coupons", label: "Cupons", icon: Ticket },
   { value: "users", label: "Clientes", icon: UsersRound },
