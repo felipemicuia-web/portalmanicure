@@ -3,44 +3,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { useTenant } from "@/contexts/TenantContext";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Upload, Trash2, Eye, Type, Image as ImageIcon } from "lucide-react";
-
-const HERO_FONT_OPTIONS = [
-  { value: "Playfair Display", label: "Playfair Display" },
-  { value: "Great Vibes", label: "Great Vibes" },
-  { value: "Dancing Script", label: "Dancing Script" },
-  { value: "Poppins", label: "Poppins" },
-  { value: "Montserrat", label: "Montserrat" },
-  { value: "Raleway", label: "Raleway" },
-  { value: "Inter", label: "Inter" },
-  { value: "Lato", label: "Lato" },
-  { value: "Roboto", label: "Roboto" },
-  { value: "Nunito", label: "Nunito" },
-];
-
-// Load Google Font dynamically
-function loadFont(fontName: string) {
-  const fontSlug = fontName.replace(/ /g, "+");
-  const id = `hero-font-${fontSlug}`;
-  if (document.getElementById(id)) return;
-  const link = document.createElement("link");
-  link.id = id;
-  link.rel = "stylesheet";
-  link.href = `https://fonts.googleapis.com/css2?family=${fontSlug}:wght@400;600;700;800;900&display=swap`;
-  document.head.appendChild(link);
-}
+import { Upload, Trash2, Eye, Image as ImageIcon } from "lucide-react";
 
 export function AdminHeroHeader() {
   const { tenantId } = useTenant();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [heroTitle, setHeroTitle] = useState("Manicures De Sucesso");
-  const [heroFont, setHeroFont] = useState("Playfair Display");
   const [heroBackgroundUrl, setHeroBackgroundUrl] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -51,13 +21,11 @@ export function AdminHeroHeader() {
     async function fetch() {
       const { data } = await supabase
         .from("work_settings")
-        .select("hero_title, hero_font, hero_background_url")
+        .select("hero_background_url")
         .eq("tenant_id", tenantId)
         .limit(1)
         .single();
       if (data) {
-        setHeroTitle((data as any).hero_title || "Manicures De Sucesso");
-        setHeroFont((data as any).hero_font || "Playfair Display");
         setHeroBackgroundUrl((data as any).hero_background_url || null);
       }
       setLoading(false);
@@ -65,26 +33,18 @@ export function AdminHeroHeader() {
     fetch();
   }, [tenantId]);
 
-  useEffect(() => {
-    loadFont(heroFont);
-  }, [heroFont]);
-
   const handleSave = async () => {
     if (!tenantId) return;
     setSaving(true);
     const { error } = await supabase
       .from("work_settings")
-      .update({
-        hero_title: heroTitle,
-        hero_font: heroFont,
-        hero_background_url: heroBackgroundUrl,
-      } as any)
+      .update({ hero_background_url: heroBackgroundUrl } as any)
       .eq("tenant_id", tenantId);
 
     if (error) {
       toast({ title: "Erro ao salvar", description: error.message, variant: "destructive" });
     } else {
-      toast({ title: "Salvo!", description: "Hero Header atualizado com sucesso." });
+      toast({ title: "Salvo!", description: "Logotipo atualizado com sucesso." });
     }
     setSaving(false);
   };
@@ -160,23 +120,6 @@ export function AdminHeroHeader() {
               />
             )}
             <div className="absolute inset-0 bg-black/30" />
-            <div className="relative z-10 flex flex-col items-center justify-center px-4 py-10 text-center">
-              {heroTitle && (
-                <h1
-                  className="text-2xl sm:text-3xl font-extrabold tracking-wide"
-                  style={{
-                    fontFamily: `'${heroFont}', sans-serif`,
-                    background: "linear-gradient(135deg, #f5c6aa 0%, #e8b88a 40%, #d4a574 100%)",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                    filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.4))",
-                  }}
-                >
-                  {heroTitle}
-                </h1>
-              )}
-              
-            </div>
           </div>
         </CardContent>
       </Card>
@@ -221,39 +164,6 @@ export function AdminHeroHeader() {
             onChange={handleUpload}
           />
           <p className="text-xs text-muted-foreground">PNG, JPG ou WebP. Máximo 5MB. Recomendado: 1920×400px.</p>
-        </CardContent>
-      </Card>
-
-      {/* Texts */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base flex items-center gap-2">
-            <Type className="w-4 h-4" />
-            Textos e Fonte
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label>Título</Label>
-            <Input value={heroTitle} onChange={(e) => setHeroTitle(e.target.value)} placeholder="Deixe vazio para ocultar" />
-            <p className="text-xs text-muted-foreground">Deixe em branco para não exibir título.</p>
-          </div>
-          
-          <div className="space-y-2">
-            <Label>Fonte do Hero</Label>
-            <Select value={heroFont} onValueChange={setHeroFont}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {HERO_FONT_OPTIONS.map((f) => (
-                  <SelectItem key={f.value} value={f.value}>
-                    <span style={{ fontFamily: `'${f.value}', sans-serif` }}>{f.label}</span>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
         </CardContent>
       </Card>
 
