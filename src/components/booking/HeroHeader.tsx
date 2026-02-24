@@ -237,11 +237,8 @@ export function HeroHeader({ user, activePage, onPageChange, onLogout }: HeroHea
           </h1>
         )}
 
-        {branding.heroSubtitle && (
-          <p className="mt-2 text-sm sm:text-base text-white/70 max-w-md">
-            {branding.heroSubtitle}
-          </p>
-        )}
+
+
       </div>
     </section>
   );

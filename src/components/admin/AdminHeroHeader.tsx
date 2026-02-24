@@ -40,7 +40,6 @@ export function AdminHeroHeader() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [heroTitle, setHeroTitle] = useState("Manicures De Sucesso");
-  const [heroSubtitle, setHeroSubtitle] = useState("Plataforma profissional para agendamentos premium");
   const [heroFont, setHeroFont] = useState("Playfair Display");
   const [heroBackgroundUrl, setHeroBackgroundUrl] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -52,13 +51,12 @@ export function AdminHeroHeader() {
     async function fetch() {
       const { data } = await supabase
         .from("work_settings")
-        .select("hero_title, hero_subtitle, hero_font, hero_background_url")
+        .select("hero_title, hero_font, hero_background_url")
         .eq("tenant_id", tenantId)
         .limit(1)
         .single();
       if (data) {
         setHeroTitle((data as any).hero_title || "Manicures De Sucesso");
-        setHeroSubtitle((data as any).hero_subtitle || "Plataforma profissional para agendamentos premium");
         setHeroFont((data as any).hero_font || "Playfair Display");
         setHeroBackgroundUrl((data as any).hero_background_url || null);
       }
@@ -78,7 +76,6 @@ export function AdminHeroHeader() {
       .from("work_settings")
       .update({
         hero_title: heroTitle,
-        hero_subtitle: heroSubtitle,
         hero_font: heroFont,
         hero_background_url: heroBackgroundUrl,
       } as any)
@@ -178,11 +175,7 @@ export function AdminHeroHeader() {
                   {heroTitle}
                 </h1>
               )}
-              {heroSubtitle && (
-                <p className="mt-2 text-sm text-white/70 max-w-md">
-                  {heroSubtitle}
-                </p>
-              )}
+              
             </div>
           </div>
         </CardContent>
@@ -245,11 +238,7 @@ export function AdminHeroHeader() {
             <Input value={heroTitle} onChange={(e) => setHeroTitle(e.target.value)} placeholder="Deixe vazio para ocultar" />
             <p className="text-xs text-muted-foreground">Deixe em branco para não exibir título.</p>
           </div>
-          <div className="space-y-2">
-            <Label>Subtítulo</Label>
-            <Input value={heroSubtitle} onChange={(e) => setHeroSubtitle(e.target.value)} placeholder="Deixe vazio para ocultar" />
-            <p className="text-xs text-muted-foreground">Deixe em branco para não exibir subtítulo.</p>
-          </div>
+          
           <div className="space-y-2">
             <Label>Fonte do Hero</Label>
             <Select value={heroFont} onValueChange={setHeroFont}>
@@ -269,7 +258,7 @@ export function AdminHeroHeader() {
       </Card>
 
       <Button onClick={handleSave} disabled={saving} className="w-full">
-        {saving ? "Salvando..." : "Salvar Hero Header"}
+        {saving ? "Salvando..." : "Salvar Logotipo"}
       </Button>
     </div>
   );
