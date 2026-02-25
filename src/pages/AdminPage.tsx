@@ -41,7 +41,6 @@ import {
 } from "lucide-react";
 
 const MENU_ITEMS: { value: string; label: string; icon: LucideIcon }[] = [
-  { value: "dashboard", label: "Dashboard", icon: BarChart3 },
   { value: "bookings", label: "Agenda", icon: CalendarDays },
   { value: "notifications", label: "Avisos", icon: Bell },
   { value: "whatsapp", label: "WhatsApp", icon: MessageCircle },
@@ -53,6 +52,7 @@ const MENU_ITEMS: { value: string; label: string; icon: LucideIcon }[] = [
   { value: "theme", label: "Cores", icon: Palette },
   { value: "coupons", label: "Cupons", icon: Ticket },
   { value: "users", label: "Clientes", icon: UsersRound },
+  { value: "dashboard", label: "Dashboard", icon: BarChart3 },
 ];
 
 const TAB_CONTENT: Record<string, React.ReactNode> = {
