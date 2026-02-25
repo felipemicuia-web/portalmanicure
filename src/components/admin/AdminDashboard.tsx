@@ -286,11 +286,11 @@ export function AdminDashboard() {
             <CardHeader className="pb-2">
               <CardTitle className="text-sm">Faturamento por dia</CardTitle>
             </CardHeader>
-            <CardContent className="h-56">
+            <CardContent className="h-56 -ml-2">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={revenueByDay}>
-                  <XAxis dataKey="date" tick={{ fontSize: 11 }} />
-                  <YAxis tick={{ fontSize: 11 }} />
+                <BarChart data={revenueByDay} margin={{ top: 5, right: 5, left: -15, bottom: 0 }}>
+                  <XAxis dataKey="date" tick={{ fontSize: 9 }} angle={-45} textAnchor="end" height={40} interval="preserveStartEnd" />
+                  <YAxis tick={{ fontSize: 10 }} width={45} tickFormatter={(v) => v >= 1000 ? `${(v/1000).toFixed(0)}k` : v} />
                   <Tooltip formatter={(v: number) => fmt(v)} />
                   <Bar dataKey="value" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
                 </BarChart>
@@ -304,7 +304,7 @@ export function AdminDashboard() {
             <CardHeader className="pb-2">
               <CardTitle className="text-sm">Faturamento por serviço</CardTitle>
             </CardHeader>
-            <CardContent className="h-64">
+            <CardContent className="h-72 sm:h-64">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
@@ -313,14 +313,20 @@ export function AdminDashboard() {
                     nameKey="name"
                     cx="50%"
                     cy="50%"
-                    outerRadius={80}
-                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                    outerRadius={65}
+                    label={({ name, percent }) => {
+                      const short = name.length > 10 ? name.slice(0, 10) + "…" : name;
+                      return `${short} ${(percent * 100).toFixed(0)}%`;
+                    }}
+                    labelLine={{ strokeWidth: 1 }}
+                    style={{ fontSize: 10 }}
                   >
                     {revenueByService.map((_, i) => (
                       <Cell key={i} fill={COLORS[i % COLORS.length]} />
                     ))}
                   </Pie>
                   <Tooltip formatter={(v: number) => fmt(v)} />
+                  <Legend wrapperStyle={{ fontSize: 11 }} />
                 </PieChart>
               </ResponsiveContainer>
             </CardContent>
@@ -345,12 +351,12 @@ export function AdminDashboard() {
             <CardHeader className="pb-2">
               <CardTitle className="text-sm">Atendimentos por semana</CardTitle>
             </CardHeader>
-            <CardContent className="h-48">
+            <CardContent className="h-48 -ml-2">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={clientsByWeek}>
+                <LineChart data={clientsByWeek} margin={{ top: 5, right: 10, left: -15, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="week" tick={{ fontSize: 11 }} />
-                  <YAxis tick={{ fontSize: 11 }} />
+                  <XAxis dataKey="week" tick={{ fontSize: 10 }} />
+                  <YAxis tick={{ fontSize: 10 }} width={35} allowDecimals={false} />
                   <Tooltip />
                   <Line type="monotone" dataKey="count" stroke="hsl(var(--primary))" strokeWidth={2} dot={{ r: 4 }} />
                 </LineChart>
@@ -376,11 +382,11 @@ export function AdminDashboard() {
             <CardHeader className="pb-2">
               <CardTitle className="text-sm">Distribuição por dia da semana</CardTitle>
             </CardHeader>
-            <CardContent className="h-48">
+            <CardContent className="h-48 -ml-2">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={dayDistribution}>
-                  <XAxis dataKey="name" tick={{ fontSize: 11 }} />
-                  <YAxis tick={{ fontSize: 11 }} />
+                <BarChart data={dayDistribution} margin={{ top: 5, right: 5, left: -15, bottom: 0 }}>
+                  <XAxis dataKey="name" tick={{ fontSize: 10 }} />
+                  <YAxis tick={{ fontSize: 10 }} width={30} allowDecimals={false} />
                   <Tooltip />
                   <Bar dataKey="count" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
                 </BarChart>
@@ -393,11 +399,11 @@ export function AdminDashboard() {
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm">Distribuição por horário</CardTitle>
               </CardHeader>
-              <CardContent className="h-48">
+              <CardContent className="h-48 -ml-2">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={hourDistribution}>
-                    <XAxis dataKey="hour" tick={{ fontSize: 10 }} />
-                    <YAxis tick={{ fontSize: 11 }} />
+                  <BarChart data={hourDistribution} margin={{ top: 5, right: 5, left: -15, bottom: 0 }}>
+                    <XAxis dataKey="hour" tick={{ fontSize: 9 }} angle={-45} textAnchor="end" height={40} interval={hourDistribution.length > 10 ? 1 : 0} />
+                    <YAxis tick={{ fontSize: 10 }} width={30} allowDecimals={false} />
                     <Tooltip />
                     <Bar dataKey="count" fill="hsl(var(--chart-2, 200 70% 50%))" radius={[4, 4, 0, 0]} />
                   </BarChart>
