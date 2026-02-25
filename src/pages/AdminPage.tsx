@@ -15,6 +15,7 @@ import { AdminWorkHours } from "@/components/admin/AdminWorkHours";
 import { AdminProfessionalSchedule } from "@/components/admin/AdminProfessionalSchedule";
 import { AdminWhatsAppTemplate } from "@/components/admin/AdminWhatsAppTemplate";
 import { AdminHeroHeader } from "@/components/admin/AdminHeroHeader";
+import { AdminDashboard } from "@/components/admin/AdminDashboard";
 
 import { AdminUsers } from "@/components/admin/AdminUsers";
 import { AdminCoupons } from "@/components/admin/AdminCoupons";
@@ -35,10 +36,12 @@ import {
   Menu,
   ChevronLeft,
   Ticket,
+  BarChart3,
   type LucideIcon,
 } from "lucide-react";
 
 const MENU_ITEMS: { value: string; label: string; icon: LucideIcon }[] = [
+  { value: "dashboard", label: "Dashboard", icon: BarChart3 },
   { value: "bookings", label: "Agenda", icon: CalendarDays },
   { value: "notifications", label: "Avisos", icon: Bell },
   { value: "whatsapp", label: "WhatsApp", icon: MessageCircle },
@@ -53,6 +56,7 @@ const MENU_ITEMS: { value: string; label: string; icon: LucideIcon }[] = [
 ];
 
 const TAB_CONTENT: Record<string, React.ReactNode> = {
+  dashboard: <AdminDashboard />,
   bookings: <AdminBookings />,
   notifications: <AdminNotifications />,
   whatsapp: <AdminWhatsAppTemplate />,
@@ -70,7 +74,7 @@ export default function AdminPage() {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("bookings");
+  const [activeTab, setActiveTab] = useState("dashboard");
   const [menuOpen, setMenuOpen] = useState(false);
   const { isAdmin, loading: adminLoading } = useAdmin(user);
   const navigate = useNavigate();
