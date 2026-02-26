@@ -246,12 +246,12 @@ export function AdminDashboard() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 overflow-x-hidden">
       {/* Month selector */}
       <div className="flex items-center gap-3 flex-wrap">
-        <h2 className="text-xl font-bold capitalize">{monthLabel}</h2>
+        <h2 className="text-lg sm:text-xl font-bold capitalize">{monthLabel}</h2>
         <Select value={String(monthOffset)} onValueChange={(v) => setMonthOffset(Number(v))}>
-          <SelectTrigger className="w-40">
+          <SelectTrigger className="w-36 sm:w-40 text-sm">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -266,10 +266,10 @@ export function AdminDashboard() {
 
       {/* ═══ 1. Revenue ═══ */}
       <section className="space-y-4">
-        <h3 className="text-lg font-semibold flex items-center gap-2">
-          <DollarSign className="w-5 h-5 text-primary" /> Faturamento
+        <h3 className="text-base sm:text-lg font-semibold flex items-center gap-2">
+          <DollarSign className="w-4 h-4 sm:w-5 sm:h-5 text-primary shrink-0" /> Faturamento
         </h3>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <StatCard icon={DollarSign} label="Faturamento do mês" value={fmt(totalRevenue)} />
           <StatCard icon={TrendingUp} label="Ticket médio" value={fmt(avgTicket)} />
           <StatCard icon={CalendarDays} label="Atendimentos" value={String(confirmed.length)} />
@@ -286,11 +286,11 @@ export function AdminDashboard() {
             <CardHeader className="pb-2">
               <CardTitle className="text-sm">Faturamento por dia</CardTitle>
             </CardHeader>
-            <CardContent className="h-56 -ml-2">
+            <CardContent className="h-56 px-1 sm:px-4">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={revenueByDay} margin={{ top: 5, right: 5, left: -15, bottom: 0 }}>
-                  <XAxis dataKey="date" tick={{ fontSize: 9 }} angle={-45} textAnchor="end" height={40} interval="preserveStartEnd" />
-                  <YAxis tick={{ fontSize: 10 }} width={45} tickFormatter={(v) => v >= 1000 ? `${(v/1000).toFixed(0)}k` : v} />
+                <BarChart data={revenueByDay} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
+                  <XAxis dataKey="date" tick={{ fontSize: 8 }} angle={-45} textAnchor="end" height={45} interval="preserveStartEnd" />
+                  <YAxis tick={{ fontSize: 9 }} width={40} tickFormatter={(v) => v >= 1000 ? `${(v/1000).toFixed(0)}k` : v} />
                   <Tooltip formatter={(v: number) => fmt(v)} />
                   <Bar dataKey="value" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
                 </BarChart>
@@ -304,31 +304,34 @@ export function AdminDashboard() {
             <CardHeader className="pb-2">
               <CardTitle className="text-sm">Faturamento por serviço</CardTitle>
             </CardHeader>
-            <CardContent className="h-72 sm:h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={revenueByService}
-                    dataKey="revenue"
-                    nameKey="name"
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={65}
-                    label={({ name, percent }) => {
-                      const short = name.length > 10 ? name.slice(0, 10) + "…" : name;
-                      return `${short} ${(percent * 100).toFixed(0)}%`;
-                    }}
-                    labelLine={{ strokeWidth: 1 }}
-                    style={{ fontSize: 10 }}
-                  >
-                    {revenueByService.map((_, i) => (
-                      <Cell key={i} fill={COLORS[i % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip formatter={(v: number) => fmt(v)} />
-                  <Legend wrapperStyle={{ fontSize: 11 }} />
-                </PieChart>
-              </ResponsiveContainer>
+            <CardContent className="px-1 sm:px-4">
+              <div className="h-64 sm:h-72">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={revenueByService}
+                      dataKey="revenue"
+                      nameKey="name"
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={55}
+                      label={false}
+                      labelLine={false}
+                      style={{ fontSize: 9 }}
+                    >
+                      {revenueByService.map((_, i) => (
+                        <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip formatter={(v: number) => fmt(v)} />
+                    <Legend
+                      wrapperStyle={{ fontSize: 10, lineHeight: '18px' }}
+                      iconSize={8}
+                      formatter={(value: string) => value.length > 18 ? value.slice(0, 18) + "…" : value}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
             </CardContent>
           </Card>
         )}
@@ -336,10 +339,10 @@ export function AdminDashboard() {
 
       {/* ═══ 2. Client flow ═══ */}
       <section className="space-y-4">
-        <h3 className="text-lg font-semibold flex items-center gap-2">
-          <Users className="w-5 h-5 text-primary" /> Fluxo de Clientes
+        <h3 className="text-base sm:text-lg font-semibold flex items-center gap-2">
+          <Users className="w-4 h-4 sm:w-5 sm:h-5 text-primary shrink-0" /> Fluxo de Clientes
         </h3>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <StatCard icon={Users} label="Clientes atendidos" value={String(uniqueClientsMonth)} />
           <StatCard icon={Users} label="Novos clientes" value={String(newVsRecurring.newClients)} />
           <StatCard icon={Users} label="Recorrentes" value={String(newVsRecurring.recurring)} />
@@ -351,14 +354,14 @@ export function AdminDashboard() {
             <CardHeader className="pb-2">
               <CardTitle className="text-sm">Atendimentos por semana</CardTitle>
             </CardHeader>
-            <CardContent className="h-48 -ml-2">
+            <CardContent className="h-48 px-1 sm:px-4">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={clientsByWeek} margin={{ top: 5, right: 10, left: -15, bottom: 0 }}>
+                <LineChart data={clientsByWeek} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="week" tick={{ fontSize: 10 }} />
-                  <YAxis tick={{ fontSize: 10 }} width={35} allowDecimals={false} />
+                  <XAxis dataKey="week" tick={{ fontSize: 9 }} />
+                  <YAxis tick={{ fontSize: 9 }} width={30} allowDecimals={false} />
                   <Tooltip />
-                  <Line type="monotone" dataKey="count" stroke="hsl(var(--primary))" strokeWidth={2} dot={{ r: 4 }} />
+                  <Line type="monotone" dataKey="count" stroke="hsl(var(--primary))" strokeWidth={2} dot={{ r: 3 }} />
                 </LineChart>
               </ResponsiveContainer>
             </CardContent>
@@ -368,25 +371,25 @@ export function AdminDashboard() {
 
       {/* ═══ 3. Peak hours / days ═══ */}
       <section className="space-y-4">
-        <h3 className="text-lg font-semibold flex items-center gap-2">
-          <Clock className="w-5 h-5 text-primary" /> Horários e Dias Mais Cheios
+        <h3 className="text-base sm:text-lg font-semibold flex items-center gap-2">
+          <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-primary shrink-0" /> Horários e Dias
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <StatCard icon={CalendarDays} label="Dia mais cheio" value={busiestDay.name} sub={`${busiestDay.count} atendimentos`} />
-          <StatCard icon={Clock} label="Horário mais agendado" value={busiestHour.hour} sub={`${busiestHour.count} agendamentos`} />
-          <StatCard icon={AlertTriangle} label="Horário mais vazio" value={quietestHour.hour} sub={`${quietestHour.count} agendamentos`} />
+          <StatCard icon={CalendarDays} label="Dia mais cheio" value={busiestDay.name} sub={`${busiestDay.count} atend.`} />
+          <StatCard icon={Clock} label="Horário pico" value={busiestHour.hour} sub={`${busiestHour.count} agend.`} />
+          <StatCard icon={AlertTriangle} label="Horário vazio" value={quietestHour.hour} sub={`${quietestHour.count} agend.`} />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4">
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm">Distribuição por dia da semana</CardTitle>
             </CardHeader>
-            <CardContent className="h-48 -ml-2">
+            <CardContent className="h-48 px-1 sm:px-4">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={dayDistribution} margin={{ top: 5, right: 5, left: -15, bottom: 0 }}>
-                  <XAxis dataKey="name" tick={{ fontSize: 10 }} />
-                  <YAxis tick={{ fontSize: 10 }} width={30} allowDecimals={false} />
+                <BarChart data={dayDistribution} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
+                  <XAxis dataKey="name" tick={{ fontSize: 9 }} />
+                  <YAxis tick={{ fontSize: 9 }} width={25} allowDecimals={false} />
                   <Tooltip />
                   <Bar dataKey="count" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
                 </BarChart>
@@ -399,11 +402,11 @@ export function AdminDashboard() {
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm">Distribuição por horário</CardTitle>
               </CardHeader>
-              <CardContent className="h-48 -ml-2">
+              <CardContent className="h-48 px-1 sm:px-4">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={hourDistribution} margin={{ top: 5, right: 5, left: -15, bottom: 0 }}>
-                    <XAxis dataKey="hour" tick={{ fontSize: 9 }} angle={-45} textAnchor="end" height={40} interval={hourDistribution.length > 10 ? 1 : 0} />
-                    <YAxis tick={{ fontSize: 10 }} width={30} allowDecimals={false} />
+                  <BarChart data={hourDistribution} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
+                    <XAxis dataKey="hour" tick={{ fontSize: 8 }} angle={-45} textAnchor="end" height={45} interval={Math.max(0, Math.floor(hourDistribution.length / 8))} />
+                    <YAxis tick={{ fontSize: 9 }} width={25} allowDecimals={false} />
                     <Tooltip />
                     <Bar dataKey="count" fill="hsl(var(--chart-2, 200 70% 50%))" radius={[4, 4, 0, 0]} />
                   </BarChart>
@@ -416,19 +419,19 @@ export function AdminDashboard() {
 
       {/* ═══ 4. Service performance ═══ */}
       <section className="space-y-4">
-        <h3 className="text-lg font-semibold flex items-center gap-2">
-          <Star className="w-5 h-5 text-primary" /> Performance dos Serviços
+        <h3 className="text-base sm:text-lg font-semibold flex items-center gap-2">
+          <Star className="w-4 h-4 sm:w-5 sm:h-5 text-primary shrink-0" /> Performance dos Serviços
         </h3>
         {revenueByService.length > 0 ? (
           <div className="grid gap-2">
             {revenueByService.map((s, i) => (
               <Card key={s.name}>
                 <CardContent className="p-3 flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <span className="text-xs font-bold text-muted-foreground w-5 text-center">#{i + 1}</span>
-                    <span className="font-medium text-sm truncate">{s.name}</span>
+                  <div className="flex items-center gap-2 min-w-0 flex-1">
+                    <span className="text-xs font-bold text-muted-foreground w-5 text-center shrink-0">#{i + 1}</span>
+                    <span className="font-medium text-xs sm:text-sm truncate">{s.name}</span>
                   </div>
-                  <div className="flex items-center gap-4 text-sm shrink-0">
+                  <div className="flex items-center gap-2 sm:gap-4 text-xs sm:text-sm shrink-0">
                     <span className="text-muted-foreground">{s.count}x</span>
                     <span className="font-semibold">{fmt(s.revenue)}</span>
                   </div>
@@ -443,13 +446,13 @@ export function AdminDashboard() {
 
       {/* ═══ 5. Bonus metrics ═══ */}
       <section className="space-y-4">
-        <h3 className="text-lg font-semibold flex items-center gap-2">
-          <Percent className="w-5 h-5 text-primary" /> Indicadores Bônus
+        <h3 className="text-base sm:text-lg font-semibold flex items-center gap-2">
+          <Percent className="w-4 h-4 sm:w-5 sm:h-5 text-primary shrink-0" /> Indicadores Bônus
         </h3>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <StatCard icon={TrendingUp} label="Taxa de conversão" value={`${conversionRate}%`} sub="Concluídos / Agendados" />
           <StatCard icon={AlertTriangle} label="Taxa de faltas" value={`${realNoShowRate}%`} sub="No-show / Total passado" />
-          <StatCard icon={CalendarDays} label="Cancelamentos" value={String(cancelled.length)} sub={`de ${bookings.length} agendamentos`} />
+          <StatCard icon={CalendarDays} label="Cancelamentos" value={String(cancelled.length)} sub={`de ${bookings.length} agend.`} />
           <StatCard
             icon={BarChart3}
             label="Crescimento"
