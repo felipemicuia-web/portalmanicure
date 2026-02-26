@@ -4,7 +4,7 @@ import { logger } from "@/lib/logger";
 import { formatPhone } from "@/lib/validation";
 import { formatDateBR } from "@/lib/dateFormat";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Calendar, Clock, User, Phone, CalendarDays, Pencil, Trash2, MessageCircle, RotateCcw, Archive, AlertTriangle } from "lucide-react";
+import { Calendar, Clock, User, Phone, CalendarDays, Pencil, Trash2, MessageCircle, RotateCcw, Archive, AlertTriangle, CheckCircle } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -301,6 +301,20 @@ export function AdminBookings() {
     ));
   };
 
+  const handleQuickComplete = async (booking: Booking) => {
+    const { error } = await supabase
+      .from("bookings")
+      .update({ status: "completed" })
+      .eq("id", booking.id);
+    if (error) {
+      logger.error("Error completing booking:", error);
+      toast.error("Erro ao concluir agendamento");
+      return;
+    }
+    toast.success("Agendamento concluído!");
+    setBookings((prev) => prev.map((b) => b.id === booking.id ? { ...b, status: "completed" } : b));
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center py-12">
@@ -411,6 +425,17 @@ export function AdminBookings() {
             </>
           ) : (
             <>
+              {booking.status === "confirmed" && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => handleQuickComplete(booking)}
+                  className="h-8 w-8 text-blue-500 hover:text-blue-600"
+                  title="Concluir"
+                >
+                  <CheckCircle className="w-4 h-4" />
+                </Button>
+              )}
               <a
                 href={getWhatsAppUrl(booking)}
                 target="_blank"
@@ -465,6 +490,17 @@ export function AdminBookings() {
       <TableCell className="text-center">{getStatusBadge(booking.status)}</TableCell>
       <TableCell>
         <div className="flex items-center justify-center gap-1">
+          {booking.status === "confirmed" && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => handleQuickComplete(booking)}
+              className="h-8 w-8 text-blue-500 hover:text-blue-600"
+              title="Concluir"
+            >
+              <CheckCircle className="w-4 h-4" />
+            </Button>
+          )}
           <a
             href={getWhatsAppUrl(booking)}
             target="_blank"
