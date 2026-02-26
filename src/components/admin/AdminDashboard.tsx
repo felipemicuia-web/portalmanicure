@@ -127,25 +127,26 @@ export function AdminDashboard() {
   );
 
   // ── Revenue metrics ──
-  const totalRevenue = confirmed.reduce((s, b) => s + Number(b.total_price), 0);
-  const prevRevenue = prevMonthConfirmed.reduce((s, b) => s + Number(b.total_price), 0);
-  const avgTicket = confirmed.length ? totalRevenue / confirmed.length : 0;
+  const totalRevenue = completed.reduce((s, b) => s + Number(b.total_price), 0);
+  const prevCompleted = prevMonthConfirmed.filter((b) => b.status === "completed");
+  const prevRevenue = prevCompleted.reduce((s, b) => s + Number(b.total_price), 0);
+  const avgTicket = completed.length ? totalRevenue / completed.length : 0;
   const growthPct = prevRevenue > 0 ? (((totalRevenue - prevRevenue) / prevRevenue) * 100).toFixed(1) : null;
 
   // Revenue by day
   const revenueByDay = useMemo(() => {
     const map: Record<string, number> = {};
-    confirmed.forEach((b) => {
+    completed.forEach((b) => {
       map[b.booking_date] = (map[b.booking_date] || 0) + Number(b.total_price);
     });
     return Object.entries(map)
       .sort(([a], [b]) => a.localeCompare(b))
       .map(([date, value]) => ({ date: format(parseISO(date), "dd/MM"), value }));
-  }, [confirmed]);
+  }, [completed]);
 
   // Revenue by service
   const revenueByService = useMemo(() => {
-    const bookingIds = new Set(confirmed.map((b) => b.id));
+    const bookingIds = new Set(completed.map((b) => b.id));
     const sMap: Record<string, number> = {};
     const countMap: Record<string, number> = {};
     bookingServices.forEach((bs) => {
@@ -158,7 +159,7 @@ export function AdminDashboard() {
     return Object.entries(sMap)
       .map(([name, revenue]) => ({ name, revenue, count: countMap[name] || 0 }))
       .sort((a, b) => b.revenue - a.revenue);
-  }, [confirmed, bookingServices, services]);
+  }, [completed, bookingServices, services]);
 
   // ── Client flow ──
   const uniqueClientsMonth = useMemo(() => new Set(confirmed.map((b) => b.user_id)).size, [confirmed]);
