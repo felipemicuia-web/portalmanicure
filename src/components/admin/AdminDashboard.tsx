@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useTenant } from "@/contexts/TenantContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, CartesianGrid, Legend } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, CartesianGrid, Legend, TooltipProps } from "recharts";
 import { DollarSign, Users, TrendingUp, Clock, Star, AlertTriangle, CalendarDays, BarChart3, Percent } from "lucide-react";
 import { format, startOfMonth, endOfMonth, subMonths, parseISO, getDay, startOfWeek, endOfWeek, eachWeekOfInterval, isAfter } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -18,6 +18,18 @@ const COLORS = [
 ];
 
 const DAY_NAMES = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+
+const tooltipStyle = {
+  contentStyle: {
+    backgroundColor: "hsl(var(--card))",
+    border: "1px solid hsl(var(--border))",
+    borderRadius: "8px",
+    color: "hsl(var(--card-foreground))",
+    fontSize: 12,
+  },
+  labelStyle: { color: "hsl(var(--card-foreground))" },
+  itemStyle: { color: "hsl(var(--card-foreground))" },
+};
 
 interface BookingRow {
   id: string;
@@ -292,7 +304,7 @@ export function AdminDashboard() {
                 <BarChart data={revenueByDay} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
                   <XAxis dataKey="date" tick={{ fontSize: 8 }} angle={-45} textAnchor="end" height={45} interval="preserveStartEnd" />
                   <YAxis tick={{ fontSize: 9 }} width={40} tickFormatter={(v) => v >= 1000 ? `${(v/1000).toFixed(0)}k` : v} />
-                  <Tooltip formatter={(v: number) => fmt(v)} />
+                  <Tooltip {...tooltipStyle} formatter={(v: number) => fmt(v)} />
                   <Bar dataKey="value" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
@@ -324,7 +336,7 @@ export function AdminDashboard() {
                         <Cell key={i} fill={COLORS[i % COLORS.length]} />
                       ))}
                     </Pie>
-                    <Tooltip formatter={(v: number) => fmt(v)} />
+                    <Tooltip {...tooltipStyle} formatter={(v: number) => fmt(v)} />
                     <Legend
                       wrapperStyle={{ fontSize: 10, lineHeight: '18px' }}
                       iconSize={8}
@@ -361,7 +373,7 @@ export function AdminDashboard() {
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="week" tick={{ fontSize: 9 }} />
                   <YAxis tick={{ fontSize: 9 }} width={30} allowDecimals={false} />
-                  <Tooltip />
+                  <Tooltip {...tooltipStyle} />
                   <Line type="monotone" dataKey="count" stroke="hsl(var(--primary))" strokeWidth={2} dot={{ r: 3 }} />
                 </LineChart>
               </ResponsiveContainer>
@@ -391,7 +403,7 @@ export function AdminDashboard() {
                 <BarChart data={dayDistribution} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
                   <XAxis dataKey="name" tick={{ fontSize: 9 }} />
                   <YAxis tick={{ fontSize: 9 }} width={25} allowDecimals={false} />
-                  <Tooltip />
+                  <Tooltip {...tooltipStyle} />
                   <Bar dataKey="count" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
@@ -408,7 +420,7 @@ export function AdminDashboard() {
                   <BarChart data={hourDistribution} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
                     <XAxis dataKey="hour" tick={{ fontSize: 8 }} angle={-45} textAnchor="end" height={45} interval={Math.max(0, Math.floor(hourDistribution.length / 8))} />
                     <YAxis tick={{ fontSize: 9 }} width={25} allowDecimals={false} />
-                    <Tooltip />
+                    <Tooltip {...tooltipStyle} />
                     <Bar dataKey="count" fill="hsl(var(--chart-2, 200 70% 50%))" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
