@@ -304,8 +304,8 @@ export function AdminDashboard() {
                 <BarChart data={revenueByDay} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
                   <XAxis dataKey="date" tick={{ fontSize: 8 }} angle={-45} textAnchor="end" height={45} interval="preserveStartEnd" />
                   <YAxis tick={{ fontSize: 9 }} width={40} tickFormatter={(v) => v >= 1000 ? `${(v/1000).toFixed(0)}k` : v} />
-                  <Tooltip {...tooltipStyle} formatter={(v: number) => fmt(v)} />
-                  <Bar dataKey="value" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                  <Tooltip {...tooltipStyle} formatter={(v: number) => [fmt(v), "Faturamento"]} labelFormatter={(l) => `Data: ${l}`} />
+                  <Bar dataKey="value" name="Faturamento" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>
@@ -336,7 +336,7 @@ export function AdminDashboard() {
                         <Cell key={i} fill={COLORS[i % COLORS.length]} />
                       ))}
                     </Pie>
-                    <Tooltip {...tooltipStyle} formatter={(v: number) => fmt(v)} />
+                    <Tooltip {...tooltipStyle} formatter={(v: number, name: string) => [fmt(v), name]} />
                     <Legend
                       wrapperStyle={{ fontSize: 10, lineHeight: '18px' }}
                       iconSize={8}
@@ -373,8 +373,8 @@ export function AdminDashboard() {
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="week" tick={{ fontSize: 9 }} />
                   <YAxis tick={{ fontSize: 9 }} width={30} allowDecimals={false} />
-                  <Tooltip {...tooltipStyle} />
-                  <Line type="monotone" dataKey="count" stroke="hsl(var(--primary))" strokeWidth={2} dot={{ r: 3 }} />
+                  <Tooltip {...tooltipStyle} formatter={(v: number) => [v, "Atendimentos"]} labelFormatter={(l) => l} />
+                  <Line type="monotone" dataKey="count" name="Atendimentos" stroke="hsl(var(--primary))" strokeWidth={2} dot={{ r: 3 }} />
                 </LineChart>
               </ResponsiveContainer>
             </CardContent>
@@ -403,8 +403,8 @@ export function AdminDashboard() {
                 <BarChart data={dayDistribution} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
                   <XAxis dataKey="name" tick={{ fontSize: 9 }} />
                   <YAxis tick={{ fontSize: 9 }} width={25} allowDecimals={false} />
-                  <Tooltip {...tooltipStyle} />
-                  <Bar dataKey="count" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                  <Tooltip {...tooltipStyle} formatter={(v: number) => [v, "Atendimentos"]} />
+                  <Bar dataKey="count" name="Atendimentos" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>
@@ -420,8 +420,8 @@ export function AdminDashboard() {
                   <BarChart data={hourDistribution} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
                     <XAxis dataKey="hour" tick={{ fontSize: 8 }} angle={-45} textAnchor="end" height={45} interval={Math.max(0, Math.floor(hourDistribution.length / 8))} />
                     <YAxis tick={{ fontSize: 9 }} width={25} allowDecimals={false} />
-                    <Tooltip {...tooltipStyle} />
-                    <Bar dataKey="count" fill="hsl(var(--chart-2, 200 70% 50%))" radius={[4, 4, 0, 0]} />
+                    <Tooltip {...tooltipStyle} formatter={(v: number) => [v, "Agendamentos"]} labelFormatter={(l) => `Horário: ${l}`} />
+                    <Bar dataKey="count" name="Agendamentos" fill="hsl(var(--chart-2, 200 70% 50%))" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </CardContent>
