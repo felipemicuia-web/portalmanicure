@@ -89,11 +89,6 @@ export function AdminDashboard() {
   const mEnd = format(endOfMonth(refDate), "yyyy-MM-dd");
   const monthLabel = format(refDate, "MMMM yyyy", { locale: ptBR });
 
-  // Previous month for comparison
-  const prevDate = subMonths(refDate, 1);
-  const prevStart = format(startOfMonth(prevDate), "yyyy-MM-dd");
-  const prevEnd = format(endOfMonth(prevDate), "yyyy-MM-dd");
-
   useEffect(() => {
     if (!tenantId) return;
     setLoading(true);
@@ -132,18 +127,29 @@ export function AdminDashboard() {
   const completed = useMemo(() => bookings.filter((b) => b.status === "completed"), [bookings]);
   const cancelled = useMemo(() => bookings.filter((b) => b.status === "cancelled"), [bookings]);
 
-  // Previous month bookings for growth comparison
-  const prevMonthConfirmed = useMemo(
-    () => allBookings.filter((b) => b.booking_date >= prevStart && b.booking_date <= prevEnd && b.status !== "cancelled"),
-    [allBookings, prevStart, prevEnd]
-  );
-
   // ── Revenue metrics ──
   const totalRevenue = completed.reduce((s, b) => s + Number(b.total_price), 0);
-  const prevCompleted = prevMonthConfirmed.filter((b) => b.status === "completed");
-  const prevRevenue = prevCompleted.reduce((s, b) => s + Number(b.total_price), 0);
   const avgTicket = completed.length ? totalRevenue / completed.length : 0;
-  const growthPct = prevRevenue > 0 ? (((totalRevenue - prevRevenue) / prevRevenue) * 100).toFixed(1) : null;
+
+  // Historical monthly average (all completed bookings grouped by month)
+  const { monthlyAvg, vsAvgPct } = useMemo(() => {
+    const allCompleted = allBookings.filter((b) => b.status === "completed");
+    if (!allCompleted.length) return { monthlyAvg: 0, vsAvgPct: null };
+
+    const byMonth: Record<string, number> = {};
+    allCompleted.forEach((b) => {
+      const key = b.booking_date.slice(0, 7); // yyyy-MM
+      byMonth[key] = (byMonth[key] || 0) + Number(b.total_price);
+    });
+
+    const months = Object.keys(byMonth);
+    if (!months.length) return { monthlyAvg: 0, vsAvgPct: null };
+
+    const total = Object.values(byMonth).reduce((a, b) => a + b, 0);
+    const avg = total / months.length;
+    const pct = avg > 0 ? (((totalRevenue - avg) / avg) * 100).toFixed(1) : null;
+    return { monthlyAvg: avg, vsAvgPct: pct };
+  }, [allBookings, totalRevenue]);
 
   // Revenue by day
   const revenueByDay = useMemo(() => {
@@ -288,9 +294,9 @@ export function AdminDashboard() {
           <StatCard icon={CalendarDays} label="Atendimentos" value={String(confirmed.length)} />
           <StatCard
             icon={BarChart3}
-            label="Crescimento mensal"
-            value={growthPct ? `${Number(growthPct) >= 0 ? "+" : ""}${growthPct}%` : "—"}
-            sub="vs mês anterior"
+            label="Média histórica"
+            value={fmt(monthlyAvg)}
+            sub={vsAvgPct ? `${Number(vsAvgPct) >= 0 ? "+" : ""}${vsAvgPct}% vs média` : "—"}
           />
         </div>
 
@@ -468,9 +474,9 @@ export function AdminDashboard() {
           <StatCard icon={CalendarDays} label="Cancelamentos" value={String(cancelled.length)} sub={`de ${bookings.length} agend.`} />
           <StatCard
             icon={BarChart3}
-            label="Crescimento"
-            value={growthPct ? `${Number(growthPct) >= 0 ? "+" : ""}${growthPct}%` : "—"}
-            sub="Faturamento vs mês anterior"
+            label="vs Média geral"
+            value={vsAvgPct ? `${Number(vsAvgPct) >= 0 ? "+" : ""}${vsAvgPct}%` : "—"}
+            sub={`Média: ${fmt(monthlyAvg)}`}
           />
         </div>
       </section>
