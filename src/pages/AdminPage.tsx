@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { User, Session } from "@supabase/supabase-js";
 import { useAdmin } from "@/hooks/useAdmin";
+import { useSuperAdmin } from "@/hooks/useSuperAdmin";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -37,6 +38,7 @@ import {
   ChevronLeft,
   Ticket,
   BarChart3,
+  Globe,
   type LucideIcon,
 } from "lucide-react";
 
@@ -77,6 +79,7 @@ export default function AdminPage() {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [menuOpen, setMenuOpen] = useState(false);
   const { isAdmin, loading: adminLoading } = useAdmin(user);
+  const { isSuperAdmin } = useSuperAdmin(user);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -174,6 +177,17 @@ export default function AdminPage() {
             })}
           </nav>
           <div className="p-3 border-t border-border/50 space-y-1">
+            {isSuperAdmin && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate("/platform")}
+                className="w-full justify-start gap-2 text-primary"
+              >
+                <Globe className="w-4 h-4" />
+                Plataforma
+              </Button>
+            )}
             <Button
               variant="ghost"
               size="sm"

@@ -4,7 +4,13 @@ import { useTenant } from "@/contexts/TenantContext";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Upload, Trash2, Eye, Image as ImageIcon } from "lucide-react";
+import { Upload, Trash2, Eye, Image as ImageIcon, History, Check } from "lucide-react";
+
+interface HistoryItem {
+  name: string;
+  url: string;
+  created_at: string;
+}
 
 export function AdminHeroHeader() {
   const { tenantId } = useTenant();
@@ -15,6 +21,8 @@ export function AdminHeroHeader() {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [history, setHistory] = useState<HistoryItem[]>([]);
+  const [showHistory, setShowHistory] = useState(false);
 
   useEffect(() => {
     if (!tenantId) return;
@@ -32,6 +40,31 @@ export function AdminHeroHeader() {
     }
     fetch();
   }, [tenantId]);
+
+  // Load history of uploaded images from storage
+  useEffect(() => {
+    if (!tenantId) return;
+    async function loadHistory() {
+      const { data } = await supabase.storage
+        .from("avatars")
+        .list(`hero-bg`, { sortBy: { column: "created_at", order: "desc" } });
+
+      if (data) {
+        const items: HistoryItem[] = data
+          .filter((f) => f.name.startsWith(`${tenantId}-`))
+          .map((f) => {
+            const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(`hero-bg/${f.name}`);
+            return {
+              name: f.name,
+              url: urlData.publicUrl,
+              created_at: f.created_at || "",
+            };
+          });
+        setHistory(items);
+      }
+    }
+    loadHistory();
+  }, [tenantId, uploading]);
 
   const handleSave = async () => {
     if (!tenantId) return;
@@ -86,6 +119,12 @@ export function AdminHeroHeader() {
     setHeroBackgroundUrl(null);
   };
 
+  const handleSelectFromHistory = (url: string) => {
+    setHeroBackgroundUrl(url);
+    setShowHistory(false);
+    toast({ title: "Imagem selecionada!", description: "Clique em Salvar para aplicar." });
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -138,7 +177,7 @@ export function AdminHeroHeader() {
               <img src={heroBackgroundUrl} alt="Background" className="w-full h-full object-cover" />
             </div>
           )}
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             <Button
               variant="outline"
               size="sm"
@@ -149,6 +188,17 @@ export function AdminHeroHeader() {
               <Upload className="w-4 h-4" />
               {uploading ? "Enviando..." : heroBackgroundUrl ? "Trocar Imagem" : "Enviar Imagem"}
             </Button>
+            {history.length > 0 && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowHistory(!showHistory)}
+                className="gap-2"
+              >
+                <History className="w-4 h-4" />
+                Histórico ({history.length})
+              </Button>
+            )}
             {heroBackgroundUrl && (
               <Button variant="outline" size="sm" onClick={handleRemoveBackground} className="gap-2 text-destructive">
                 <Trash2 className="w-4 h-4" />
@@ -166,6 +216,41 @@ export function AdminHeroHeader() {
           <p className="text-xs text-muted-foreground">PNG, JPG ou WebP. Máximo 5MB. Recomendado: 1920×400px.</p>
         </CardContent>
       </Card>
+
+      {/* History */}
+      {showHistory && history.length > 0 && (
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              <History className="w-4 h-4" />
+              Histórico de Imagens
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {history.map((item) => {
+                const isSelected = heroBackgroundUrl === item.url;
+                return (
+                  <button
+                    key={item.name}
+                    onClick={() => handleSelectFromHistory(item.url)}
+                    className={`relative rounded-lg overflow-hidden h-24 bg-muted border-2 transition-all hover:opacity-90 ${
+                      isSelected ? "border-primary ring-2 ring-primary/30" : "border-transparent"
+                    }`}
+                  >
+                    <img src={item.url} alt="Histórico" className="w-full h-full object-cover" />
+                    {isSelected && (
+                      <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
+                        <Check className="w-6 h-6 text-primary" />
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <Button onClick={handleSave} disabled={saving} className="w-full">
         {saving ? "Salvando..." : "Salvar Logotipo"}
