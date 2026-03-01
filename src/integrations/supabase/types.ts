@@ -298,6 +298,79 @@ export type Database = {
           },
         ]
       }
+      dashboard_widgets: {
+        Row: {
+          config_json: Json
+          created_at: string
+          dashboard_id: string
+          id: string
+          position_json: Json
+          type: string
+        }
+        Insert: {
+          config_json?: Json
+          created_at?: string
+          dashboard_id: string
+          id?: string
+          position_json?: Json
+          type: string
+        }
+        Update: {
+          config_json?: Json
+          created_at?: string
+          dashboard_id?: string
+          id?: string
+          position_json?: Json
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dashboard_widgets_dashboard_id_fkey"
+            columns: ["dashboard_id"]
+            isOneToOne: false
+            referencedRelation: "dashboards"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dashboards: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          is_system: boolean
+          name: string
+          tenant_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          is_system?: boolean
+          name: string
+          tenant_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          is_system?: boolean
+          name?: string
+          tenant_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dashboards_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       followers: {
         Row: {
           created_at: string
@@ -452,6 +525,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      platform_admins: {
+        Row: {
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       professional_blocked_dates: {
         Row: {
@@ -1008,6 +1099,7 @@ export type Database = {
         Args: { p_professional_id: string; p_user_id: string }
         Returns: boolean
       }
+      is_superadmin: { Args: { _user_id?: string }; Returns: boolean }
       is_tenant_admin: {
         Args: { _tenant_id: string; _user_id: string }
         Returns: boolean

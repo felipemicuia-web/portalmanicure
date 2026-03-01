@@ -10,6 +10,7 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 import BookingPage from "./pages/BookingPage";
 import Auth from "./pages/Auth";
 import AdminPage from "./pages/AdminPage";
+import PlatformPage from "./pages/PlatformPage";
 import ProfessionalProfilePage from "./pages/ProfessionalProfilePage";
 import NotFound from "./pages/NotFound";
 
@@ -30,6 +31,7 @@ const App = () => (
                 <Route path="/" element={<BookingPage />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/admin" element={<AdminPage />} />
+                <Route path="/platform" element={<PlatformPage />} />
                 <Route path="/professional/:id" element={<ProfessionalProfilePage />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
