@@ -319,7 +319,7 @@ export function PlatformOverview({ onSelectTenant }: Props) {
                     </div>
                     <div className="flex gap-1 flex-wrap justify-end">
                       {issues.map((issue) => (
-                        <Badge key={issue} variant="outline" className="text-xs text-orange-600 dark:text-orange-400 border-orange-500/30">
+                        <Badge key={issue} variant="destructive" className="text-xs">
                           {issue}
                         </Badge>
                       ))}
