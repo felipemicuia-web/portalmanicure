@@ -1,30 +1,26 @@
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Search, Plus, Building2, Eye } from "lucide-react";
-import { onboardTenant } from "@/lib/tenant";
-
-interface Tenant {
-  id: string;
-  name: string;
-  slug: string;
-  plan: string;
-  active: boolean;
-  created_at: string;
-  custom_domain: string | null;
-}
+import { TenantDetailPanel } from "./TenantDetailPanel";
+import {
+  PlatformTenant,
+  TenantStatus,
+  TENANT_STATUS_CONFIG,
+  fetchAllTenants,
+  createTenant,
+} from "@/lib/platform";
 
 export function PlatformTenants() {
-  const [tenants, setTenants] = useState<Tenant[]>([]);
+  const [tenants, setTenants] = useState<PlatformTenant[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
-  const [selectedTenant, setSelectedTenant] = useState<Tenant | null>(null);
+  const [selectedTenant, setSelectedTenant] = useState<PlatformTenant | null>(null);
   const [showCreate, setShowCreate] = useState(false);
   const [newName, setNewName] = useState("");
   const [newSlug, setNewSlug] = useState("");
@@ -32,17 +28,24 @@ export function PlatformTenants() {
   const [creating, setCreating] = useState(false);
   const { toast } = useToast();
 
-  async function fetchTenants() {
+  async function loadTenants() {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("tenants")
-      .select("*")
-      .order("created_at", { ascending: false });
-    if (!error && data) setTenants(data);
-    setLoading(false);
+    try {
+      const data = await fetchAllTenants();
+      setTenants(data);
+      // Refresh selected tenant if open
+      if (selectedTenant) {
+        const updated = data.find((t) => t.id === selectedTenant.id);
+        if (updated) setSelectedTenant(updated);
+      }
+    } catch {
+      toast({ title: "Erro ao carregar tenants", variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
   }
 
-  useEffect(() => { fetchTenants(); }, []);
+  useEffect(() => { loadTenants(); }, []);
 
   const filtered = tenants.filter(
     (t) =>
@@ -53,40 +56,30 @@ export function PlatformTenants() {
   const handleCreate = async () => {
     if (!newName.trim() || !newSlug.trim()) return;
     setCreating(true);
-
-    const { tenantId, error } = await onboardTenant({
-      name: newName.trim(),
-      slug: newSlug.trim().toLowerCase().replace(/[^a-z0-9_-]/g, ""),
-      customDomain: newDomain.trim() || undefined,
-    });
-
-    if (error) {
-      toast({ title: "Erro", description: error, variant: "destructive" });
-    } else {
+    try {
+      const tenantId = await createTenant({
+        name: newName.trim(),
+        slug: newSlug.trim().toLowerCase().replace(/[^a-z0-9_-]/g, ""),
+        customDomain: newDomain.trim() || undefined,
+      });
       toast({ title: "Tenant criado!", description: `ID: ${tenantId}` });
       setShowCreate(false);
       setNewName("");
       setNewSlug("");
       setNewDomain("");
-      fetchTenants();
+      loadTenants();
+    } catch (err: any) {
+      toast({ title: "Erro", description: err.message, variant: "destructive" });
+    } finally {
+      setCreating(false);
     }
-    setCreating(false);
   };
 
-  const handleToggleStatus = async (tenant: Tenant) => {
-    const { error } = await supabase
-      .from("tenants")
-      .update({ active: !tenant.active })
-      .eq("id", tenant.id);
-    if (error) {
-      toast({ title: "Erro", description: error.message, variant: "destructive" });
-    } else {
-      toast({ title: tenant.active ? "Tenant desativado" : "Tenant ativado" });
-      fetchTenants();
-      if (selectedTenant?.id === tenant.id) {
-        setSelectedTenant({ ...tenant, active: !tenant.active });
-      }
-    }
+  const getStatusBadge = (tenant: PlatformTenant) => {
+    const s = (tenant.status ?? (tenant.active ? "active" : "inactive")) as TenantStatus;
+    const config = TENANT_STATUS_CONFIG[s] || TENANT_STATUS_CONFIG.active;
+    const variant = s === "active" ? "outline" as const : s === "suspended" ? "destructive" as const : "secondary" as const;
+    return <Badge variant={variant} className="text-xs">{config.label}</Badge>;
   };
 
   if (loading) {
@@ -102,12 +95,7 @@ export function PlatformTenants() {
       <div className="flex items-center gap-2">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder="Buscar tenant..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-9"
-          />
+          <Input placeholder="Buscar tenant..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
         </div>
         <Dialog open={showCreate} onOpenChange={setShowCreate}>
           <DialogTrigger asChild>
@@ -122,11 +110,7 @@ export function PlatformTenants() {
               </div>
               <div>
                 <Label>Slug (URL)</Label>
-                <Input
-                  value={newSlug}
-                  onChange={(e) => setNewSlug(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ""))}
-                  placeholder="salao-exemplo"
-                />
+                <Input value={newSlug} onChange={(e) => setNewSlug(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ""))} placeholder="salao-exemplo" />
                 <p className="text-xs text-muted-foreground mt-1">Usado na URL: /t/salao-exemplo</p>
               </div>
               <div>
@@ -152,33 +136,11 @@ export function PlatformTenants() {
       <div className="text-sm text-muted-foreground">{filtered.length} tenant(s)</div>
 
       {selectedTenant && (
-        <Card className="border-primary/30">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base flex items-center gap-2">
-              <Building2 className="w-4 h-4" />
-              {selectedTenant.name}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2 text-sm">
-            <div><span className="text-muted-foreground">Slug:</span> {selectedTenant.slug}</div>
-            <div><span className="text-muted-foreground">Plano:</span> {selectedTenant.plan}</div>
-            <div><span className="text-muted-foreground">Domínio:</span> {selectedTenant.custom_domain || "—"}</div>
-            <div><span className="text-muted-foreground">Criado em:</span> {new Date(selectedTenant.created_at).toLocaleDateString("pt-BR")}</div>
-            <div className="flex items-center gap-2">
-              <Badge variant={selectedTenant.active ? "default" : "destructive"}>
-                {selectedTenant.active ? "Ativo" : "Inativo"}
-              </Badge>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleToggleStatus(selectedTenant)}
-              >
-                {selectedTenant.active ? "Desativar" : "Ativar"}
-              </Button>
-            </div>
-            <Button variant="ghost" size="sm" onClick={() => setSelectedTenant(null)}>Fechar</Button>
-          </CardContent>
-        </Card>
+        <TenantDetailPanel
+          tenant={selectedTenant}
+          onClose={() => setSelectedTenant(null)}
+          onUpdated={loadTenants}
+        />
       )}
 
       <div className="grid gap-2">
@@ -197,9 +159,8 @@ export function PlatformTenants() {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <Badge variant={t.active ? "outline" : "destructive"} className="text-xs">
-                  {t.active ? t.plan : "Inativo"}
-                </Badge>
+                {getStatusBadge(t)}
+                <Badge variant="outline" className="text-xs">{t.plan}</Badge>
                 <Eye className="w-4 h-4 text-muted-foreground" />
               </div>
             </CardContent>
