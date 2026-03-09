@@ -43,7 +43,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-const MENU_ITEMS: { value: string; label: string; icon: LucideIcon }[] = [
+const BASE_MENU_ITEMS: { value: string; label: string; icon: LucideIcon; superOnly?: boolean }[] = [
   { value: "bookings", label: "Agenda", icon: CalendarDays },
   { value: "notifications", label: "Avisos", icon: Bell },
   { value: "whatsapp", label: "WhatsApp", icon: MessageCircle },
@@ -56,6 +56,7 @@ const MENU_ITEMS: { value: string; label: string; icon: LucideIcon }[] = [
   { value: "coupons", label: "Cupons", icon: Ticket },
   { value: "users", label: "Clientes", icon: UsersRound },
   { value: "dashboard", label: "Dashboard", icon: BarChart3 },
+  { value: "superadmin", label: "Superadmin", icon: Globe, superOnly: true },
 ];
 
 const TAB_CONTENT: Record<string, React.ReactNode> = {
@@ -71,6 +72,7 @@ const TAB_CONTENT: Record<string, React.ReactNode> = {
   theme: <AdminTheme />,
   coupons: <AdminCoupons />,
   users: <AdminUsers />,
+  superadmin: <AdminSuperAdmin />,
 };
 
 export default function AdminPage() {
