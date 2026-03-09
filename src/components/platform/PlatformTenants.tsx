@@ -92,17 +92,21 @@ export function PlatformTenants() {
   };
 
   const handleCreate = async () => {
-    if (!newName.trim() || !newSlug.trim()) return;
+    if (!newName.trim() || !newSlug.trim() || !newOwner.trim()) {
+      toast({ title: "Preencha nome, slug e owner", variant: "destructive" });
+      return;
+    }
     setCreating(true);
     try {
       const tenantId = await createTenant({
         name: newName.trim(),
         slug: newSlug.trim().toLowerCase().replace(/[^a-z0-9_-]/g, ""),
+        ownerUserId: newOwner.trim(),
         customDomain: newDomain.trim() || undefined,
       });
       toast({ title: "Tenant criado!", description: `ID: ${tenantId}` });
       setShowCreate(false);
-      setNewName(""); setNewSlug(""); setNewDomain("");
+      setNewName(""); setNewSlug(""); setNewDomain(""); setNewOwner("");
       loadTenants();
     } catch (err: any) {
       toast({ title: "Erro", description: err.message, variant: "destructive" });
