@@ -132,7 +132,7 @@ export function PlatformOverview({ onSelectTenant }: Props) {
         </h3>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
           <StatCard label="Total de Tenants" value={stats.total_tenants} icon={<Building2 className="w-5 h-5" />} />
-          <StatCard label="Tenants Ativos" value={stats.active_tenants} icon={<Building2 className="w-5 h-5 text-green-500" />} />
+          <StatCard label="Tenants Ativos" value={stats.active_tenants} icon={<Building2 className="w-5 h-5 text-primary" />} />
           <StatCard
             label="Inativos / Suspensos"
             value={`${stats.inactive_tenants} / ${stats.suspended_tenants}`}
