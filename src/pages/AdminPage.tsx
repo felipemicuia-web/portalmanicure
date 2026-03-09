@@ -145,6 +145,7 @@ export default function AdminPage() {
     );
   }
 
+  const MENU_ITEMS = BASE_MENU_ITEMS.filter(item => !item.superOnly || isSuperAdmin);
   const activeItem = MENU_ITEMS.find((m) => m.value === activeTab);
   const ActiveIcon = activeItem?.icon ?? CalendarDays;
 
