@@ -36,11 +36,7 @@ const Auth = () => {
   const [errors, setErrors] = useState<FormErrors>({});
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { tenantId, loading: tenantLoading } = useTenant();
   
-  // Guaranteed tenant ID - never null
-  const safeTenantId = tenantId || TENANT_DEFAULT_ID;
-
   // Get redirect URL from query params
   const redirectTo = new URLSearchParams(window.location.search).get("redirect") || "/";
 
