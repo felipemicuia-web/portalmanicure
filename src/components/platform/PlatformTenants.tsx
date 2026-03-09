@@ -166,10 +166,15 @@ export function PlatformTenants() {
               <div>
                 <Label>Slug (URL)</Label>
                 <Input value={newSlug} onChange={(e) => setNewSlug(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ""))} placeholder="salao-exemplo" />
-                <p className="text-xs text-muted-foreground mt-1">Usado na URL: /t/salao-exemplo</p>
+                <p className="text-xs text-muted-foreground mt-1">3-50 caracteres. Usado na URL: /t/salao-exemplo</p>
+              </div>
+              <div>
+                <Label>Owner (User ID) <span className="text-destructive">*</span></Label>
+                <Input value={newOwner} onChange={(e) => setNewOwner(e.target.value.trim())} placeholder="UUID do usuário owner" />
+                <p className="text-xs text-muted-foreground mt-1">Obrigatório. O usuário será vinculado como owner do tenant.</p>
               </div>
               <div><Label>Domínio Customizado (opcional)</Label><Input value={newDomain} onChange={(e) => setNewDomain(e.target.value)} placeholder="meusalao.com.br" /></div>
-              <Button onClick={handleCreate} disabled={creating} className="w-full">{creating ? "Criando..." : "Criar Tenant"}</Button>
+              <Button onClick={handleCreate} disabled={creating || !newName.trim() || !newSlug.trim() || !newOwner.trim()} className="w-full">{creating ? "Criando..." : "Criar Tenant"}</Button>
             </div>
           </DialogContent>
         </Dialog>
