@@ -175,17 +175,7 @@ export default function AdminPage() {
             })}
           </nav>
           <div className="p-3 border-t border-border/50 space-y-1">
-            {isSuperAdmin && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate("/platform")}
-                className="w-full justify-start gap-2 text-primary"
-              >
-                <Globe className="w-4 h-4" />
-                Plataforma
-              </Button>
-            )}
+            
             <Button
               variant="ghost"
               size="sm"
