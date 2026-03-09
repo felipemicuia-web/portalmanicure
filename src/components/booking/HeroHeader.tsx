@@ -115,6 +115,18 @@ export function HeroHeader({ user, activePage, onPageChange, onLogout }: HeroHea
                   </Button>
                 </Link>
               )}
+              {isSuperAdmin && (
+                <Link to="/platform">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="gap-1.5 text-white/80 hover:text-white hover:bg-white/10 border border-primary/30"
+                  >
+                    <Globe className="w-4 h-4" />
+                    Superadmin
+                  </Button>
+                </Link>
+              )}
               <Button
                 variant="ghost"
                 size="sm"
