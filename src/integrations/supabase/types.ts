@@ -1087,6 +1087,10 @@ export type Database = {
         Returns: number
       }
       get_photo_like_count: { Args: { p_photo_id: string }; Returns: number }
+      get_platform_booking_activity: { Args: never; Returns: Json }
+      get_platform_stats: { Args: never; Returns: Json }
+      get_platform_tenant_growth: { Args: never; Returns: Json }
+      get_platform_tenant_list: { Args: never; Returns: Json }
       get_public_gallery_photos: {
         Args: { limit_count?: number }
         Returns: {
@@ -1096,6 +1100,7 @@ export type Database = {
           image_url: string
         }[]
       }
+      get_tenant_detail_stats: { Args: { p_tenant_id: string }; Returns: Json }
       get_tenant_stats: { Args: { p_tenant_id: string }; Returns: Json }
       get_user_role_in_tenant: {
         Args: { _tenant_id: string; _user_id: string }
