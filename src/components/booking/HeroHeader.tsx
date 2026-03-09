@@ -1,8 +1,9 @@
 import { Link } from "react-router-dom";
 import { User } from "@supabase/supabase-js";
-import { LogOut, User as UserIcon, Shield, Menu, X, Calendar, CalendarCheck } from "lucide-react";
+import { LogOut, User as UserIcon, Shield, Menu, X, Calendar, CalendarCheck, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAdmin } from "@/hooks/useAdmin";
+import { useSuperAdmin } from "@/hooks/useSuperAdmin";
 import { useBranding } from "@/hooks/useBranding";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
