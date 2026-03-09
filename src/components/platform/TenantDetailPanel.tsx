@@ -6,19 +6,21 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
 import { ConfirmDialog } from "./ConfirmDialog";
 import { useToast } from "@/hooks/use-toast";
 import {
   PlatformTenant,
-  TenantStats,
+  TenantDetailStats,
   TenantStatus,
   TENANT_STATUS_CONFIG,
-  fetchTenantStats,
+  fetchTenantDetailStats,
   changeTenantStatus,
   updateTenantDetails,
 } from "@/lib/platform";
 import {
   Building2, Users, UserCheck, CalendarDays, X, Save, Shield, AlertTriangle,
+  Scissors, Briefcase, Ticket, Ban, Clock,
 } from "lucide-react";
 
 interface TenantDetailPanelProps {
@@ -27,8 +29,18 @@ interface TenantDetailPanelProps {
   onUpdated: () => void;
 }
 
+function MiniStat({ icon, label, value }: { icon: React.ReactNode; label: string; value: number | string }) {
+  return (
+    <div className="bg-muted/50 rounded-lg p-3 text-center">
+      <div className="mx-auto mb-1 text-primary flex justify-center">{icon}</div>
+      <div className="text-lg font-bold">{value}</div>
+      <div className="text-xs text-muted-foreground">{label}</div>
+    </div>
+  );
+}
+
 export function TenantDetailPanel({ tenant, onClose, onUpdated }: TenantDetailPanelProps) {
-  const [stats, setStats] = useState<TenantStats | null>(null);
+  const [stats, setStats] = useState<TenantDetailStats | null>(null);
   const [statsLoading, setStatsLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState(tenant.name);
@@ -43,7 +55,7 @@ export function TenantDetailPanel({ tenant, onClose, onUpdated }: TenantDetailPa
 
   useEffect(() => {
     setStatsLoading(true);
-    fetchTenantStats(tenant.id)
+    fetchTenantDetailStats(tenant.id)
       .then(setStats)
       .catch(() => setStats(null))
       .finally(() => setStatsLoading(false));
@@ -94,36 +106,54 @@ export function TenantDetailPanel({ tenant, onClose, onUpdated }: TenantDetailPa
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* Status + badge */}
+        {/* Status */}
         <div className="flex items-center gap-2 flex-wrap">
           <Badge variant={badgeVariant}>{statusConfig.label}</Badge>
+          <Badge variant="outline" className="text-xs">{tenant.plan}</Badge>
           <span className="text-xs text-muted-foreground">{statusConfig.description}</span>
         </div>
 
-        {/* Stats */}
+        {/* Stats Grid */}
         {statsLoading ? (
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <div className="w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
-            Carregando estatísticas...
+          <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+            {Array.from({ length: 8 }).map((_, i) => <Skeleton key={i} className="h-20 rounded-lg" />)}
           </div>
         ) : stats ? (
-          <div className="grid grid-cols-3 gap-3">
-            <div className="bg-muted/50 rounded-lg p-3 text-center">
-              <UserCheck className="w-4 h-4 mx-auto mb-1 text-primary" />
-              <div className="text-lg font-bold">{stats.internal_users}</div>
-              <div className="text-xs text-muted-foreground">Equipe interna</div>
+          <>
+            <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+              <MiniStat icon={<UserCheck className="w-4 h-4" />} label="Equipe" value={stats.internal_users} />
+              <MiniStat icon={<Users className="w-4 h-4" />} label="Clientes" value={stats.total_profiles} />
+              <MiniStat icon={<Ban className="w-4 h-4" />} label="Bloqueados" value={stats.blocked_profiles} />
+              <MiniStat icon={<CalendarDays className="w-4 h-4" />} label="Total Bookings" value={stats.total_bookings} />
+              <MiniStat icon={<Clock className="w-4 h-4" />} label="Hoje" value={stats.bookings_today} />
+              <MiniStat icon={<CalendarDays className="w-4 h-4" />} label="7 dias" value={stats.bookings_7d} />
+              <MiniStat icon={<CalendarDays className="w-4 h-4" />} label="30 dias" value={stats.bookings_30d} />
+              <MiniStat icon={<Scissors className="w-4 h-4" />} label="Serviços" value={stats.total_services} />
+              <MiniStat icon={<Briefcase className="w-4 h-4" />} label="Profissionais" value={stats.total_professionals} />
+              <MiniStat icon={<Ticket className="w-4 h-4" />} label="Cupons" value={stats.total_coupons} />
             </div>
-            <div className="bg-muted/50 rounded-lg p-3 text-center">
-              <Users className="w-4 h-4 mx-auto mb-1 text-primary" />
-              <div className="text-lg font-bold">{stats.total_profiles}</div>
-              <div className="text-xs text-muted-foreground">Clientes</div>
-            </div>
-            <div className="bg-muted/50 rounded-lg p-3 text-center">
-              <CalendarDays className="w-4 h-4 mx-auto mb-1 text-primary" />
-              <div className="text-lg font-bold">{stats.total_bookings}</div>
-              <div className="text-xs text-muted-foreground">Agendamentos</div>
-            </div>
-          </div>
+
+            {/* Staff list */}
+            {stats.staff_roles && stats.staff_roles.length > 0 && (
+              <div className="space-y-1">
+                <p className="text-xs font-medium text-muted-foreground">Equipe interna</p>
+                <div className="space-y-1">
+                  {stats.staff_roles.map((s) => (
+                    <div key={s.user_id} className="flex items-center justify-between text-xs bg-muted/50 rounded px-2 py-1.5">
+                      <code className="text-muted-foreground">{s.user_id.slice(0, 8)}…</code>
+                      <Badge variant={s.role === "owner" ? "default" : "outline"} className="text-xs">{s.role}</Badge>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {stats.last_booking_date && (
+              <p className="text-xs text-muted-foreground">
+                Último booking: {new Date(stats.last_booking_date).toLocaleDateString("pt-BR")}
+              </p>
+            )}
+          </>
         ) : null}
 
         <Separator />
@@ -131,18 +161,9 @@ export function TenantDetailPanel({ tenant, onClose, onUpdated }: TenantDetailPa
         {/* Details / Edit */}
         {editing ? (
           <div className="space-y-3">
-            <div>
-              <Label className="text-xs">Nome</Label>
-              <Input value={name} onChange={(e) => setName(e.target.value)} />
-            </div>
-            <div>
-              <Label className="text-xs">Slug</Label>
-              <Input value={slug} onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ""))} />
-            </div>
-            <div>
-              <Label className="text-xs">Domínio customizado</Label>
-              <Input value={domain} onChange={(e) => setDomain(e.target.value)} placeholder="meusalao.com.br" />
-            </div>
+            <div><Label className="text-xs">Nome</Label><Input value={name} onChange={(e) => setName(e.target.value)} /></div>
+            <div><Label className="text-xs">Slug</Label><Input value={slug} onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ""))} /></div>
+            <div><Label className="text-xs">Domínio customizado</Label><Input value={domain} onChange={(e) => setDomain(e.target.value)} placeholder="meusalao.com.br" /></div>
             <div>
               <Label className="text-xs">Plano</Label>
               <Select value={plan} onValueChange={setPlan}>
@@ -168,6 +189,7 @@ export function TenantDetailPanel({ tenant, onClose, onUpdated }: TenantDetailPa
             <div><span className="text-muted-foreground">Plano:</span> {tenant.plan}</div>
             <div><span className="text-muted-foreground">Domínio:</span> {tenant.custom_domain || "—"}</div>
             <div><span className="text-muted-foreground">Criado em:</span> {new Date(tenant.created_at).toLocaleDateString("pt-BR")}</div>
+            <div><span className="text-muted-foreground">Atualizado em:</span> {new Date(tenant.updated_at).toLocaleDateString("pt-BR")}</div>
             {stats?.owner_user_id && (
               <div><span className="text-muted-foreground">Owner:</span> <code className="text-xs">{stats.owner_user_id.slice(0, 8)}…</code></div>
             )}
@@ -187,7 +209,7 @@ export function TenantDetailPanel({ tenant, onClose, onUpdated }: TenantDetailPa
               <ConfirmDialog
                 trigger={<Button variant="outline" size="sm">Ativar</Button>}
                 title="Ativar tenant"
-                description={`O tenant "${tenant.name}" voltará a funcionar normalmente. Clientes poderão agendar e admins poderão operar.`}
+                description={`O tenant "${tenant.name}" voltará a funcionar normalmente.`}
                 onConfirm={() => handleStatusChange("active")}
               />
             )}
@@ -195,7 +217,7 @@ export function TenantDetailPanel({ tenant, onClose, onUpdated }: TenantDetailPa
               <ConfirmDialog
                 trigger={<Button variant="outline" size="sm">Desativar</Button>}
                 title="Desativar tenant"
-                description={`O tenant "${tenant.name}" será desativado.\n\n• Novos agendamentos serão bloqueados\n• Admins não poderão operar\n• Dados serão preservados\n\nEsta ação pode ser revertida.`}
+                description={`O tenant "${tenant.name}" será desativado.\n\n• Novos agendamentos serão bloqueados\n• Dados serão preservados\n• Esta ação pode ser revertida.`}
                 onConfirm={() => handleStatusChange("inactive")}
               />
             )}
@@ -207,7 +229,7 @@ export function TenantDetailPanel({ tenant, onClose, onUpdated }: TenantDetailPa
                   </Button>
                 }
                 title="Suspender tenant"
-                description={`⚠️ AÇÃO CRÍTICA\n\nO tenant "${tenant.name}" será SUSPENSO.\n\n• Nenhuma operação será permitida\n• Clientes e admins perdem acesso\n• Dados serão preservados\n• Use apenas para violação de termos ou inadimplência`}
+                description={`⚠️ AÇÃO CRÍTICA\n\nO tenant "${tenant.name}" será SUSPENSO.\n\n• Nenhuma operação será permitida\n• Use apenas para violação de termos ou inadimplência`}
                 confirmText={tenant.slug}
                 variant="destructive"
                 onConfirm={() => handleStatusChange("suspended")}

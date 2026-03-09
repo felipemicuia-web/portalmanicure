@@ -5,6 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { PlatformTenants } from "@/components/platform/PlatformTenants";
+import { PlatformOverview } from "@/components/platform/PlatformOverview";
 import { PlatformDashboards } from "@/components/platform/PlatformDashboards";
 import { PlatformUsers } from "@/components/platform/PlatformUsers";
 import {
@@ -15,17 +16,19 @@ import {
   Building2,
   LayoutDashboard,
   Users,
+  BarChart3,
   type LucideIcon,
 } from "lucide-react";
 
 const MENU_ITEMS: { value: string; label: string; icon: LucideIcon }[] = [
+  { value: "overview", label: "Visão Geral", icon: BarChart3 },
   { value: "tenants", label: "Tenants", icon: Building2 },
   { value: "users", label: "Usuários", icon: Users },
   { value: "dashboards", label: "Dashboards", icon: LayoutDashboard },
 ];
 
 export default function PlatformPage() {
-  const [activeTab, setActiveTab] = useState("tenants");
+  const [activeTab, setActiveTab] = useState("overview");
   const [menuOpen, setMenuOpen] = useState(false);
   const { signOut } = useAuth();
   const navigate = useNavigate();
@@ -37,8 +40,12 @@ export default function PlatformPage() {
     navigate("/");
   };
 
+  const handleSelectTenantFromOverview = () => {
+    setActiveTab("tenants");
+  };
+
   const activeItem = MENU_ITEMS.find((m) => m.value === activeTab);
-  const ActiveIcon = activeItem?.icon ?? Building2;
+  const ActiveIcon = activeItem?.icon ?? BarChart3;
 
   return (
     <div className="min-h-screen bg-background">
@@ -132,7 +139,8 @@ export default function PlatformPage() {
             </div>
           </header>
 
-          <main className="p-4 sm:p-6 max-w-5xl">
+          <main className="p-4 sm:p-6 max-w-6xl">
+            {activeTab === "overview" && <PlatformOverview onSelectTenant={handleSelectTenantFromOverview} />}
             {activeTab === "tenants" && <PlatformTenants />}
             {activeTab === "users" && <PlatformUsers />}
             {activeTab === "dashboards" && <PlatformDashboards />}
