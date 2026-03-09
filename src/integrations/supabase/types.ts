@@ -1122,7 +1122,6 @@ export type Database = {
         Args: { _tenant_id: string; _user_id: string }
         Returns: boolean
       }
-      join_active_tenant: { Args: { p_tenant_id: string }; Returns: undefined }
       onboard_tenant: {
         Args: {
           p_custom_domain?: string
