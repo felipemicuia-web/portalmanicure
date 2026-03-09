@@ -348,7 +348,7 @@ const Auth = () => {
             <Button
               type="submit" 
               className="w-full h-11 font-semibold bg-primary hover:bg-primary/90 transition-all duration-200"
-              disabled={loading || tenantLoading}
+              disabled={loading}
             >
               {loading ? (
                 <div className="flex items-center gap-2">

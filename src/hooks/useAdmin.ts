@@ -22,17 +22,7 @@ export function useAdmin(user: User | null) {
         _tenant_id: tenantId,
       });
 
-      if (!error && data) {
-        setIsAdmin(true);
-      } else {
-        // Fallback: check global admin role
-        const { data: globalAdmin } = await supabase.rpc("has_role", {
-          _user_id: user.id,
-          _role: "admin",
-        });
-        setIsAdmin(!!globalAdmin);
-      }
-
+      setIsAdmin(!error && !!data);
       setLoading(false);
     }
 
