@@ -78,7 +78,6 @@ export default function AdminPage() {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [menuOpen, setMenuOpen] = useState(false);
   const { isAdmin, loading: adminLoading } = useAdmin(user);
-  const { isSuperAdmin } = useSuperAdmin(user);
   const navigate = useNavigate();
   const { toast } = useToast();
 
