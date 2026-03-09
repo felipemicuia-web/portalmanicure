@@ -9,9 +9,6 @@ import { useToast } from "@/hooks/use-toast";
 import { Eye, EyeOff, Mail, Lock, User, ArrowLeft, Phone } from "lucide-react";
 import { z } from "zod";
 import { isValidBrazilianPhone, normalizePhone, formatPhone } from "@/lib/validation";
-import { logger } from "@/lib/logger";
-import { useTenant } from "@/contexts/TenantContext";
-import { TENANT_DEFAULT_ID } from "@/config/tenant";
 
 const emailSchema = z.string().email("Email inválido");
 const passwordSchema = z.string().min(6, "Senha deve ter pelo menos 6 caracteres");
@@ -39,11 +36,7 @@ const Auth = () => {
   const [errors, setErrors] = useState<FormErrors>({});
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { tenantId, loading: tenantLoading } = useTenant();
   
-  // Guaranteed tenant ID - never null
-  const safeTenantId = tenantId || TENANT_DEFAULT_ID;
-
   // Get redirect URL from query params
   const redirectTo = new URLSearchParams(window.location.search).get("redirect") || "/";
 
@@ -136,11 +129,18 @@ const Auth = () => {
           });
         }
       } else {
+        // Signup flow - Supabase auth only
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
             emailRedirectTo: `${window.location.origin}/`,
+            data: {
+              // Store user info in auth metadata for later profile creation
+              first_name: firstName.trim(),
+              last_name: lastName.trim(),
+              phone: normalizePhone(phone),
+            }
           },
         });
 
@@ -158,42 +158,11 @@ const Auth = () => {
               variant: "destructive",
             });
           }
-        } else if (data.user) {
-          // IMPORTANT: Create tenant_users FIRST (RLS policies depend on it)
-          const { error: tuError } = await supabase.from("tenant_users").upsert({
-            tenant_id: safeTenantId,
-            user_id: data.user.id,
-            role: "user",
-          }, { onConflict: "tenant_id,user_id" });
-
-          if (tuError) {
-            logger.error("Tenant user creation error:", tuError);
-          }
-
-          // Now create profile (RLS can now resolve tenant via tenant_users)
-          const fullName = `${firstName.trim()} ${lastName.trim()}`;
-          const normalizedPhone = normalizePhone(phone);
-          
-          const { error: profileError } = await supabase.from("profiles").upsert({
-            user_id: data.user.id,
-            name: fullName,
-            phone: normalizedPhone,
-            tenant_id: safeTenantId,
+        } else {
+          toast({
+            title: "Conta criada!",
+            description: "Verifique seu email para confirmar o cadastro. Um administrador irá ativar seu acesso.",
           });
-
-          if (profileError) {
-            logger.error("Profile creation error:", profileError);
-            toast({
-              title: "Conta criada, mas houve um problema",
-              description: "Seu perfil pode estar incompleto. Atualize seus dados no perfil.",
-              variant: "destructive",
-            });
-          } else {
-            toast({
-              title: "Conta criada!",
-              description: "Cadastro realizado com sucesso",
-            });
-          }
         }
       }
     } catch (error) {
@@ -379,7 +348,7 @@ const Auth = () => {
             <Button
               type="submit" 
               className="w-full h-11 font-semibold bg-primary hover:bg-primary/90 transition-all duration-200"
-              disabled={loading || tenantLoading}
+              disabled={loading}
             >
               {loading ? (
                 <div className="flex items-center gap-2">
