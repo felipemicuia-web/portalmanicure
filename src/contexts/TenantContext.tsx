@@ -100,7 +100,7 @@ export function TenantProvider({ children }: { children: ReactNode }) {
 
   // Resolve user role + superadmin status when auth changes
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       const userId = session?.user?.id;
       if (!userId) {
         setMembershipRole(null);
@@ -108,17 +108,18 @@ export function TenantProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      // Check superadmin
-      const { data: superData } = await supabase.rpc("is_superadmin", { _user_id: userId });
-      setIsSuperAdmin(!!superData);
+      // Fire and forget - don't await inside onAuthStateChange
+      supabase.rpc("is_superadmin", { _user_id: userId }).then(({ data: superData }) => {
+        setIsSuperAdmin(!!superData);
+      });
 
-      // Check tenant role
       if (tenantId) {
-        const { data: roleData } = await supabase.rpc("get_user_role_in_tenant" as any, {
+        supabase.rpc("get_user_role_in_tenant" as any, {
           _user_id: userId,
           _tenant_id: tenantId,
+        }).then(({ data: roleData }) => {
+          setMembershipRole((roleData as string) || null);
         });
-        setMembershipRole((roleData as string) || null);
       }
     });
 
