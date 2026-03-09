@@ -144,7 +144,6 @@ export default function AdminPage() {
   }
 
   const activeItem = MENU_ITEMS.find((m) => m.value === activeTab);
-  const activeItem = MENU_ITEMS.find((m) => m.value === activeTab);
   const ActiveIcon = activeItem?.icon ?? CalendarDays;
 
   return (
