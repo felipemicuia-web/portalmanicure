@@ -26,6 +26,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // First restore session from storage
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
+
+    // Then subscribe to future changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
