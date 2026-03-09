@@ -5,8 +5,10 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ThemedBackground } from "@/components/backgrounds/ThemedBackground";
+import { AuthProvider } from "@/contexts/AuthContext";
 import { TenantProvider } from "@/contexts/TenantContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { RequireSuperAdmin } from "@/components/guards/RequireSuperAdmin";
 import BookingPage from "./pages/BookingPage";
 import Auth from "./pages/Auth";
 import AdminPage from "./pages/AdminPage";
@@ -19,26 +21,35 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <TenantProvider>
-        <ThemeProvider>
-          <Toaster />
-          <Sonner />
-          <div className="galaxy-bg" />
-          <ThemedBackground />
-          <ErrorBoundary>
-            <BrowserRouter>
-              <Routes>
-                <Route path="/" element={<BookingPage />} />
-                <Route path="/auth" element={<Auth />} />
-                <Route path="/admin" element={<AdminPage />} />
-                <Route path="/platform" element={<PlatformPage />} />
-                <Route path="/professional/:id" element={<ProfessionalProfilePage />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </BrowserRouter>
-          </ErrorBoundary>
-        </ThemeProvider>
-      </TenantProvider>
+      <AuthProvider>
+        <TenantProvider>
+          <ThemeProvider>
+            <Toaster />
+            <Sonner />
+            <div className="galaxy-bg" />
+            <ThemedBackground />
+            <ErrorBoundary>
+              <BrowserRouter>
+                <Routes>
+                  <Route path="/" element={<BookingPage />} />
+                  <Route path="/auth" element={<Auth />} />
+                  <Route path="/admin" element={<AdminPage />} />
+                  <Route
+                    path="/platform"
+                    element={
+                      <RequireSuperAdmin>
+                        <PlatformPage />
+                      </RequireSuperAdmin>
+                    }
+                  />
+                  <Route path="/professional/:id" element={<ProfessionalProfilePage />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </BrowserRouter>
+            </ErrorBoundary>
+          </ThemeProvider>
+        </TenantProvider>
+      </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );

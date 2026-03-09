@@ -1,13 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
-import { User, Session } from "@supabase/supabase-js";
-import { useSuperAdmin } from "@/hooks/useSuperAdmin";
+import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { PlatformTenants } from "@/components/platform/PlatformTenants";
 import { PlatformDashboards } from "@/components/platform/PlatformDashboards";
+import { PlatformUsers } from "@/components/platform/PlatformUsers";
 import {
   Shield,
   LogOut,
@@ -15,59 +14,28 @@ import {
   Menu,
   Building2,
   LayoutDashboard,
+  Users,
   type LucideIcon,
 } from "lucide-react";
 
 const MENU_ITEMS: { value: string; label: string; icon: LucideIcon }[] = [
   { value: "tenants", label: "Tenants", icon: Building2 },
+  { value: "users", label: "Usuários", icon: Users },
   { value: "dashboards", label: "Dashboards", icon: LayoutDashboard },
 ];
 
 export default function PlatformPage() {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("tenants");
   const [menuOpen, setMenuOpen] = useState(false);
-  const { isSuperAdmin, loading: superLoading } = useSuperAdmin(user);
+  const { signOut } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
-    return () => subscription.unsubscribe();
-  }, []);
-
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    await signOut();
     toast({ title: "Até logo!" });
     navigate("/");
   };
-
-  if (loading || superLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
-      </div>
-    );
-  }
-
-  if (!user || !isSuperAdmin) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="glass-panel p-8 text-center">
-          <Shield className="w-12 h-12 mx-auto mb-4 text-destructive" />
-          <h1 className="text-2xl font-bold mb-2">Acesso Negado</h1>
-          <p className="text-muted-foreground mb-6">
-            Apenas superadmins podem acessar o console da plataforma.
-          </p>
-          <Button onClick={() => navigate("/")}>Voltar ao Início</Button>
-        </div>
-      </div>
-    );
-  }
 
   const activeItem = MENU_ITEMS.find((m) => m.value === activeTab);
   const ActiveIcon = activeItem?.icon ?? Building2;
@@ -166,6 +134,7 @@ export default function PlatformPage() {
 
           <main className="p-4 sm:p-6 max-w-5xl">
             {activeTab === "tenants" && <PlatformTenants />}
+            {activeTab === "users" && <PlatformUsers />}
             {activeTab === "dashboards" && <PlatformDashboards />}
           </main>
         </div>
