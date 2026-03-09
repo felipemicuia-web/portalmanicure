@@ -462,6 +462,10 @@ export default function BookingPage() {
 
   const selectedProfessional = professionals.find((p) => p.id === professionalId);
 
+  if (import.meta.env.DEV) {
+    console.log(`[BookingPage] loading=${loading} dataLoading=${dataLoading} tenantId=${tenantId}`);
+  }
+
   if (loading || dataLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
