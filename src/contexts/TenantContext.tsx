@@ -12,6 +12,8 @@ interface TenantContextType {
   tenantId: string | null;
   tenantSlug: string | null;
   tenantName: string | null;
+  membershipRole: string | null;
+  isSuperAdmin: boolean;
   loading: boolean;
 }
 
@@ -19,6 +21,8 @@ const TenantContext = createContext<TenantContextType>({
   tenantId: null,
   tenantSlug: null,
   tenantName: null,
+  membershipRole: null,
+  isSuperAdmin: false,
   loading: true,
 });
 
@@ -26,22 +30,11 @@ export function useTenant() {
   return useContext(TenantContext);
 }
 
-/**
- * Resolves tenant from:
- * 1. Subdomain (e.g., cliente.app.com)
- * 2. Custom domain (e.g., meusite.com.br)
- * 3. URL path (e.g., /t/slug)
- * 4. Falls back to 'default' tenant
- */
 function resolveSlugFromUrl(): string {
   const hostname = window.location.hostname;
-
-  // Check for custom domain (not lovable.app, not localhost)
   if (!hostname.includes("lovable.app") && hostname !== "localhost" && !hostname.includes("127.0.0.1")) {
     return `domain:${hostname}`;
   }
-
-  // Check subdomain pattern
   const parts = hostname.split(".");
   if (parts.length >= 3 && parts[0] !== "www") {
     const subdomain = parts[0];
@@ -49,13 +42,8 @@ function resolveSlugFromUrl(): string {
       return subdomain;
     }
   }
-
-  // Check URL path pattern: /t/<slug>
   const pathMatch = window.location.pathname.match(/^\/t\/([a-zA-Z0-9_-]+)/);
-  if (pathMatch) {
-    return pathMatch[1];
-  }
-
+  if (pathMatch) return pathMatch[1];
   return "default";
 }
 
@@ -63,54 +51,32 @@ export function TenantProvider({ children }: { children: ReactNode }) {
   const [tenantId, setTenantId] = useState<string | null>(null);
   const [tenantSlug, setTenantSlug] = useState<string | null>(null);
   const [tenantName, setTenantName] = useState<string | null>(null);
+  const [membershipRole, setMembershipRole] = useState<string | null>(null);
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  // Resolve tenant
   useEffect(() => {
-    // ── SINGLE-TENANT MODE: skip DB lookup, use fixed values ──
     if (!MULTI_TENANT_MODE) {
       setTenantId(TENANT_DEFAULT_ID);
       setTenantSlug(TENANT_DEFAULT_SLUG);
       setTenantName(TENANT_DEFAULT_NAME);
       setLoading(false);
-
-      if (import.meta.env.DEV) {
-        console.log(
-          `%c[Tenant] Single-tenant mode → ID: ${TENANT_DEFAULT_ID}`,
-          "color: #22c55e; font-weight: bold;"
-        );
-      }
       return;
     }
 
-    // ── MULTI-TENANT MODE: resolve from URL ──
     async function resolveTenant() {
       try {
         const slug = resolveSlugFromUrl();
-
         let query;
         if (slug.startsWith("domain:")) {
           const domain = slug.replace("domain:", "");
-          query = supabase
-            .from("tenants")
-            .select("id, slug, name")
-            .eq("active", true)
-            .eq("custom_domain", domain)
-            .limit(1)
-            .single();
+          query = supabase.from("tenants").select("id, slug, name").eq("active", true).eq("custom_domain", domain).limit(1).single();
         } else {
-          query = supabase
-            .from("tenants")
-            .select("id, slug, name")
-            .eq("active", true)
-            .eq("slug", slug)
-            .limit(1)
-            .single();
+          query = supabase.from("tenants").select("id, slug, name").eq("active", true).eq("slug", slug).limit(1).single();
         }
-
         const { data, error } = await query;
-
         if (error || !data) {
-          // Fallback to default tenant
           setTenantId(TENANT_DEFAULT_ID);
           setTenantSlug(TENANT_DEFAULT_SLUG);
           setTenantName(TENANT_DEFAULT_NAME);
@@ -122,7 +88,6 @@ export function TenantProvider({ children }: { children: ReactNode }) {
         }
       } catch (err) {
         logger.error("Error resolving tenant:", err);
-        // Always fallback to default on error
         setTenantId(TENANT_DEFAULT_ID);
         setTenantSlug(TENANT_DEFAULT_SLUG);
         setTenantName(TENANT_DEFAULT_NAME);
@@ -130,22 +95,48 @@ export function TenantProvider({ children }: { children: ReactNode }) {
         setLoading(false);
       }
     }
-
     resolveTenant();
   }, []);
 
-  // Dev debug log
+  // Resolve user role + superadmin status when auth changes
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      const userId = session?.user?.id;
+      if (!userId) {
+        setMembershipRole(null);
+        setIsSuperAdmin(false);
+        return;
+      }
+
+      // Check superadmin
+      const { data: superData } = await supabase.rpc("is_superadmin", { _user_id: userId });
+      setIsSuperAdmin(!!superData);
+
+      // Check tenant role
+      if (tenantId) {
+        const { data: roleData } = await supabase.rpc("get_user_role_in_tenant" as any, {
+          _user_id: userId,
+          _tenant_id: tenantId,
+        });
+        setMembershipRole((roleData as string) || null);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [tenantId]);
+
+  // Dev debug
   useEffect(() => {
     if (import.meta.env.DEV && tenantId) {
       console.log(
-        `%c[Tenant] Active → slug: ${tenantSlug} | id: ${tenantId}`,
+        `%c[Tenant] Active → slug: ${tenantSlug} | id: ${tenantId} | role: ${membershipRole} | superadmin: ${isSuperAdmin}`,
         "color: #3b82f6; font-weight: bold;"
       );
     }
-  }, [tenantId, tenantSlug]);
+  }, [tenantId, tenantSlug, membershipRole, isSuperAdmin]);
 
   return (
-    <TenantContext.Provider value={{ tenantId, tenantSlug, tenantName, loading }}>
+    <TenantContext.Provider value={{ tenantId, tenantSlug, tenantName, membershipRole, isSuperAdmin, loading }}>
       {children}
     </TenantContext.Provider>
   );

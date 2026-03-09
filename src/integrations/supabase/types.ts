@@ -872,21 +872,27 @@ export type Database = {
           created_at: string
           id: string
           role: string
+          status: string
           tenant_id: string
+          updated_at: string
           user_id: string
         }
         Insert: {
           created_at?: string
           id?: string
           role?: string
+          status?: string
           tenant_id: string
+          updated_at?: string
           user_id: string
         }
         Update: {
           created_at?: string
           id?: string
           role?: string
+          status?: string
           tenant_id?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: [
@@ -1061,6 +1067,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      add_user_to_tenant: {
+        Args: { p_role?: string; p_tenant_id: string; p_user_id: string }
+        Returns: undefined
+      }
+      change_tenant_role: {
+        Args: { p_new_role: string; p_tenant_id: string; p_user_id: string }
+        Returns: undefined
+      }
       get_average_rating: {
         Args: { p_professional_id: string }
         Returns: number
@@ -1078,6 +1092,10 @@ export type Database = {
           id: string
           image_url: string
         }[]
+      }
+      get_user_role_in_tenant: {
+        Args: { _tenant_id: string; _user_id: string }
+        Returns: string
       }
       get_user_tenant_id: { Args: { _user_id: string }; Returns: string }
       hard_delete_booking: {
@@ -1103,6 +1121,15 @@ export type Database = {
       is_tenant_admin: {
         Args: { _tenant_id: string; _user_id: string }
         Returns: boolean
+      }
+      onboard_tenant: {
+        Args: {
+          p_custom_domain?: string
+          p_name: string
+          p_owner_user_id?: string
+          p_slug: string
+        }
+        Returns: string
       }
       resolve_tenant: {
         Args: { p_domain?: string; p_slug?: string }
