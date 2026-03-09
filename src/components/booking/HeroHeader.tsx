@@ -29,6 +29,7 @@ interface HeroHeaderProps {
 export function HeroHeader({ user, activePage, onPageChange, onLogout }: HeroHeaderProps) {
   const { branding } = useBranding();
   const { isAdmin } = useAdmin(user);
+  const { isSuperAdmin } = useSuperAdmin(user);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
