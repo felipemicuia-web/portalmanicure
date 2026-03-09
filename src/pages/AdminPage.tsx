@@ -34,10 +34,8 @@ import {
   Image,
   UsersRound,
   Menu,
-  ChevronLeft,
   Ticket,
   BarChart3,
-  Globe,
   type LucideIcon,
 } from "lucide-react";
 
