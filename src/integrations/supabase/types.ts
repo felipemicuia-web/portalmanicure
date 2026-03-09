@@ -1139,6 +1139,10 @@ export type Database = {
         Args: { _tenant_id: string; _user_id: string }
         Returns: boolean
       }
+      user_has_profile_in_tenant: {
+        Args: { _tenant_id: string; _user_id: string }
+        Returns: boolean
+      }
       validate_phone_format: { Args: { phone: string }; Returns: boolean }
     }
     Enums: {

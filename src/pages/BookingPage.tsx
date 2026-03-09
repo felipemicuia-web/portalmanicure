@@ -140,13 +140,14 @@ export default function BookingPage() {
   // Load profile data when user is logged in
   useEffect(() => {
     async function loadProfile() {
-      if (!user) return;
+      if (!user || !tenantId) return;
 
       const { data } = await supabase
         .from("profiles")
         .select("*")
         .eq("user_id", user.id)
-        .single();
+        .eq("tenant_id", tenantId)
+        .maybeSingle();
 
       if (data) {
         if (data.name && !clientName) setClientName(data.name);
@@ -159,7 +160,7 @@ export default function BookingPage() {
     }
 
     loadProfile();
-  }, [user]);
+  }, [user, tenantId]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -280,14 +281,35 @@ export default function BookingPage() {
       return;
     }
 
-    // Check if user is blocked
-    const { data: profile } = await supabase
+    // Ensure profile exists in this tenant (auto-create if needed)
+    const { data: existingProfile } = await supabase
       .from("profiles")
       .select("blocked")
       .eq("user_id", user.id)
-      .single();
+      .eq("tenant_id", tenantId)
+      .maybeSingle();
 
-    if (profile?.blocked) {
+    if (!existingProfile) {
+      // Auto-create profile for this tenant
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .insert({
+          user_id: user.id,
+          tenant_id: tenantId,
+          name: clientName.trim() || null,
+          phone: normalizePhone(clientPhone) || null,
+        });
+      if (profileError) {
+        logger.error("Error creating profile:", profileError);
+        toast({
+          title: "Erro",
+          description: "Não foi possível criar seu perfil. Tente novamente.",
+          variant: "destructive",
+        });
+        setIsSubmitting(false);
+        return;
+      }
+    } else if (existingProfile.blocked) {
       toast({
         title: "Conta bloqueada",
         description: "Sua conta está bloqueada. Entre em contato com o estabelecimento.",
@@ -431,7 +453,10 @@ export default function BookingPage() {
       // Update profile name and phone only (not notes - those are booking-specific)
       await supabase
         .from("profiles")
-        .upsert({ user_id: user.id, name, phone: phoneDigits, tenant_id: tenantId }, { onConflict: "user_id" });
+        .upsert(
+          { user_id: user.id, name, phone: phoneDigits, tenant_id: tenantId },
+          { onConflict: "user_id,tenant_id" }
+        );
 
       toast({
         title: "Agendamento confirmado!",

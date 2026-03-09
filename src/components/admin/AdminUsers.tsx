@@ -47,10 +47,12 @@ export function AdminUsers() {
   const { tenantId } = useTenant();
 
   const fetchUsers = async () => {
+    if (!tenantId) return;
     setLoading(true);
     const { data, error } = await supabase
       .from("profiles")
       .select("id, user_id, name, phone, avatar_url, blocked, created_at")
+      .eq("tenant_id", tenantId)
       .order("created_at", { ascending: false });
 
     if (error) {
@@ -63,7 +65,7 @@ export function AdminUsers() {
 
   useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [tenantId]);
 
   const toggleBlock = async (profile: ProfileUser) => {
     const newBlocked = !profile.blocked;
