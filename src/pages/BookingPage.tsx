@@ -281,14 +281,35 @@ export default function BookingPage() {
       return;
     }
 
-    // Check if user is blocked
-    const { data: profile } = await supabase
+    // Ensure profile exists in this tenant (auto-create if needed)
+    const { data: existingProfile } = await supabase
       .from("profiles")
       .select("blocked")
       .eq("user_id", user.id)
-      .single();
+      .eq("tenant_id", tenantId)
+      .maybeSingle();
 
-    if (profile?.blocked) {
+    if (!existingProfile) {
+      // Auto-create profile for this tenant
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .insert({
+          user_id: user.id,
+          tenant_id: tenantId,
+          name: clientName.trim() || null,
+          phone: normalizePhone(clientPhone) || null,
+        });
+      if (profileError) {
+        logger.error("Error creating profile:", profileError);
+        toast({
+          title: "Erro",
+          description: "Não foi possível criar seu perfil. Tente novamente.",
+          variant: "destructive",
+        });
+        setIsSubmitting(false);
+        return;
+      }
+    } else if (existingProfile.blocked) {
       toast({
         title: "Conta bloqueada",
         description: "Sua conta está bloqueada. Entre em contato com o estabelecimento.",
