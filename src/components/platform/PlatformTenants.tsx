@@ -35,6 +35,7 @@ export function PlatformTenants() {
   const [newName, setNewName] = useState("");
   const [newSlug, setNewSlug] = useState("");
   const [newDomain, setNewDomain] = useState("");
+  const [newOwner, setNewOwner] = useState("");
   const [creating, setCreating] = useState(false);
   const { toast } = useToast();
 
@@ -91,17 +92,21 @@ export function PlatformTenants() {
   };
 
   const handleCreate = async () => {
-    if (!newName.trim() || !newSlug.trim()) return;
+    if (!newName.trim() || !newSlug.trim() || !newOwner.trim()) {
+      toast({ title: "Preencha nome, slug e owner", variant: "destructive" });
+      return;
+    }
     setCreating(true);
     try {
       const tenantId = await createTenant({
         name: newName.trim(),
         slug: newSlug.trim().toLowerCase().replace(/[^a-z0-9_-]/g, ""),
+        ownerUserId: newOwner.trim(),
         customDomain: newDomain.trim() || undefined,
       });
       toast({ title: "Tenant criado!", description: `ID: ${tenantId}` });
       setShowCreate(false);
-      setNewName(""); setNewSlug(""); setNewDomain("");
+      setNewName(""); setNewSlug(""); setNewDomain(""); setNewOwner("");
       loadTenants();
     } catch (err: any) {
       toast({ title: "Erro", description: err.message, variant: "destructive" });
@@ -161,10 +166,15 @@ export function PlatformTenants() {
               <div>
                 <Label>Slug (URL)</Label>
                 <Input value={newSlug} onChange={(e) => setNewSlug(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ""))} placeholder="salao-exemplo" />
-                <p className="text-xs text-muted-foreground mt-1">Usado na URL: /t/salao-exemplo</p>
+                <p className="text-xs text-muted-foreground mt-1">3-50 caracteres. Usado na URL: /t/salao-exemplo</p>
+              </div>
+              <div>
+                <Label>Owner (User ID) <span className="text-destructive">*</span></Label>
+                <Input value={newOwner} onChange={(e) => setNewOwner(e.target.value.trim())} placeholder="UUID do usuário owner" />
+                <p className="text-xs text-muted-foreground mt-1">Obrigatório. O usuário será vinculado como owner do tenant.</p>
               </div>
               <div><Label>Domínio Customizado (opcional)</Label><Input value={newDomain} onChange={(e) => setNewDomain(e.target.value)} placeholder="meusalao.com.br" /></div>
-              <Button onClick={handleCreate} disabled={creating} className="w-full">{creating ? "Criando..." : "Criar Tenant"}</Button>
+              <Button onClick={handleCreate} disabled={creating || !newName.trim() || !newSlug.trim() || !newOwner.trim()} className="w-full">{creating ? "Criando..." : "Criar Tenant"}</Button>
             </div>
           </DialogContent>
         </Dialog>

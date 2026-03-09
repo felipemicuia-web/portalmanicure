@@ -166,13 +166,16 @@ export async function updateTenantDetails(
 export async function createTenant(params: {
   name: string;
   slug: string;
-  ownerUserId?: string;
+  ownerUserId: string;
   customDomain?: string;
 }): Promise<string> {
+  if (!params.ownerUserId) {
+    throw new Error("Owner é obrigatório para criar um tenant.");
+  }
   const { data, error } = await supabase.rpc("onboard_tenant" as any, {
     p_name: params.name,
     p_slug: params.slug,
-    p_owner_user_id: params.ownerUserId || null,
+    p_owner_user_id: params.ownerUserId,
     p_custom_domain: params.customDomain || null,
   });
   if (error) throw error;

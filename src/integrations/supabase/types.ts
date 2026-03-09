@@ -1135,7 +1135,7 @@ export type Database = {
         Args: {
           p_custom_domain?: string
           p_name: string
-          p_owner_user_id?: string
+          p_owner_user_id: string
           p_slug: string
         }
         Returns: string
