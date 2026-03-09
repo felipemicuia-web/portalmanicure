@@ -24,20 +24,22 @@ export function ProfilePage({ user }: ProfilePageProps) {
   const { tenantId } = useTenant();
 
   const fetchData = useCallback(async () => {
+    if (!tenantId) return;
     setLoading(true);
 
-    // Fetch profile
+    // Fetch profile for this tenant
     const { data: profileData } = await supabase
       .from("profiles")
       .select("*")
       .eq("user_id", user.id)
-      .single();
+      .eq("tenant_id", tenantId)
+      .maybeSingle();
 
     // If no profile exists, create one
     if (!profileData) {
       const { data: newProfile } = await supabase
         .from("profiles")
-        .insert({ user_id: user.id, tenant_id: tenantId! })
+        .insert({ user_id: user.id, tenant_id: tenantId })
         .select()
         .single();
       
@@ -46,16 +48,17 @@ export function ProfilePage({ user }: ProfilePageProps) {
       setProfile(profileData);
     }
 
-    // Fetch booking count
+    // Fetch booking count for this tenant
     const { count } = await supabase
       .from("bookings")
       .select("*", { count: "exact", head: true })
-      .eq("user_id", user.id);
+      .eq("user_id", user.id)
+      .eq("tenant_id", tenantId);
 
     setBookingCount(count || 0);
 
     setLoading(false);
-  }, [user.id]);
+  }, [user.id, tenantId]);
 
   useEffect(() => {
     fetchData();

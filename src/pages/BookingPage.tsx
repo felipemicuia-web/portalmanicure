@@ -453,7 +453,10 @@ export default function BookingPage() {
       // Update profile name and phone only (not notes - those are booking-specific)
       await supabase
         .from("profiles")
-        .upsert({ user_id: user.id, name, phone: phoneDigits, tenant_id: tenantId }, { onConflict: "user_id" });
+        .upsert(
+          { user_id: user.id, name, phone: phoneDigits, tenant_id: tenantId },
+          { onConflict: "user_id,tenant_id" }
+        );
 
       toast({
         title: "Agendamento confirmado!",

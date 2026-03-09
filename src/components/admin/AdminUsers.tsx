@@ -65,7 +65,7 @@ export function AdminUsers() {
 
   useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [tenantId]);
 
   const toggleBlock = async (profile: ProfileUser) => {
     const newBlocked = !profile.blocked;
