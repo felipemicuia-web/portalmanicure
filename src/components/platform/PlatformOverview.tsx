@@ -292,9 +292,9 @@ export function PlatformOverview({ onSelectTenant }: Props) {
 
       {/* Attention */}
       {needsAttention.length > 0 && (
-        <Card className="border-orange-500/30">
+        <Card className="border-destructive/30">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm flex items-center gap-2 text-orange-600 dark:text-orange-400">
+            <CardTitle className="text-sm flex items-center gap-2 text-destructive">
               <AlertTriangle className="w-4 h-4" /> Tenants que precisam de atenção ({needsAttention.length})
             </CardTitle>
           </CardHeader>
