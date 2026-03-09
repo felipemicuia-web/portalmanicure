@@ -35,6 +35,7 @@ export function PlatformTenants() {
   const [newName, setNewName] = useState("");
   const [newSlug, setNewSlug] = useState("");
   const [newDomain, setNewDomain] = useState("");
+  const [newOwner, setNewOwner] = useState("");
   const [creating, setCreating] = useState(false);
   const { toast } = useToast();
 
