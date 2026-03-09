@@ -198,20 +198,13 @@ export function PlatformUsers() {
                 {m.role === "owner" ? (
                   <Badge variant="default" className="text-xs">Owner (protegido)</Badge>
                 ) : (
-                  <ConfirmDialog
-                    trigger={
-                      <Select value={m.role} onValueChange={(v) => handleChangeRole(m.user_id, m.role, v)}>
-                        <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="admin">Administrador</SelectItem>
-                          <SelectItem value="user">Staff</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    }
-                    title="Confirmar alteração de role"
-                    description={`Deseja alterar o papel deste membro?`}
-                    onConfirm={() => {}}
-                  />
+                  <Select value={m.role} onValueChange={(v) => handleChangeRole(m.user_id, m.role, v)}>
+                    <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="admin">Administrador</SelectItem>
+                      <SelectItem value="user">Staff</SelectItem>
+                    </SelectContent>
+                  </Select>
                 )}
               </CardContent>
             </Card>
