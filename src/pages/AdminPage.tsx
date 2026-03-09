@@ -16,7 +16,6 @@ import { AdminProfessionalSchedule } from "@/components/admin/AdminProfessionalS
 import { AdminWhatsAppTemplate } from "@/components/admin/AdminWhatsAppTemplate";
 import { AdminHeroHeader } from "@/components/admin/AdminHeroHeader";
 import { AdminDashboard } from "@/components/admin/AdminDashboard";
-import { AdminSuperAdmin } from "@/components/admin/AdminSuperAdmin";
 
 import { AdminUsers } from "@/components/admin/AdminUsers";
 import { AdminCoupons } from "@/components/admin/AdminCoupons";
