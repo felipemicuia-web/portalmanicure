@@ -140,13 +140,14 @@ export default function BookingPage() {
   // Load profile data when user is logged in
   useEffect(() => {
     async function loadProfile() {
-      if (!user) return;
+      if (!user || !tenantId) return;
 
       const { data } = await supabase
         .from("profiles")
         .select("*")
         .eq("user_id", user.id)
-        .single();
+        .eq("tenant_id", tenantId)
+        .maybeSingle();
 
       if (data) {
         if (data.name && !clientName) setClientName(data.name);
@@ -159,7 +160,7 @@ export default function BookingPage() {
     }
 
     loadProfile();
-  }, [user]);
+  }, [user, tenantId]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
