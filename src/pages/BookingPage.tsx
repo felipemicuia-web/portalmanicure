@@ -102,8 +102,14 @@ export default function BookingPage() {
     totalMinutes
   );
 
-  // Auth - onAuthStateChange already fires INITIAL_SESSION
+  // Auth - restore session first, then listen for changes
   useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
