@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { User, Session } from "@supabase/supabase-js";
 import { useAdmin } from "@/hooks/useAdmin";
-import { useSuperAdmin } from "@/hooks/useSuperAdmin";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -17,7 +16,6 @@ import { AdminProfessionalSchedule } from "@/components/admin/AdminProfessionalS
 import { AdminWhatsAppTemplate } from "@/components/admin/AdminWhatsAppTemplate";
 import { AdminHeroHeader } from "@/components/admin/AdminHeroHeader";
 import { AdminDashboard } from "@/components/admin/AdminDashboard";
-import { AdminSuperAdmin } from "@/components/admin/AdminSuperAdmin";
 
 import { AdminUsers } from "@/components/admin/AdminUsers";
 import { AdminCoupons } from "@/components/admin/AdminCoupons";
@@ -36,14 +34,12 @@ import {
   Image,
   UsersRound,
   Menu,
-  ChevronLeft,
   Ticket,
   BarChart3,
-  Globe,
   type LucideIcon,
 } from "lucide-react";
 
-const BASE_MENU_ITEMS: { value: string; label: string; icon: LucideIcon; superOnly?: boolean }[] = [
+const MENU_ITEMS: { value: string; label: string; icon: LucideIcon }[] = [
   { value: "bookings", label: "Agenda", icon: CalendarDays },
   { value: "notifications", label: "Avisos", icon: Bell },
   { value: "whatsapp", label: "WhatsApp", icon: MessageCircle },
@@ -56,7 +52,6 @@ const BASE_MENU_ITEMS: { value: string; label: string; icon: LucideIcon; superOn
   { value: "coupons", label: "Cupons", icon: Ticket },
   { value: "users", label: "Clientes", icon: UsersRound },
   { value: "dashboard", label: "Dashboard", icon: BarChart3 },
-  { value: "superadmin", label: "Superadmin", icon: Globe, superOnly: true },
 ];
 
 const TAB_CONTENT: Record<string, React.ReactNode> = {
@@ -72,7 +67,6 @@ const TAB_CONTENT: Record<string, React.ReactNode> = {
   theme: <AdminTheme />,
   coupons: <AdminCoupons />,
   users: <AdminUsers />,
-  superadmin: <AdminSuperAdmin />,
 };
 
 export default function AdminPage() {
@@ -82,7 +76,6 @@ export default function AdminPage() {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [menuOpen, setMenuOpen] = useState(false);
   const { isAdmin, loading: adminLoading } = useAdmin(user);
-  const { isSuperAdmin } = useSuperAdmin(user);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -145,7 +138,6 @@ export default function AdminPage() {
     );
   }
 
-  const MENU_ITEMS = BASE_MENU_ITEMS.filter(item => !item.superOnly || isSuperAdmin);
   const activeItem = MENU_ITEMS.find((m) => m.value === activeTab);
   const ActiveIcon = activeItem?.icon ?? CalendarDays;
 
@@ -181,17 +173,7 @@ export default function AdminPage() {
             })}
           </nav>
           <div className="p-3 border-t border-border/50 space-y-1">
-            {isSuperAdmin && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate("/platform")}
-                className="w-full justify-start gap-2 text-primary"
-              >
-                <Globe className="w-4 h-4" />
-                Plataforma
-              </Button>
-            )}
+            
             <Button
               variant="ghost"
               size="sm"

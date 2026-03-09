@@ -1,8 +1,9 @@
 import { Link } from "react-router-dom";
 import { User } from "@supabase/supabase-js";
-import { LogOut, User as UserIcon, Shield, Menu, X, Calendar, CalendarCheck } from "lucide-react";
+import { LogOut, User as UserIcon, Shield, Menu, X, Calendar, CalendarCheck, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAdmin } from "@/hooks/useAdmin";
+import { useSuperAdmin } from "@/hooks/useSuperAdmin";
 import { useBranding } from "@/hooks/useBranding";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
@@ -28,6 +29,7 @@ interface HeroHeaderProps {
 export function HeroHeader({ user, activePage, onPageChange, onLogout }: HeroHeaderProps) {
   const { branding } = useBranding();
   const { isAdmin } = useAdmin(user);
+  const { isSuperAdmin } = useSuperAdmin(user);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -110,6 +112,18 @@ export function HeroHeader({ user, activePage, onPageChange, onLogout }: HeroHea
                   >
                     <Shield className="w-4 h-4" />
                     Admin
+                  </Button>
+                </Link>
+              )}
+              {isSuperAdmin && (
+                <Link to="/platform">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="gap-1.5 text-white/80 hover:text-white hover:bg-white/10 border border-primary/30"
+                  >
+                    <Globe className="w-4 h-4" />
+                    Superadmin
                   </Button>
                 </Link>
               )}
@@ -206,6 +220,16 @@ export function HeroHeader({ user, activePage, onPageChange, onLogout }: HeroHea
             >
               <Shield className="w-5 h-5" />
               <span>Admin</span>
+            </Link>
+          )}
+          {isSuperAdmin && (
+            <Link
+              to="/platform"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center gap-3 px-3 py-3 rounded-xl text-white/80 hover:bg-white/10 transition-all"
+            >
+              <Globe className="w-5 h-5" />
+              <span>Superadmin</span>
             </Link>
           )}
           <div className="border-t border-white/10 mt-2 pt-2">
