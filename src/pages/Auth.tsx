@@ -9,9 +9,6 @@ import { useToast } from "@/hooks/use-toast";
 import { Eye, EyeOff, Mail, Lock, User, ArrowLeft, Phone } from "lucide-react";
 import { z } from "zod";
 import { isValidBrazilianPhone, normalizePhone, formatPhone } from "@/lib/validation";
-import { logger } from "@/lib/logger";
-import { useTenant } from "@/contexts/TenantContext";
-import { TENANT_DEFAULT_ID } from "@/config/tenant";
 
 const emailSchema = z.string().email("Email inválido");
 const passwordSchema = z.string().min(6, "Senha deve ter pelo menos 6 caracteres");
