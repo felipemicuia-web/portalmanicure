@@ -915,6 +915,7 @@ export type Database = {
           name: string
           plan: string
           slug: string
+          status: string
           updated_at: string
         }
         Insert: {
@@ -926,6 +927,7 @@ export type Database = {
           name: string
           plan?: string
           slug: string
+          status?: string
           updated_at?: string
         }
         Update: {
@@ -937,6 +939,7 @@ export type Database = {
           name?: string
           plan?: string
           slug?: string
+          status?: string
           updated_at?: string
         }
         Relationships: []
@@ -1093,6 +1096,7 @@ export type Database = {
           image_url: string
         }[]
       }
+      get_tenant_stats: { Args: { p_tenant_id: string }; Returns: Json }
       get_user_role_in_tenant: {
         Args: { _tenant_id: string; _user_id: string }
         Returns: string
@@ -1134,6 +1138,10 @@ export type Database = {
       resolve_tenant: {
         Args: { p_domain?: string; p_slug?: string }
         Returns: string
+      }
+      set_tenant_status: {
+        Args: { p_status: string; p_tenant_id: string }
+        Returns: undefined
       }
       user_belongs_to_tenant: {
         Args: { _tenant_id: string; _user_id: string }
