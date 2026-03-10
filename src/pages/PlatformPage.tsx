@@ -13,7 +13,6 @@ import {
   Home,
   Menu,
   Building2,
-  LayoutDashboard,
   Users,
   BarChart3,
   type LucideIcon,
