@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { PlatformTenants } from "@/components/platform/PlatformTenants";
 import { PlatformOverview } from "@/components/platform/PlatformOverview";
-import { PlatformDashboards } from "@/components/platform/PlatformDashboards";
 import { PlatformUsers } from "@/components/platform/PlatformUsers";
 import {
   Shield,
