@@ -245,7 +245,7 @@ export function HeroHeader({ user, activePage, onPageChange, onLogout }: HeroHea
       )}
 
       {/* Hero content — logo + text */}
-      <div className="relative z-10 flex flex-col items-center justify-center px-4 pt-4 pb-10 sm:pt-6 sm:pb-14 text-center">
+      <div className="relative z-10 flex flex-col items-center justify-center px-4 pt-4 pb-10 sm:pt-6 sm:pb-14 md:pt-16 md:pb-24 text-center">
         {branding.heroTitle && (
           <h1
             className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-wide"
