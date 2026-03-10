@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { PlatformTenants } from "@/components/platform/PlatformTenants";
 import { PlatformOverview } from "@/components/platform/PlatformOverview";
-import { PlatformDashboards } from "@/components/platform/PlatformDashboards";
 import { PlatformUsers } from "@/components/platform/PlatformUsers";
 import {
   Shield,
@@ -14,7 +13,6 @@ import {
   Home,
   Menu,
   Building2,
-  LayoutDashboard,
   Users,
   BarChart3,
   type LucideIcon,
@@ -24,7 +22,6 @@ const MENU_ITEMS: { value: string; label: string; icon: LucideIcon }[] = [
   { value: "overview", label: "Visão Geral", icon: BarChart3 },
   { value: "tenants", label: "Tenants", icon: Building2 },
   { value: "users", label: "Usuários", icon: Users },
-  { value: "dashboards", label: "Dashboards", icon: LayoutDashboard },
 ];
 
 export default function PlatformPage() {
@@ -143,7 +140,6 @@ export default function PlatformPage() {
             {activeTab === "overview" && <PlatformOverview onSelectTenant={handleSelectTenantFromOverview} />}
             {activeTab === "tenants" && <PlatformTenants />}
             {activeTab === "users" && <PlatformUsers />}
-            {activeTab === "dashboards" && <PlatformDashboards />}
           </main>
         </div>
       </div>
