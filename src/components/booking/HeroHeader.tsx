@@ -47,11 +47,11 @@ export function HeroHeader({ user, activePage, onPageChange, onLogout }: HeroHea
   };
 
   return (
-    <section className="relative w-full overflow-hidden">
+    <section className="relative w-full overflow-hidden md:min-h-[280px]">
       {/* Background */}
       {branding.heroBackgroundUrl ? (
         <div
-          className="absolute inset-0 bg-cover bg-center"
+          className="absolute inset-0 bg-cover bg-center md:bg-contain md:bg-top md:bg-no-repeat"
           style={{ backgroundImage: `url('${branding.heroBackgroundUrl}')` }}
         />
       ) : (
