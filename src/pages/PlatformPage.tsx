@@ -23,7 +23,6 @@ const MENU_ITEMS: { value: string; label: string; icon: LucideIcon }[] = [
   { value: "overview", label: "Visão Geral", icon: BarChart3 },
   { value: "tenants", label: "Tenants", icon: Building2 },
   { value: "users", label: "Usuários", icon: Users },
-  { value: "dashboards", label: "Dashboards", icon: LayoutDashboard },
 ];
 
 export default function PlatformPage() {
