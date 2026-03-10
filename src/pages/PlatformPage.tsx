@@ -141,7 +141,6 @@ export default function PlatformPage() {
             {activeTab === "overview" && <PlatformOverview onSelectTenant={handleSelectTenantFromOverview} />}
             {activeTab === "tenants" && <PlatformTenants />}
             {activeTab === "users" && <PlatformUsers />}
-            {activeTab === "dashboards" && <PlatformDashboards />}
           </main>
         </div>
       </div>
