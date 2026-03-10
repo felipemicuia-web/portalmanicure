@@ -121,6 +121,17 @@ export default function PlatformPage() {
                         );
                       })}
                     </nav>
+                    <div className="mt-auto p-3 border-t border-border/50 space-y-1">
+                      <Button variant="ghost" size="sm" onClick={() => { navigate("/"); setMenuOpen(false); }} className="w-full justify-start gap-2">
+                        <Home className="w-4 h-4" /> Início
+                      </Button>
+                      <Button variant="ghost" size="sm" onClick={() => { navigate("/admin"); setMenuOpen(false); }} className="w-full justify-start gap-2">
+                        <Building2 className="w-4 h-4" /> Admin Tenant
+                      </Button>
+                      <Button variant="ghost" size="sm" onClick={handleLogout} className="w-full justify-start gap-2 text-destructive hover:text-destructive">
+                        <LogOut className="w-4 h-4" /> Sair
+                      </Button>
+                    </div>
                   </SheetContent>
                 </Sheet>
                 <div className="flex items-center gap-2">
