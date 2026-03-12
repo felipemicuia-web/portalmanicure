@@ -1,8 +1,10 @@
+import { useState, useMemo } from "react";
 import { Professional } from "@/types/booking";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User, ChevronRight, ExternalLink } from "lucide-react";
+import { User, ChevronRight, ExternalLink, Search, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 
@@ -11,6 +13,7 @@ interface ProfessionalSelectProps {
   selectedId: string;
   onSelect: (id: string) => void;
   onNext: () => void;
+  showFilter?: boolean;
 }
 
 export function ProfessionalSelect({
@@ -18,13 +21,46 @@ export function ProfessionalSelect({
   selectedId,
   onSelect,
   onNext,
+  showFilter = false,
 }: ProfessionalSelectProps) {
   const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [activeSubtitle, setActiveSubtitle] = useState<string | null>(null);
 
   const handleViewProfile = (e: React.MouseEvent, professionalId: string) => {
     e.stopPropagation();
     navigate(`/professional/${professionalId}`);
   };
+
+  // Extract unique subtitles for filter tabs
+  const subtitleTabs = useMemo(() => {
+    const subs = professionals
+      .map((p) => p.subtitle)
+      .filter((s): s is string => !!s && s.trim().length > 0);
+    return Array.from(new Set(subs));
+  }, [professionals]);
+
+  // Filter professionals
+  const filtered = useMemo(() => {
+    if (!showFilter) return professionals;
+    
+    let result = professionals;
+
+    if (activeSubtitle) {
+      result = result.filter((p) => p.subtitle === activeSubtitle);
+    }
+
+    if (searchTerm.trim()) {
+      const term = searchTerm.toLowerCase().trim();
+      result = result.filter(
+        (p) =>
+          p.name.toLowerCase().includes(term) ||
+          (p.subtitle && p.subtitle.toLowerCase().includes(term))
+      );
+    }
+
+    return result;
+  }, [professionals, showFilter, activeSubtitle, searchTerm]);
 
   return (
     <div className="glass-panel p-4 sm:p-6 space-y-4 sm:space-y-5">
@@ -35,13 +71,70 @@ export function ProfessionalSelect({
         <p className="text-muted-foreground text-xs sm:text-sm">Escolha quem vai te atender.</p>
       </div>
 
+      {showFilter && (
+        <div className="space-y-3">
+          {/* Search input */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Buscar por nome ou especialidade..."
+              className="pl-9 pr-9 h-10"
+            />
+            {searchTerm && (
+              <button
+                type="button"
+                onClick={() => setSearchTerm("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+
+          {/* Subtitle filter tabs */}
+          {subtitleTabs.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => setActiveSubtitle(null)}
+                className={cn(
+                  "px-3 py-1.5 rounded-full text-xs font-medium transition-all border",
+                  !activeSubtitle
+                    ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                    : "bg-muted/50 text-muted-foreground border-border/50 hover:bg-muted hover:text-foreground"
+                )}
+              >
+                Todas
+              </button>
+              {subtitleTabs.map((sub) => (
+                <button
+                  key={sub}
+                  type="button"
+                  onClick={() => setActiveSubtitle(activeSubtitle === sub ? null : sub)}
+                  className={cn(
+                    "px-3 py-1.5 rounded-full text-xs font-medium transition-all border",
+                    activeSubtitle === sub
+                      ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                      : "bg-muted/50 text-muted-foreground border-border/50 hover:bg-muted hover:text-foreground"
+                  )}
+                >
+                  {sub}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
       <div className="flex flex-col gap-3 sm:gap-4">
         <div className="w-full">
           <Label htmlFor="professional" className="text-xs sm:text-sm opacity-90 mb-2 sm:mb-3 block font-medium">
             Profissional
           </Label>
           <div id="professional" className="grid grid-cols-1 gap-2 sm:gap-3">
-            {professionals.map((p) => {
+            {filtered.map((p) => {
               const isSelected = selectedId === p.id;
               const initials = p.name
                 .split(" ")
@@ -109,9 +202,11 @@ export function ProfessionalSelect({
               );
             })}
 
-            {professionals.length === 0 && (
+            {filtered.length === 0 && (
               <div className="col-span-full text-sm text-muted-foreground text-center py-4">
-                Nenhum profissional disponível no momento.
+                {showFilter && (searchTerm || activeSubtitle)
+                  ? "Nenhum profissional encontrado com esse filtro."
+                  : "Nenhum profissional disponível no momento."}
               </div>
             )}
           </div>
