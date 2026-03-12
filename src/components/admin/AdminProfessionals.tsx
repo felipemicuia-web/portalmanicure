@@ -110,7 +110,27 @@ export function AdminProfessionals() {
   useEffect(() => {
     fetchProfessionals();
     fetchAllServices();
-  }, []);
+    // Fetch filter setting
+    async function fetchFilter() {
+      if (!tenantId) return;
+      const { data } = await supabase
+        .from("work_settings")
+        .select("show_professional_filter")
+        .eq("tenant_id", tenantId)
+        .maybeSingle();
+      if (data) setShowFilter((data as any).show_professional_filter ?? false);
+    }
+    fetchFilter();
+  }, [tenantId]);
+
+  const handleToggleFilter = async (checked: boolean) => {
+    setShowFilter(checked);
+    await supabase
+      .from("work_settings")
+      .update({ show_professional_filter: checked } as any)
+      .eq("tenant_id", tenantId);
+    toast({ title: checked ? "Filtro habilitado" : "Filtro desabilitado" });
+  };
 
   const handleAdd = async () => {
     if (!newName.trim()) return;
