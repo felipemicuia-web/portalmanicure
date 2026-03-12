@@ -77,6 +77,7 @@ export function AdminProfessionals() {
   const [galleryProfessional, setGalleryProfessional] = useState<Professional | null>(null);
   const [allServices, setAllServices] = useState<ServiceItem[]>([]);
   const [selectedServiceIds, setSelectedServiceIds] = useState<string[]>([]);
+  const [showFilter, setShowFilter] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const isMobile = useIsMobile();
@@ -109,7 +110,27 @@ export function AdminProfessionals() {
   useEffect(() => {
     fetchProfessionals();
     fetchAllServices();
-  }, []);
+    // Fetch filter setting
+    async function fetchFilter() {
+      if (!tenantId) return;
+      const { data } = await supabase
+        .from("work_settings")
+        .select("show_professional_filter")
+        .eq("tenant_id", tenantId)
+        .maybeSingle();
+      if (data) setShowFilter((data as any).show_professional_filter ?? false);
+    }
+    fetchFilter();
+  }, [tenantId]);
+
+  const handleToggleFilter = async (checked: boolean) => {
+    setShowFilter(checked);
+    await supabase
+      .from("work_settings")
+      .update({ show_professional_filter: checked } as any)
+      .eq("tenant_id", tenantId);
+    toast({ title: checked ? "Filtro habilitado" : "Filtro desabilitado" });
+  };
 
   const handleAdd = async () => {
     if (!newName.trim()) return;
@@ -396,6 +417,14 @@ export function AdminProfessionals() {
         <Button onClick={() => setIsAdding(true)} size="sm" className="gap-1">
           <Plus className="w-4 h-4" /> <span className="hidden sm:inline">Adicionar</span>
         </Button>
+      </div>
+
+      <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30 border border-border/50">
+        <div className="flex flex-col">
+          <span className="text-sm font-medium">Filtro de profissionais</span>
+          <span className="text-xs text-muted-foreground">Exibir busca e filtros por especialidade na seleção</span>
+        </div>
+        <Switch checked={showFilter} onCheckedChange={handleToggleFilter} />
       </div>
 
       {isAdding && (

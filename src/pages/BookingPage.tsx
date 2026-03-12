@@ -5,6 +5,7 @@ import { User, Session } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
 import { useBookingData, useAvailableTimes } from "@/hooks/useBookingData";
 import { useTenant } from "@/contexts/TenantContext";
+import { useBranding } from "@/hooks/useBranding";
 import { BookingTopbar } from "@/components/booking/BookingTopbar";
 import { HeroHeader } from "@/components/booking/HeroHeader";
 import { BookingStepper } from "@/components/booking/BookingStepper";
@@ -48,6 +49,7 @@ export default function BookingPage() {
   const { toast } = useToast();
   const { tenantId } = useTenant();
   const { professionals, services, loading: dataLoading } = useBookingData();
+  const { branding } = useBranding();
   const [draftRestored, setDraftRestored] = useState(false);
   const [professionalServiceIds, setProfessionalServiceIds] = useState<string[]>([]);
 
@@ -543,6 +545,7 @@ export default function BookingPage() {
                       }
                     }}
                     onNext={() => goToStep(2)}
+                    showFilter={branding.showProfessionalFilter}
                   />
                 )}
 

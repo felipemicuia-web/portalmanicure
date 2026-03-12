@@ -27,6 +27,7 @@ export interface Branding {
   heroSubtitle: string;
   heroFont: string;
   heroBackgroundUrl: string | null;
+  showProfessionalFilter: boolean;
 }
 
 const DEFAULT_BRANDING: Branding = {
@@ -41,6 +42,7 @@ const DEFAULT_BRANDING: Branding = {
   heroSubtitle: "Plataforma profissional para agendamentos premium",
   heroFont: "Playfair Display",
   heroBackgroundUrl: null,
+  showProfessionalFilter: false,
 };
 
 function loadFont(fontName: string) {
@@ -74,7 +76,7 @@ export function useBranding() {
 
       const { data } = await supabase
         .from("work_settings")
-        .select("site_name, site_subtitle, logo_url, logo_display_mode, site_font, show_brand_name, logo_size, hero_title, hero_subtitle, hero_font, hero_background_url")
+        .select("site_name, site_subtitle, logo_url, logo_display_mode, site_font, show_brand_name, logo_size, hero_title, hero_subtitle, hero_font, hero_background_url, show_professional_filter")
         .eq("tenant_id", tenantId)
         .limit(1)
         .single();
@@ -94,6 +96,7 @@ export function useBranding() {
           heroSubtitle: d.hero_subtitle || "Plataforma profissional para agendamentos premium",
           heroFont: d.hero_font || "Playfair Display",
           heroBackgroundUrl: d.hero_background_url || null,
+          showProfessionalFilter: d.show_professional_filter ?? false,
         });
         applyFont(font);
       }
