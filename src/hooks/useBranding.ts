@@ -96,6 +96,7 @@ export function useBranding() {
           heroSubtitle: d.hero_subtitle || "Plataforma profissional para agendamentos premium",
           heroFont: d.hero_font || "Playfair Display",
           heroBackgroundUrl: d.hero_background_url || null,
+          showProfessionalFilter: d.show_professional_filter ?? false,
         });
         applyFont(font);
       }
