@@ -77,6 +77,7 @@ export function AdminProfessionals() {
   const [galleryProfessional, setGalleryProfessional] = useState<Professional | null>(null);
   const [allServices, setAllServices] = useState<ServiceItem[]>([]);
   const [selectedServiceIds, setSelectedServiceIds] = useState<string[]>([]);
+  const [showFilter, setShowFilter] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const isMobile = useIsMobile();
