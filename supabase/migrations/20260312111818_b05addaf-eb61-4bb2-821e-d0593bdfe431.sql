@@ -1,0 +1,1 @@
+ALTER TABLE public.work_settings ADD COLUMN show_professional_filter boolean NOT NULL DEFAULT false;

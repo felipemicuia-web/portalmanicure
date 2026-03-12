@@ -992,6 +992,7 @@ export type Database = {
           lunch_end: string | null
           lunch_start: string | null
           show_brand_name: boolean
+          show_professional_filter: boolean
           site_font: string | null
           site_name: string | null
           site_subtitle: string | null
@@ -1018,6 +1019,7 @@ export type Database = {
           lunch_end?: string | null
           lunch_start?: string | null
           show_brand_name?: boolean
+          show_professional_filter?: boolean
           site_font?: string | null
           site_name?: string | null
           site_subtitle?: string | null
@@ -1044,6 +1046,7 @@ export type Database = {
           lunch_end?: string | null
           lunch_start?: string | null
           show_brand_name?: boolean
+          show_professional_filter?: boolean
           site_font?: string | null
           site_name?: string | null
           site_subtitle?: string | null
