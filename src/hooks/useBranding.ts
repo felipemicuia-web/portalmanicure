@@ -27,6 +27,7 @@ export interface Branding {
   heroSubtitle: string;
   heroFont: string;
   heroBackgroundUrl: string | null;
+  showProfessionalFilter: boolean;
 }
 
 const DEFAULT_BRANDING: Branding = {
