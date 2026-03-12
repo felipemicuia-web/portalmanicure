@@ -419,6 +419,14 @@ export function AdminProfessionals() {
         </Button>
       </div>
 
+      <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30 border border-border/50">
+        <div className="flex flex-col">
+          <span className="text-sm font-medium">Filtro de profissionais</span>
+          <span className="text-xs text-muted-foreground">Exibir busca e filtros por especialidade na seleção</span>
+        </div>
+        <Switch checked={showFilter} onCheckedChange={handleToggleFilter} />
+      </div>
+
       {isAdding && (
         <div className="flex items-center gap-2 p-3 glass-panel">
           <Input
