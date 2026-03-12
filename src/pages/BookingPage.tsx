@@ -49,6 +49,7 @@ export default function BookingPage() {
   const { toast } = useToast();
   const { tenantId } = useTenant();
   const { professionals, services, loading: dataLoading } = useBookingData();
+  const { branding } = useBranding();
   const [draftRestored, setDraftRestored] = useState(false);
   const [professionalServiceIds, setProfessionalServiceIds] = useState<string[]>([]);
 
