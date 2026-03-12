@@ -42,6 +42,7 @@ const DEFAULT_BRANDING: Branding = {
   heroSubtitle: "Plataforma profissional para agendamentos premium",
   heroFont: "Playfair Display",
   heroBackgroundUrl: null,
+  showProfessionalFilter: false,
 };
 
 function loadFont(fontName: string) {
