@@ -5,6 +5,7 @@ import { User, Session } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
 import { useBookingData, useAvailableTimes } from "@/hooks/useBookingData";
 import { useTenant } from "@/contexts/TenantContext";
+import { useBranding } from "@/hooks/useBranding";
 import { BookingTopbar } from "@/components/booking/BookingTopbar";
 import { HeroHeader } from "@/components/booking/HeroHeader";
 import { BookingStepper } from "@/components/booking/BookingStepper";
