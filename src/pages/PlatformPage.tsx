@@ -7,6 +7,8 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { PlatformTenants } from "@/components/platform/PlatformTenants";
 import { PlatformOverview } from "@/components/platform/PlatformOverview";
 import { PlatformUsers } from "@/components/platform/PlatformUsers";
+import { PlatformPlans } from "@/components/platform/PlatformPlans";
+import { PlatformInsights } from "@/components/platform/PlatformInsights";
 import {
   Shield,
   LogOut,
@@ -15,6 +17,8 @@ import {
   Building2,
   Users,
   BarChart3,
+  Crown,
+  DollarSign,
   type LucideIcon,
 } from "lucide-react";
 
@@ -22,6 +26,8 @@ const MENU_ITEMS: { value: string; label: string; icon: LucideIcon }[] = [
   { value: "overview", label: "Visão Geral", icon: BarChart3 },
   { value: "tenants", label: "Tenants", icon: Building2 },
   { value: "users", label: "Usuários", icon: Users },
+  { value: "insights", label: "Valores e Insights", icon: DollarSign },
+  { value: "plans", label: "Planos", icon: Crown },
 ];
 
 export default function PlatformPage() {
@@ -154,6 +160,8 @@ export default function PlatformPage() {
             {activeTab === "overview" && <PlatformOverview onSelectTenant={handleSelectTenantFromOverview} />}
             {activeTab === "tenants" && <PlatformTenants />}
             {activeTab === "users" && <PlatformUsers />}
+            {activeTab === "insights" && <PlatformInsights />}
+            {activeTab === "plans" && <PlatformPlans />}
           </main>
         </div>
       </div>

@@ -558,6 +558,47 @@ export type Database = {
           },
         ]
       }
+      plan_features: {
+        Row: {
+          created_at: string
+          display_order: number
+          feature_key: string
+          feature_label: string
+          id: string
+          included: boolean
+          limit_value: number | null
+          plan_id: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number
+          feature_key: string
+          feature_label: string
+          id?: string
+          included?: boolean
+          limit_value?: number | null
+          plan_id: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          feature_key?: string
+          feature_label?: string
+          id?: string
+          included?: boolean
+          limit_value?: number | null
+          plan_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plan_features_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "platform_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       platform_admins: {
         Row: {
           created_at: string
@@ -573,6 +614,51 @@ export type Database = {
           created_at?: string
           id?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      platform_plans: {
+        Row: {
+          annual_price: number
+          created_at: string
+          description: string | null
+          display_order: number
+          id: string
+          is_active: boolean
+          is_highlighted: boolean
+          limits: Json
+          monthly_price: number
+          name: string
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          annual_price?: number
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          is_highlighted?: boolean
+          limits?: Json
+          monthly_price?: number
+          name: string
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          annual_price?: number
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          is_highlighted?: boolean
+          limits?: Json
+          monthly_price?: number
+          name?: string
+          slug?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -899,6 +985,57 @@ export type Database = {
           },
         ]
       }
+      tenant_subscriptions: {
+        Row: {
+          billing_cycle: string
+          created_at: string
+          id: string
+          plan_id: string
+          renewal_date: string | null
+          started_at: string
+          status: string
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          billing_cycle?: string
+          created_at?: string
+          id?: string
+          plan_id: string
+          renewal_date?: string | null
+          started_at?: string
+          status?: string
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          billing_cycle?: string
+          created_at?: string
+          id?: string
+          plan_id?: string
+          renewal_date?: string | null
+          started_at?: string
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tenant_subscriptions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "platform_plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tenant_subscriptions_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tenant_users: {
         Row: {
           created_at: string
@@ -1122,6 +1259,7 @@ export type Database = {
         Returns: number
       }
       get_photo_like_count: { Args: { p_photo_id: string }; Returns: number }
+      get_plan_insights: { Args: never; Returns: Json }
       get_platform_booking_activity: { Args: never; Returns: Json }
       get_platform_stats: { Args: never; Returns: Json }
       get_platform_tenant_growth: { Args: never; Returns: Json }
