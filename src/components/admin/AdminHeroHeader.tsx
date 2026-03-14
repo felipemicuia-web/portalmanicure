@@ -4,11 +4,12 @@ import { useTenant } from "@/contexts/TenantContext";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Upload, Trash2, Eye, Image as ImageIcon, History, Check } from "lucide-react";
+import { Upload, Trash2, Eye, Image as ImageIcon, History, Check, X } from "lucide-react";
 
 interface HistoryItem {
-  name: string;
-  url: string;
+  id: string;
+  image_url: string;
+  file_name: string | null;
   created_at: string;
 }
 
@@ -34,50 +35,39 @@ export function AdminHeroHeader() {
         .limit(1)
         .single();
       if (data) {
-        setHeroBackgroundUrl((data as any).hero_background_url || null);
+        setHeroBackgroundUrl(data.hero_background_url || null);
       }
       setLoading(false);
     }
     fetch();
   }, [tenantId]);
 
-  // Load history of uploaded images from storage
-  useEffect(() => {
+  const loadHistory = async () => {
     if (!tenantId) return;
-    async function loadHistory() {
-      const { data } = await supabase.storage
-        .from("avatars")
-        .list(`hero-bg`, { sortBy: { column: "created_at", order: "desc" } });
+    const { data } = await supabase
+      .from("logo_history")
+      .select("*")
+      .eq("tenant_id", tenantId)
+      .order("created_at", { ascending: false });
+    if (data) setHistory(data);
+  };
 
-      if (data) {
-        const items: HistoryItem[] = data
-          .filter((f) => f.name.startsWith(`${tenantId}-`))
-          .map((f) => {
-            const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(`hero-bg/${f.name}`);
-            return {
-              name: f.name,
-              url: urlData.publicUrl,
-              created_at: f.created_at || "",
-            };
-          });
-        setHistory(items);
-      }
-    }
+  useEffect(() => {
     loadHistory();
-  }, [tenantId, uploading]);
+  }, [tenantId]);
 
   const handleSave = async () => {
     if (!tenantId) return;
     setSaving(true);
     const { error } = await supabase
       .from("work_settings")
-      .update({ hero_background_url: heroBackgroundUrl } as any)
+      .update({ hero_background_url: heroBackgroundUrl })
       .eq("tenant_id", tenantId);
 
     if (error) {
       toast({ title: "Erro ao salvar", description: error.message, variant: "destructive" });
     } else {
-      toast({ title: "Salvo!", description: "Logotipo atualizado com sucesso." });
+      toast({ title: "Salvo!", description: "Imagem de fundo atualizada com sucesso." });
     }
     setSaving(false);
   };
@@ -97,7 +87,8 @@ export function AdminHeroHeader() {
 
     setUploading(true);
     const ext = file.name.split(".").pop();
-    const path = `hero-bg/${tenantId}-${Date.now()}.${ext}`;
+    const fileName = `${tenantId}-${Date.now()}.${ext}`;
+    const path = `hero-bg/${fileName}`;
 
     const { error: uploadError } = await supabase.storage
       .from("avatars")
@@ -110,8 +101,18 @@ export function AdminHeroHeader() {
     }
 
     const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(path);
-    setHeroBackgroundUrl(urlData.publicUrl);
+    const publicUrl = urlData.publicUrl;
+
+    // Save to history table
+    await supabase.from("logo_history").insert({
+      tenant_id: tenantId,
+      image_url: publicUrl,
+      file_name: file.name,
+    });
+
+    setHeroBackgroundUrl(publicUrl);
     setUploading(false);
+    await loadHistory();
     toast({ title: "Imagem enviada!", description: "Clique em Salvar para aplicar." });
   };
 
@@ -123,6 +124,16 @@ export function AdminHeroHeader() {
     setHeroBackgroundUrl(url);
     setShowHistory(false);
     toast({ title: "Imagem selecionada!", description: "Clique em Salvar para aplicar." });
+  };
+
+  const handleDeleteFromHistory = async (id: string) => {
+    const { error } = await supabase.from("logo_history").delete().eq("id", id);
+    if (error) {
+      toast({ title: "Erro ao excluir", description: error.message, variant: "destructive" });
+      return;
+    }
+    await loadHistory();
+    toast({ title: "Imagem removida do histórico." });
   };
 
   if (loading) {
@@ -229,22 +240,33 @@ export function AdminHeroHeader() {
           <CardContent>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {history.map((item) => {
-                const isSelected = heroBackgroundUrl === item.url;
+                const isSelected = heroBackgroundUrl === item.image_url;
                 return (
-                  <button
-                    key={item.name}
-                    onClick={() => handleSelectFromHistory(item.url)}
-                    className={`relative rounded-lg overflow-hidden h-24 bg-muted border-2 transition-all hover:opacity-90 ${
-                      isSelected ? "border-primary ring-2 ring-primary/30" : "border-transparent"
-                    }`}
-                  >
-                    <img src={item.url} alt="Histórico" className="w-full h-full object-cover" />
-                    {isSelected && (
-                      <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
-                        <Check className="w-6 h-6 text-primary" />
-                      </div>
+                  <div key={item.id} className="relative group">
+                    <button
+                      onClick={() => handleSelectFromHistory(item.image_url)}
+                      className={`relative rounded-lg overflow-hidden h-24 w-full bg-muted border-2 transition-all hover:opacity-90 ${
+                        isSelected ? "border-primary ring-2 ring-primary/30" : "border-transparent"
+                      }`}
+                    >
+                      <img src={item.image_url} alt={item.file_name || "Histórico"} className="w-full h-full object-cover" />
+                      {isSelected && (
+                        <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
+                          <Check className="w-6 h-6 text-primary" />
+                        </div>
+                      )}
+                    </button>
+                    <button
+                      onClick={() => handleDeleteFromHistory(item.id)}
+                      className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity shadow-md"
+                      title="Excluir do histórico"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                    {item.file_name && (
+                      <p className="text-[10px] text-muted-foreground mt-1 truncate">{item.file_name}</p>
                     )}
-                  </button>
+                  </div>
                 );
               })}
             </div>
@@ -253,7 +275,7 @@ export function AdminHeroHeader() {
       )}
 
       <Button onClick={handleSave} disabled={saving} className="w-full">
-        {saving ? "Salvando..." : "Salvar Logotipo"}
+        {saving ? "Salvando..." : "Salvar Imagem de Fundo"}
       </Button>
     </div>
   );
