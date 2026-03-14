@@ -445,6 +445,38 @@ export type Database = {
           },
         ]
       }
+      logo_history: {
+        Row: {
+          created_at: string
+          file_name: string | null
+          id: string
+          image_url: string
+          tenant_id: string
+        }
+        Insert: {
+          created_at?: string
+          file_name?: string | null
+          id?: string
+          image_url: string
+          tenant_id: string
+        }
+        Update: {
+          created_at?: string
+          file_name?: string | null
+          id?: string
+          image_url?: string
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "logo_history_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       photo_comments: {
         Row: {
           content: string
