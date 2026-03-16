@@ -18,6 +18,7 @@ import {
   changeTenantStatus,
   updateTenantDetails,
 } from "@/lib/platform";
+import { fetchPlans, assignPlanToTenant, type PlatformPlan } from "@/lib/plans";
 import {
   Building2, Users, UserCheck, CalendarDays, X, Save, Shield, AlertTriangle,
   Scissors, Briefcase, Ticket, Ban, Clock,
@@ -48,6 +49,10 @@ export function TenantDetailPanel({ tenant, onClose, onUpdated }: TenantDetailPa
   const [domain, setDomain] = useState(tenant.custom_domain || "");
   const [plan, setPlan] = useState(tenant.plan);
   const [saving, setSaving] = useState(false);
+  const [plans, setPlans] = useState<PlatformPlan[]>([]);
+  const [selectedPlanId, setSelectedPlanId] = useState("");
+  const [billingCycle, setBillingCycle] = useState("monthly");
+  const [assigningPlan, setAssigningPlan] = useState(false);
   const { toast } = useToast();
 
   const status = (tenant.status ?? (tenant.active ? "active" : "inactive")) as TenantStatus;
@@ -59,6 +64,7 @@ export function TenantDetailPanel({ tenant, onClose, onUpdated }: TenantDetailPa
       .then(setStats)
       .catch(() => setStats(null))
       .finally(() => setStatsLoading(false));
+    fetchPlans().then(setPlans).catch(() => {});
   }, [tenant.id]);
 
   const handleSave = async () => {
@@ -165,16 +171,9 @@ export function TenantDetailPanel({ tenant, onClose, onUpdated }: TenantDetailPa
             <div><Label className="text-xs">Slug</Label><Input value={slug} onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ""))} /></div>
             <div><Label className="text-xs">Domínio customizado</Label><Input value={domain} onChange={(e) => setDomain(e.target.value)} placeholder="meusalao.com.br" /></div>
             <div>
-              <Label className="text-xs">Plano</Label>
-              <Select value={plan} onValueChange={setPlan}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="free">Free</SelectItem>
-                  <SelectItem value="starter">Starter</SelectItem>
-                  <SelectItem value="pro">Pro</SelectItem>
-                  <SelectItem value="enterprise">Enterprise</SelectItem>
-                </SelectContent>
-              </Select>
+              <Label className="text-xs">Plano (legado)</Label>
+              <Input value={plan} onChange={(e) => setPlan(e.target.value)} placeholder="free" />
+              <p className="text-xs text-muted-foreground mt-1">Campo legado. Use "Alterar Plano" abaixo para vincular via assinatura.</p>
             </div>
             <div className="flex gap-2">
               <Button onClick={handleSave} disabled={saving} size="sm" className="gap-2">
@@ -194,6 +193,55 @@ export function TenantDetailPanel({ tenant, onClose, onUpdated }: TenantDetailPa
               <div><span className="text-muted-foreground">Owner:</span> <code className="text-xs">{stats.owner_user_id.slice(0, 8)}…</code></div>
             )}
             <Button variant="outline" size="sm" onClick={() => setEditing(true)}>Editar detalhes</Button>
+          </div>
+        )}
+
+        <Separator />
+
+        {/* Plan Assignment */}
+        {plans.length > 0 && (
+          <div className="space-y-2">
+            <p className="text-xs font-medium text-muted-foreground">Alterar Plano</p>
+            <div className="flex flex-col gap-2">
+              <Select value={selectedPlanId} onValueChange={setSelectedPlanId}>
+                <SelectTrigger><SelectValue placeholder="Selecione um plano" /></SelectTrigger>
+                <SelectContent>
+                  {plans.filter(p => p.is_active).map(p => (
+                    <SelectItem key={p.id} value={p.id}>
+                      {p.name} — R$ {Number(p.monthly_price).toFixed(2)}/mês
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={billingCycle} onValueChange={setBillingCycle}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="monthly">Mensal</SelectItem>
+                  <SelectItem value="annual">Anual</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button
+                size="sm"
+                disabled={!selectedPlanId || assigningPlan}
+                onClick={async () => {
+                  setAssigningPlan(true);
+                  try {
+                    await assignPlanToTenant(tenant.id, selectedPlanId, billingCycle);
+                    const planName = plans.find(p => p.id === selectedPlanId)?.slug || "";
+                    await updateTenantDetails(tenant.id, { plan: planName });
+                    toast({ title: "Plano atribuído com sucesso!" });
+                    setSelectedPlanId("");
+                    onUpdated();
+                  } catch (err: any) {
+                    toast({ title: "Erro", description: err.message, variant: "destructive" });
+                  } finally {
+                    setAssigningPlan(false);
+                  }
+                }}
+              >
+                {assigningPlan ? "Atribuindo..." : "Atribuir Plano"}
+              </Button>
+            </div>
           </div>
         )}
 
