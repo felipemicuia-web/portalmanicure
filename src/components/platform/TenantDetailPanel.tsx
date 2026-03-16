@@ -18,6 +18,7 @@ import {
   changeTenantStatus,
   updateTenantDetails,
 } from "@/lib/platform";
+import { fetchPlans, assignPlanToTenant, type PlatformPlan } from "@/lib/plans";
 import {
   Building2, Users, UserCheck, CalendarDays, X, Save, Shield, AlertTriangle,
   Scissors, Briefcase, Ticket, Ban, Clock,
