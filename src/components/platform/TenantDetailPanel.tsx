@@ -64,6 +64,7 @@ export function TenantDetailPanel({ tenant, onClose, onUpdated }: TenantDetailPa
       .then(setStats)
       .catch(() => setStats(null))
       .finally(() => setStatsLoading(false));
+    fetchPlans().then(setPlans).catch(() => {});
   }, [tenant.id]);
 
   const handleSave = async () => {
