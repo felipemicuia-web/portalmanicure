@@ -198,6 +198,55 @@ export function TenantDetailPanel({ tenant, onClose, onUpdated }: TenantDetailPa
 
         <Separator />
 
+        {/* Plan Assignment */}
+        {plans.length > 0 && (
+          <div className="space-y-2">
+            <p className="text-xs font-medium text-muted-foreground">Alterar Plano</p>
+            <div className="flex flex-col gap-2">
+              <Select value={selectedPlanId} onValueChange={setSelectedPlanId}>
+                <SelectTrigger><SelectValue placeholder="Selecione um plano" /></SelectTrigger>
+                <SelectContent>
+                  {plans.filter(p => p.is_active).map(p => (
+                    <SelectItem key={p.id} value={p.id}>
+                      {p.name} — R$ {Number(p.monthly_price).toFixed(2)}/mês
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={billingCycle} onValueChange={setBillingCycle}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="monthly">Mensal</SelectItem>
+                  <SelectItem value="annual">Anual</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button
+                size="sm"
+                disabled={!selectedPlanId || assigningPlan}
+                onClick={async () => {
+                  setAssigningPlan(true);
+                  try {
+                    await assignPlanToTenant(tenant.id, selectedPlanId, billingCycle);
+                    const planName = plans.find(p => p.id === selectedPlanId)?.slug || "";
+                    await updateTenantDetails(tenant.id, { plan: planName });
+                    toast({ title: "Plano atribuído com sucesso!" });
+                    setSelectedPlanId("");
+                    onUpdated();
+                  } catch (err: any) {
+                    toast({ title: "Erro", description: err.message, variant: "destructive" });
+                  } finally {
+                    setAssigningPlan(false);
+                  }
+                }}
+              >
+                {assigningPlan ? "Atribuindo..." : "Atribuir Plano"}
+              </Button>
+            </div>
+          </div>
+        )}
+
+        <Separator />
+
         {/* Status actions */}
         <div className="space-y-2">
           <p className="text-xs font-medium text-muted-foreground flex items-center gap-1">
