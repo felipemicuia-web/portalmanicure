@@ -49,6 +49,10 @@ export function TenantDetailPanel({ tenant, onClose, onUpdated }: TenantDetailPa
   const [domain, setDomain] = useState(tenant.custom_domain || "");
   const [plan, setPlan] = useState(tenant.plan);
   const [saving, setSaving] = useState(false);
+  const [plans, setPlans] = useState<PlatformPlan[]>([]);
+  const [selectedPlanId, setSelectedPlanId] = useState("");
+  const [billingCycle, setBillingCycle] = useState("monthly");
+  const [assigningPlan, setAssigningPlan] = useState(false);
   const { toast } = useToast();
 
   const status = (tenant.status ?? (tenant.active ? "active" : "inactive")) as TenantStatus;
