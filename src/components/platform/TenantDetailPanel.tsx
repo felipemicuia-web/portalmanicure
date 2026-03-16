@@ -171,16 +171,9 @@ export function TenantDetailPanel({ tenant, onClose, onUpdated }: TenantDetailPa
             <div><Label className="text-xs">Slug</Label><Input value={slug} onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ""))} /></div>
             <div><Label className="text-xs">Domínio customizado</Label><Input value={domain} onChange={(e) => setDomain(e.target.value)} placeholder="meusalao.com.br" /></div>
             <div>
-              <Label className="text-xs">Plano</Label>
-              <Select value={plan} onValueChange={setPlan}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="free">Free</SelectItem>
-                  <SelectItem value="starter">Starter</SelectItem>
-                  <SelectItem value="pro">Pro</SelectItem>
-                  <SelectItem value="enterprise">Enterprise</SelectItem>
-                </SelectContent>
-              </Select>
+              <Label className="text-xs">Plano (legado)</Label>
+              <Input value={plan} onChange={(e) => setPlan(e.target.value)} placeholder="free" />
+              <p className="text-xs text-muted-foreground mt-1">Campo legado. Use "Alterar Plano" abaixo para vincular via assinatura.</p>
             </div>
             <div className="flex gap-2">
               <Button onClick={handleSave} disabled={saving} size="sm" className="gap-2">
