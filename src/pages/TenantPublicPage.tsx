@@ -55,11 +55,15 @@ export default function TenantPublicPage() {
   const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
-    if (!slug) { setNotFound(true); setLoading(false); return; }
+    if (!slug) {
+      console.log("[TenantPublic] No slug provided");
+      setNotFound(true); setLoading(false); return;
+    }
 
     async function load() {
       setLoading(true);
       setNotFound(false);
+      console.log("[TenantPublic] Slug capturado:", slug);
 
       const { data: t, error } = await supabase
         .from("tenants")
@@ -69,12 +73,23 @@ export default function TenantPublicPage() {
         .limit(1)
         .maybeSingle();
 
-      if (error || !t) {
+      console.log("[TenantPublic] Resultado da busca:", { data: t, error });
+
+      if (error) {
+        console.error("[TenantPublic] Erro na consulta:", error);
         setNotFound(true);
         setLoading(false);
         return;
       }
 
+      if (!t) {
+        console.warn("[TenantPublic] Tenant não encontrado para slug:", slug);
+        setNotFound(true);
+        setLoading(false);
+        return;
+      }
+
+      console.log("[TenantPublic] Tenant encontrado:", t.name, "| ID:", t.id);
       setTenant(t);
 
       const [settingsRes, profsRes, servicesRes] = await Promise.all([
@@ -97,6 +112,10 @@ export default function TenantPublicPage() {
           .eq("active", true)
           .order("name"),
       ]);
+
+      console.log("[TenantPublic] Settings:", settingsRes.data, "| Error:", settingsRes.error);
+      console.log("[TenantPublic] Professionals:", profsRes.data?.length, "| Error:", profsRes.error);
+      console.log("[TenantPublic] Services:", servicesRes.data?.length, "| Error:", servicesRes.error);
 
       if (settingsRes.data) setSettings(settingsRes.data as WorkSettingsPublic);
       if (profsRes.data) setProfessionals(profsRes.data);
