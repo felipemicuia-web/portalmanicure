@@ -44,6 +44,7 @@ const App = () => (
                     }
                   />
                   <Route path="/professional/:id" element={<ProfessionalProfilePage />} />
+                  <Route path="/tenant/:slug" element={<TenantPublicPage />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </BrowserRouter>
