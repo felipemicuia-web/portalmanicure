@@ -168,7 +168,7 @@ export default function TenantPublicPage() {
   const schedule = settings ? `${settings.start_time.slice(0, 5)} – ${settings.end_time.slice(0, 5)}` : null;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative z-10">
       {/* Hero */}
       <div className="relative w-full overflow-hidden" style={{ minHeight: 220 }}>
         {heroUrl ? (
