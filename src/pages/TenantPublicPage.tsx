@@ -55,11 +55,15 @@ export default function TenantPublicPage() {
   const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
-    if (!slug) { setNotFound(true); setLoading(false); return; }
+    if (!slug) {
+      console.log("[TenantPublic] No slug provided");
+      setNotFound(true); setLoading(false); return;
+    }
 
     async function load() {
       setLoading(true);
       setNotFound(false);
+      console.log("[TenantPublic] Slug capturado:", slug);
 
       const { data: t, error } = await supabase
         .from("tenants")
@@ -69,12 +73,23 @@ export default function TenantPublicPage() {
         .limit(1)
         .maybeSingle();
 
-      if (error || !t) {
+      console.log("[TenantPublic] Resultado da busca:", { data: t, error });
+
+      if (error) {
+        console.error("[TenantPublic] Erro na consulta:", error);
         setNotFound(true);
         setLoading(false);
         return;
       }
 
+      if (!t) {
+        console.warn("[TenantPublic] Tenant não encontrado para slug:", slug);
+        setNotFound(true);
+        setLoading(false);
+        return;
+      }
+
+      console.log("[TenantPublic] Tenant encontrado:", t.name, "| ID:", t.id);
       setTenant(t);
 
       const [settingsRes, profsRes, servicesRes] = await Promise.all([
@@ -98,6 +113,10 @@ export default function TenantPublicPage() {
           .order("name"),
       ]);
 
+      console.log("[TenantPublic] Settings:", settingsRes.data, "| Error:", settingsRes.error);
+      console.log("[TenantPublic] Professionals:", profsRes.data?.length, "| Error:", profsRes.error);
+      console.log("[TenantPublic] Services:", servicesRes.data?.length, "| Error:", servicesRes.error);
+
       if (settingsRes.data) setSettings(settingsRes.data as WorkSettingsPublic);
       if (profsRes.data) setProfessionals(profsRes.data);
       if (servicesRes.data) setServices(servicesRes.data);
@@ -109,7 +128,7 @@ export default function TenantPublicPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background p-6 max-w-4xl mx-auto space-y-6">
+      <div className="min-h-screen bg-background p-6 max-w-4xl mx-auto space-y-6 relative z-10">
         <Skeleton className="h-48 w-full rounded-xl" />
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {Array.from({ length: 4 }).map((_, i) => (
@@ -122,8 +141,8 @@ export default function TenantPublicPage() {
 
   if (notFound || !tenant) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-6">
-        <Card className="max-w-md w-full text-center">
+      <div className="min-h-screen bg-background flex items-center justify-center p-6 relative z-10">
+        <Card className="max-w-md w-full text-center shadow-lg">
           <CardContent className="pt-8 pb-8 space-y-4">
             <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto">
               <Building2 className="w-8 h-8 text-muted-foreground" />
@@ -149,7 +168,7 @@ export default function TenantPublicPage() {
   const schedule = settings ? `${settings.start_time.slice(0, 5)} – ${settings.end_time.slice(0, 5)}` : null;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative z-10">
       {/* Hero */}
       <div className="relative w-full overflow-hidden" style={{ minHeight: 220 }}>
         {heroUrl ? (
