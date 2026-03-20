@@ -141,8 +141,8 @@ export default function TenantPublicPage() {
 
   if (notFound || !tenant) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-6">
-        <Card className="max-w-md w-full text-center">
+      <div className="min-h-screen bg-background flex items-center justify-center p-6 relative z-10">
+        <Card className="max-w-md w-full text-center shadow-lg">
           <CardContent className="pt-8 pb-8 space-y-4">
             <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto">
               <Building2 className="w-8 h-8 text-muted-foreground" />
