@@ -128,7 +128,7 @@ export default function TenantPublicPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background p-6 max-w-4xl mx-auto space-y-6">
+      <div className="min-h-screen bg-background p-6 max-w-4xl mx-auto space-y-6 relative z-10">
         <Skeleton className="h-48 w-full rounded-xl" />
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {Array.from({ length: 4 }).map((_, i) => (
