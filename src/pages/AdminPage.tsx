@@ -96,7 +96,7 @@ export default function AdminPage() {
   const handleLogout = async () => {
     await supabase.auth.signOut();
     toast({ title: "Até logo!", description: "Você saiu da sua conta" });
-    navigate("/");
+    navigate(tp("/"));
   };
 
   if (loading || adminLoading) {
