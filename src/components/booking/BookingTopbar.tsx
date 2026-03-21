@@ -4,6 +4,7 @@ import { LogOut, User as UserIcon, Shield, Menu, X, Calendar, CalendarCheck } fr
 import { Button } from "@/components/ui/button";
 import { useAdmin } from "@/hooks/useAdmin";
 import { useBranding } from "@/hooks/useBranding";
+import { useTenantPath } from "@/contexts/TenantScopeProvider";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 
