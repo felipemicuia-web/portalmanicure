@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useAdmin } from "@/hooks/useAdmin";
 import { useSuperAdmin } from "@/hooks/useSuperAdmin";
 import { useBranding } from "@/hooks/useBranding";
+import { useTenantPath } from "@/contexts/TenantScopeProvider";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 
