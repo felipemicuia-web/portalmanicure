@@ -18,6 +18,7 @@ import { MyBookings } from "@/components/booking/MyBookings";
 import { logger } from "@/lib/logger";
 import { normalizePhone, isValidBrazilianPhone, isValidName } from "@/lib/validation";
 import { saveBookingDraft, loadBookingDraft, clearBookingDraft } from "@/lib/bookingDraft";
+import { useTenantPath } from "@/contexts/TenantScopeProvider";
 
 function getTodayISO(): string {
   const d = new Date();
