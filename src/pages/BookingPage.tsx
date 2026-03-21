@@ -49,6 +49,7 @@ export default function BookingPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { tenantId } = useTenant();
+  const tp = useTenantPath();
   const { professionals, services, loading: dataLoading } = useBookingData();
   const { branding } = useBranding();
   const [draftRestored, setDraftRestored] = useState(false);
