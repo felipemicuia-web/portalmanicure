@@ -134,7 +134,7 @@ export default function AdminPage() {
           <p className="text-muted-foreground mb-6">
             Você não tem permissão para acessar o painel administrativo.
           </p>
-          <Button onClick={() => navigate("/")}>Voltar ao Início</Button>
+          <Button onClick={() => navigate(tp("/"))}>Voltar ao Início</Button>
         </div>
       </div>
     );
