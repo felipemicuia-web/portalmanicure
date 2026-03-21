@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Eye, EyeOff, Mail, Lock, User, ArrowLeft, Phone } from "lucide-react";
 import { z } from "zod";
 import { isValidBrazilianPhone, normalizePhone, formatPhone } from "@/lib/validation";
+import { useTenantPath } from "@/contexts/TenantScopeProvider";
 
 const emailSchema = z.string().email("Email inválido");
 const passwordSchema = z.string().min(6, "Senha deve ter pelo menos 6 caracteres");
@@ -36,9 +37,10 @@ const Auth = () => {
   const [errors, setErrors] = useState<FormErrors>({});
   const navigate = useNavigate();
   const { toast } = useToast();
+  const tp = useTenantPath();
   
   // Get redirect URL from query params
-  const redirectTo = new URLSearchParams(window.location.search).get("redirect") || "/";
+  const redirectTo = new URLSearchParams(window.location.search).get("redirect") || tp("/");
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -134,7 +136,7 @@ const Auth = () => {
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/`,
+            emailRedirectTo: `${window.location.origin}${tp("/")}`,
             data: {
               // Store user info in auth metadata for later profile creation
               first_name: firstName.trim(),
@@ -186,7 +188,7 @@ const Auth = () => {
         <CardHeader className="space-y-3 pb-6">
           <div className="flex items-center gap-2">
             <button 
-              onClick={() => navigate("/")}
+              onClick={() => navigate(tp("/"))}
               className="p-2 rounded-lg hover:bg-muted transition-colors"
             >
               <ArrowLeft className="w-5 h-5 text-muted-foreground" />

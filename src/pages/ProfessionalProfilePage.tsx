@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
 import { logger } from "@/lib/logger";
+import { useTenantPath } from "@/contexts/TenantScopeProvider";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { 
@@ -55,6 +56,7 @@ export default function ProfessionalProfilePage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const tp = useTenantPath();
   
   const [user, setUser] = useState<User | null>(null);
   const { isAdmin } = useAdmin(user);
@@ -86,7 +88,7 @@ export default function ProfessionalProfilePage() {
           description: "Profissional não encontrado.",
           variant: "destructive",
         });
-        navigate("/");
+        navigate(tp("/"));
         return;
       }
 
@@ -214,7 +216,7 @@ export default function ProfessionalProfilePage() {
   };
 
   const handleBookNow = () => {
-    navigate(`/?professional=${id}`);
+    navigate(tp(`/?professional=${id}`));
   };
 
   if (loading) {

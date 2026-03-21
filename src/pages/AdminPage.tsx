@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { User, Session } from "@supabase/supabase-js";
 import { useAdmin } from "@/hooks/useAdmin";
 import { useToast } from "@/hooks/use-toast";
+import { useTenantPath } from "@/contexts/TenantScopeProvider";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { AdminProfessionals } from "@/components/admin/AdminProfessionals";
@@ -78,6 +79,7 @@ export default function AdminPage() {
   const { isAdmin, loading: adminLoading } = useAdmin(user);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const tp = useTenantPath();
 
   useEffect(() => {
     const {
@@ -94,7 +96,7 @@ export default function AdminPage() {
   const handleLogout = async () => {
     await supabase.auth.signOut();
     toast({ title: "Até logo!", description: "Você saiu da sua conta" });
-    navigate("/");
+    navigate(tp("/"));
   };
 
   if (loading || adminLoading) {
@@ -116,7 +118,7 @@ export default function AdminPage() {
           <p className="text-muted-foreground mb-6">
             Faça login para acessar o painel administrativo.
           </p>
-          <Button onClick={() => navigate("/auth")}>Fazer Login</Button>
+          <Button onClick={() => navigate(tp("/auth"))}>Fazer Login</Button>
         </div>
       </div>
     );
@@ -132,7 +134,7 @@ export default function AdminPage() {
           <p className="text-muted-foreground mb-6">
             Você não tem permissão para acessar o painel administrativo.
           </p>
-          <Button onClick={() => navigate("/")}>Voltar ao Início</Button>
+          <Button onClick={() => navigate(tp("/"))}>Voltar ao Início</Button>
         </div>
       </div>
     );
@@ -177,7 +179,7 @@ export default function AdminPage() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => navigate("/")}
+              onClick={() => navigate(tp("/"))}
               className="w-full justify-start gap-2"
             >
               <Home className="w-4 h-4" />
@@ -239,7 +241,7 @@ export default function AdminPage() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => { setMenuOpen(false); navigate("/"); }}
+                        onClick={() => { setMenuOpen(false); navigate(tp("/")); }}
                         className="w-full justify-start gap-2"
                       >
                         <Home className="w-4 h-4" />
@@ -263,7 +265,7 @@ export default function AdminPage() {
                 </div>
               </div>
               <div className="flex items-center gap-1">
-                <Button variant="ghost" size="icon" onClick={() => navigate("/")} className="h-9 w-9">
+                <Button variant="ghost" size="icon" onClick={() => navigate(tp("/"))} className="h-9 w-9">
                   <Home className="w-4 h-4" />
                 </Button>
                 <Button variant="ghost" size="icon" onClick={handleLogout} className="h-9 w-9">

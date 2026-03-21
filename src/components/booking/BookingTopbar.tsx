@@ -4,6 +4,7 @@ import { LogOut, User as UserIcon, Shield, Menu, X, Calendar, CalendarCheck } fr
 import { Button } from "@/components/ui/button";
 import { useAdmin } from "@/hooks/useAdmin";
 import { useBranding } from "@/hooks/useBranding";
+import { useTenantPath } from "@/contexts/TenantScopeProvider";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 
@@ -22,6 +23,7 @@ export function BookingTopbar({
 }: BookingTopbarProps) {
   const { isAdmin } = useAdmin(user);
   const { branding } = useBranding();
+  const tp = useTenantPath();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   const handlePageChange = (page: "booking" | "profile" | "my-bookings") => {
@@ -123,7 +125,7 @@ export function BookingTopbar({
                     Meus Agendamentos
                   </button>
                   {isAdmin && (
-                    <Link to="/admin">
+                    <Link to={tp("/admin")}>
                       <Button
                         variant="ghost"
                         size="sm"
@@ -145,7 +147,7 @@ export function BookingTopbar({
                   </Button>
                 </>
               ) : (
-                <Link to="/auth">
+                <Link to={tp("/auth")}>
                   <Button 
                     variant="outline" 
                     size="sm" 
@@ -161,7 +163,7 @@ export function BookingTopbar({
             {/* Mobile buttons */}
             <div className="flex md:hidden items-center gap-2">
               {!user && (
-                <Link to="/auth">
+                <Link to={tp("/auth")}>
                   <Button 
                     variant="outline" 
                     size="sm" 
@@ -229,7 +231,7 @@ export function BookingTopbar({
               </button>
               {isAdmin && (
                 <Link 
-                  to="/admin" 
+                  to={tp("/admin")} 
                   onClick={() => setMobileMenuOpen(false)}
                   className="flex items-center gap-3 px-3 py-3 rounded-xl text-white/80 hover:bg-white/10 transition-all"
                 >

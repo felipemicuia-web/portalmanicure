@@ -18,6 +18,7 @@ import { MyBookings } from "@/components/booking/MyBookings";
 import { logger } from "@/lib/logger";
 import { normalizePhone, isValidBrazilianPhone, isValidName } from "@/lib/validation";
 import { saveBookingDraft, loadBookingDraft, clearBookingDraft } from "@/lib/bookingDraft";
+import { useTenantPath } from "@/contexts/TenantScopeProvider";
 
 function getTodayISO(): string {
   const d = new Date();
@@ -48,6 +49,7 @@ export default function BookingPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { tenantId } = useTenant();
+  const tp = useTenantPath();
   const { professionals, services, loading: dataLoading } = useBookingData();
   const { branding } = useBranding();
   const [draftRestored, setDraftRestored] = useState(false);
@@ -279,7 +281,7 @@ export default function BookingPage() {
         title: "Login necessário",
         description: "Faça login para confirmar o agendamento. Seus dados serão preservados.",
       });
-      navigate("/auth?redirect=/");
+      navigate(tp("/auth?redirect=" + encodeURIComponent(tp("/"))));
       return;
     }
 

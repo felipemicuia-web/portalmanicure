@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useAdmin } from "@/hooks/useAdmin";
 import { useSuperAdmin } from "@/hooks/useSuperAdmin";
 import { useBranding } from "@/hooks/useBranding";
+import { useTenantPath } from "@/contexts/TenantScopeProvider";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 
@@ -30,6 +31,7 @@ export function HeroHeader({ user, activePage, onPageChange, onLogout }: HeroHea
   const { branding } = useBranding();
   const { isAdmin } = useAdmin(user);
   const { isSuperAdmin } = useSuperAdmin(user);
+  const tp = useTenantPath();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -104,7 +106,7 @@ export function HeroHeader({ user, activePage, onPageChange, onLogout }: HeroHea
                 Meus Agendamentos
               </button>
               {isAdmin && (
-                <Link to="/admin">
+                <Link to={tp("/admin")}>
                   <Button
                     variant="ghost"
                     size="sm"
@@ -138,7 +140,7 @@ export function HeroHeader({ user, activePage, onPageChange, onLogout }: HeroHea
               </Button>
             </>
           ) : (
-            <Link to="/auth">
+            <Link to={tp("/auth")}>
               <Button
                 variant="outline"
                 size="sm"
@@ -154,7 +156,7 @@ export function HeroHeader({ user, activePage, onPageChange, onLogout }: HeroHea
         {/* Mobile buttons */}
         <div className="flex md:hidden items-center gap-2">
           {!user && (
-            <Link to="/auth">
+            <Link to={tp("/auth")}>
               <Button
                 variant="outline"
                 size="sm"
@@ -214,7 +216,7 @@ export function HeroHeader({ user, activePage, onPageChange, onLogout }: HeroHea
           </button>
           {isAdmin && (
             <Link
-              to="/admin"
+              to={tp("/admin")}
               onClick={() => setMobileMenuOpen(false)}
               className="flex items-center gap-3 px-3 py-3 rounded-xl text-white/80 hover:bg-white/10 transition-all"
             >
