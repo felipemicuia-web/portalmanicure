@@ -14,7 +14,7 @@ import Auth from "./pages/Auth";
 import AdminPage from "./pages/AdminPage";
 import PlatformPage from "./pages/PlatformPage";
 import ProfessionalProfilePage from "./pages/ProfessionalProfilePage";
-import TenantPublicPage from "./pages/TenantPublicPage";
+import TenantScopedApp from "./pages/TenantScopedApp";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -44,7 +44,7 @@ const App = () => (
                     }
                   />
                   <Route path="/professional/:id" element={<ProfessionalProfilePage />} />
-                  <Route path="/tenant/:slug" element={<TenantPublicPage />} />
+                  <Route path="/tenant/:slug/*" element={<TenantScopedApp />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </BrowserRouter>
