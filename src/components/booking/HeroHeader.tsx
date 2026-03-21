@@ -140,7 +140,7 @@ export function HeroHeader({ user, activePage, onPageChange, onLogout }: HeroHea
               </Button>
             </>
           ) : (
-            <Link to="/auth">
+            <Link to={tp("/auth")}>
               <Button
                 variant="outline"
                 size="sm"
