@@ -17,7 +17,7 @@ interface TenantContextType {
   loading: boolean;
 }
 
-const TenantContext = createContext<TenantContextType>({
+export const TenantContext = createContext<TenantContextType>({
   tenantId: null,
   tenantSlug: null,
   tenantName: null,
