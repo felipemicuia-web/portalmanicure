@@ -265,7 +265,7 @@ export default function AdminPage() {
                 </div>
               </div>
               <div className="flex items-center gap-1">
-                <Button variant="ghost" size="icon" onClick={() => navigate("/")} className="h-9 w-9">
+                <Button variant="ghost" size="icon" onClick={() => navigate(tp("/"))} className="h-9 w-9">
                   <Home className="w-4 h-4" />
                 </Button>
                 <Button variant="ghost" size="icon" onClick={handleLogout} className="h-9 w-9">
