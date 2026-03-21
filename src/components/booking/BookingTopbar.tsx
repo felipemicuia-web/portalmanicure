@@ -147,7 +147,7 @@ export function BookingTopbar({
                   </Button>
                 </>
               ) : (
-                <Link to="/auth">
+                <Link to={tp("/auth")}>
                   <Button 
                     variant="outline" 
                     size="sm" 
