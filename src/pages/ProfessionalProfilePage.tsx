@@ -88,7 +88,7 @@ export default function ProfessionalProfilePage() {
           description: "Profissional não encontrado.",
           variant: "destructive",
         });
-        navigate("/");
+        navigate(tp("/"));
         return;
       }
 
