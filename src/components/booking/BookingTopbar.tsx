@@ -163,7 +163,7 @@ export function BookingTopbar({
             {/* Mobile buttons */}
             <div className="flex md:hidden items-center gap-2">
               {!user && (
-                <Link to="/auth">
+                <Link to={tp("/auth")}>
                   <Button 
                     variant="outline" 
                     size="sm" 
