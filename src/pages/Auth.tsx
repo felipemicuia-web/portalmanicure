@@ -37,9 +37,10 @@ const Auth = () => {
   const [errors, setErrors] = useState<FormErrors>({});
   const navigate = useNavigate();
   const { toast } = useToast();
+  const tp = useTenantPath();
   
   // Get redirect URL from query params
-  const redirectTo = new URLSearchParams(window.location.search).get("redirect") || "/";
+  const redirectTo = new URLSearchParams(window.location.search).get("redirect") || tp("/");
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
