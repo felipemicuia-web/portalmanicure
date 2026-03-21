@@ -118,7 +118,7 @@ export default function AdminPage() {
           <p className="text-muted-foreground mb-6">
             Faça login para acessar o painel administrativo.
           </p>
-          <Button onClick={() => navigate("/auth")}>Fazer Login</Button>
+          <Button onClick={() => navigate(tp("/auth"))}>Fazer Login</Button>
         </div>
       </div>
     );
