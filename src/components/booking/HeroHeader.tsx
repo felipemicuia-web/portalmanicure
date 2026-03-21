@@ -106,7 +106,7 @@ export function HeroHeader({ user, activePage, onPageChange, onLogout }: HeroHea
                 Meus Agendamentos
               </button>
               {isAdmin && (
-                <Link to="/admin">
+                <Link to={tp("/admin")}>
                   <Button
                     variant="ghost"
                     size="sm"
