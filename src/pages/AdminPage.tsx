@@ -179,7 +179,7 @@ export default function AdminPage() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => navigate("/")}
+              onClick={() => navigate(tp("/"))}
               className="w-full justify-start gap-2"
             >
               <Home className="w-4 h-4" />
