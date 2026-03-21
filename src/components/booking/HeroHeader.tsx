@@ -156,7 +156,7 @@ export function HeroHeader({ user, activePage, onPageChange, onLogout }: HeroHea
         {/* Mobile buttons */}
         <div className="flex md:hidden items-center gap-2">
           {!user && (
-            <Link to="/auth">
+            <Link to={tp("/auth")}>
               <Button
                 variant="outline"
                 size="sm"
