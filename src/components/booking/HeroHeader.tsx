@@ -31,6 +31,7 @@ export function HeroHeader({ user, activePage, onPageChange, onLogout }: HeroHea
   const { branding } = useBranding();
   const { isAdmin } = useAdmin(user);
   const { isSuperAdmin } = useSuperAdmin(user);
+  const tp = useTenantPath();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
