@@ -79,6 +79,7 @@ export default function AdminPage() {
   const { isAdmin, loading: adminLoading } = useAdmin(user);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const tp = useTenantPath();
 
   useEffect(() => {
     const {
