@@ -125,7 +125,7 @@ export function BookingTopbar({
                     Meus Agendamentos
                   </button>
                   {isAdmin && (
-                    <Link to="/admin">
+                    <Link to={tp("/admin")}>
                       <Button
                         variant="ghost"
                         size="sm"
