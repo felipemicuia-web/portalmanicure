@@ -216,7 +216,7 @@ export default function ProfessionalProfilePage() {
   };
 
   const handleBookNow = () => {
-    navigate(`/?professional=${id}`);
+    navigate(tp(`/?professional=${id}`));
   };
 
   if (loading) {
