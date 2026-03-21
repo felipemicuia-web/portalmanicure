@@ -188,7 +188,7 @@ const Auth = () => {
         <CardHeader className="space-y-3 pb-6">
           <div className="flex items-center gap-2">
             <button 
-              onClick={() => navigate("/")}
+              onClick={() => navigate(tp("/"))}
               className="p-2 rounded-lg hover:bg-muted transition-colors"
             >
               <ArrowLeft className="w-5 h-5 text-muted-foreground" />
