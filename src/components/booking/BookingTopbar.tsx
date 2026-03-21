@@ -23,6 +23,7 @@ export function BookingTopbar({
 }: BookingTopbarProps) {
   const { isAdmin } = useAdmin(user);
   const { branding } = useBranding();
+  const tp = useTenantPath();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   const handlePageChange = (page: "booking" | "profile" | "my-bookings") => {
