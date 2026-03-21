@@ -136,7 +136,7 @@ const Auth = () => {
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/`,
+            emailRedirectTo: `${window.location.origin}${tp("/")}`,
             data: {
               // Store user info in auth metadata for later profile creation
               first_name: firstName.trim(),
