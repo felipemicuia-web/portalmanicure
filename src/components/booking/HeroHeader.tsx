@@ -216,7 +216,7 @@ export function HeroHeader({ user, activePage, onPageChange, onLogout }: HeroHea
           </button>
           {isAdmin && (
             <Link
-              to="/admin"
+              to={tp("/admin")}
               onClick={() => setMobileMenuOpen(false)}
               className="flex items-center gap-3 px-3 py-3 rounded-xl text-white/80 hover:bg-white/10 transition-all"
             >
