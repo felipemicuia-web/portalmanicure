@@ -281,7 +281,7 @@ export default function BookingPage() {
         title: "Login necessário",
         description: "Faça login para confirmar o agendamento. Seus dados serão preservados.",
       });
-      navigate("/auth?redirect=/");
+      navigate(tp("/auth?redirect=" + encodeURIComponent(tp("/"))));
       return;
     }
 
