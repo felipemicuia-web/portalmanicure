@@ -59,6 +59,7 @@ interface Profile {
 }
 
 export function AdminBookings() {
+  const { tenantId, loading: tenantLoading } = useTenant();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [deletedBookings, setDeletedBookings] = useState<Booking[]>([]);
   const [professionals, setProfessionals] = useState<Professional[]>([]);
