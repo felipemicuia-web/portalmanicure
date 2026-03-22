@@ -41,16 +41,20 @@ export function AdminWorkHours() {
   const [saving, setSaving] = useState(false);
   const [hasLunch, setHasLunch] = useState(false);
   const { toast } = useToast();
+  const { tenantId, loading: tenantLoading } = useTenant();
 
   useEffect(() => {
+    if (tenantLoading || !tenantId) return;
     fetchSettings();
-  }, []);
+  }, [tenantId, tenantLoading]);
 
   async function fetchSettings() {
+    if (!tenantId) return;
     setLoading(true);
     const { data, error } = await supabase
       .from("work_settings")
       .select("*")
+      .eq("tenant_id", tenantId)
       .maybeSingle();
 
     if (error) {
