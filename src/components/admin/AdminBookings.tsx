@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { logger } from "@/lib/logger";
+import { useTenant } from "@/contexts/TenantContext";
 import { formatPhone } from "@/lib/validation";
 import { formatDateBR } from "@/lib/dateFormat";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -58,6 +59,7 @@ interface Profile {
 }
 
 export function AdminBookings() {
+  const { tenantId, loading: tenantLoading } = useTenant();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [deletedBookings, setDeletedBookings] = useState<Booking[]>([]);
   const [professionals, setProfessionals] = useState<Professional[]>([]);
@@ -88,21 +90,24 @@ export function AdminBookings() {
   const [restoringId, setRestoringId] = useState<string | null>(null);
 
   useEffect(() => {
+    if (tenantLoading || !tenantId) return;
     async function fetchData() {
       const [activeRes, deletedRes, professionalsRes, settingsRes] = await Promise.all([
         supabase
           .from("bookings")
           .select("*")
+          .eq("tenant_id", tenantId)
           .is("deleted_at", null)
           .order("booking_date", { ascending: true })
           .order("booking_time", { ascending: true }),
         supabase
           .from("bookings")
           .select("*")
+          .eq("tenant_id", tenantId)
           .not("deleted_at", "is", null)
           .order("deleted_at", { ascending: false }),
-        supabase.from("professionals").select("id, name"),
-        supabase.from("work_settings").select("whatsapp_template").limit(1).single(),
+        supabase.from("professionals").select("id, name").eq("tenant_id", tenantId),
+        supabase.from("work_settings").select("whatsapp_template").eq("tenant_id", tenantId).limit(1).single(),
       ]);
 
       if (activeRes.error) {
@@ -130,7 +135,7 @@ export function AdminBookings() {
       setLoading(false);
     }
     fetchData();
-  }, []);
+  }, [tenantId, tenantLoading]);
 
   const getProfessionalName = (id: string) => professionals.find((p) => p.id === id)?.name || "—";
   const getClientAvatar = (userId: string) => profiles.find((p) => p.user_id === userId)?.avatar_url || null;

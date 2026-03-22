@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useTenant } from "@/contexts/TenantContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -41,16 +42,20 @@ export function AdminWorkHours() {
   const [saving, setSaving] = useState(false);
   const [hasLunch, setHasLunch] = useState(false);
   const { toast } = useToast();
+  const { tenantId, loading: tenantLoading } = useTenant();
 
   useEffect(() => {
+    if (tenantLoading || !tenantId) return;
     fetchSettings();
-  }, []);
+  }, [tenantId, tenantLoading]);
 
   async function fetchSettings() {
+    if (!tenantId) return;
     setLoading(true);
     const { data, error } = await supabase
       .from("work_settings")
       .select("*")
+      .eq("tenant_id", tenantId)
       .maybeSingle();
 
     if (error) {
@@ -90,7 +95,8 @@ export function AdminWorkHours() {
     const { error } = await supabase
       .from("work_settings")
       .update(updateData)
-      .eq("id", settings.id);
+      .eq("id", settings.id)
+      .eq("tenant_id", tenantId);
 
     setSaving(false);
 

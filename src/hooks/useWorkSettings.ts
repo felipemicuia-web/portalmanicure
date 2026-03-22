@@ -38,13 +38,11 @@ export function useWorkSettings() {
     async function fetchSettings() {
       if (tenantLoading || !tenantId) return;
 
-      let query = supabase
+      const { data, error } = await supabase
         .from("work_settings")
-        .select("start_time, end_time, interval_minutes, slot_step_minutes, lunch_start, lunch_end, working_days")
+        .select("start_time, end_time, interval_minutes, slot_step_minutes, lunch_start, lunch_end, working_days, day_schedules")
         .eq("tenant_id", tenantId)
         .maybeSingle();
-
-      const { data, error } = await query;
 
       if (!error && data) {
         setSettings({
@@ -55,7 +53,7 @@ export function useWorkSettings() {
           lunch_start: data.lunch_start,
           lunch_end: data.lunch_end,
           working_days: data.working_days || [1, 2, 3, 4, 5, 6],
-          day_schedules: (data as any).day_schedules || {},
+          day_schedules: (data.day_schedules as Record<string, { start_time: string; end_time: string }>) || {},
         });
       }
       setLoading(false);

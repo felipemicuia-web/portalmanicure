@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { logger } from "@/lib/logger";
 import { toast } from "sonner";
+import { useTenant } from "@/contexts/TenantContext";
 import { Image, Save, Upload, Trash2, Type } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +12,7 @@ import { Slider } from "@/components/ui/slider";
 import { FONT_OPTIONS } from "@/hooks/useBranding";
 
 export function AdminBranding() {
+  const { tenantId, loading: tenantLoading } = useTenant();
   const [siteName, setSiteName] = useState("Agendamento");
   const [siteSubtitle, setSiteSubtitle] = useState("Agende seu horário");
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
@@ -28,10 +30,12 @@ export function AdminBranding() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    if (tenantLoading || !tenantId) return;
     async function fetch() {
       const { data } = await supabase
         .from("work_settings")
         .select("site_name, site_subtitle, logo_url, logo_display_mode, site_font, show_brand_name, logo_size")
+        .eq("tenant_id", tenantId)
         .limit(1)
         .single();
 
@@ -58,7 +62,7 @@ export function AdminBranding() {
       setLoading(false);
     }
     fetch();
-  }, []);
+  }, [tenantId, tenantLoading]);
 
   const handleUploadLogo = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -116,7 +120,7 @@ export function AdminBranding() {
         show_brand_name: showBrandName,
         logo_size: logoSize,
       } as any)
-      .not("id", "is", null);
+      .eq("tenant_id", tenantId!);
 
     setSaving(false);
     if (error) {

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { logger } from "@/lib/logger";
 import { toast } from "sonner";
+import { useTenant } from "@/contexts/TenantContext";
 import { MessageCircle, Save, RotateCcw, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -30,16 +31,19 @@ const PLACEHOLDERS = [
 ];
 
 export function AdminWhatsAppTemplate() {
+  const { tenantId, loading: tenantLoading } = useTenant();
   const [template, setTemplate] = useState(DEFAULT_TEMPLATE);
   const [originalTemplate, setOriginalTemplate] = useState(DEFAULT_TEMPLATE);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
+    if (tenantLoading || !tenantId) return;
     async function fetch() {
       const { data } = await supabase
         .from("work_settings")
         .select("whatsapp_template")
+        .eq("tenant_id", tenantId)
         .limit(1)
         .single();
 
@@ -50,14 +54,14 @@ export function AdminWhatsAppTemplate() {
       setLoading(false);
     }
     fetch();
-  }, []);
+  }, [tenantId, tenantLoading]);
 
   const handleSave = async () => {
     setSaving(true);
     const { error } = await supabase
       .from("work_settings")
       .update({ whatsapp_template: template })
-      .not("id", "is", null);
+      .eq("tenant_id", tenantId!);
 
     setSaving(false);
     if (error) {
