@@ -135,7 +135,7 @@ export function AdminBookings() {
       setLoading(false);
     }
     fetchData();
-  }, []);
+  }, [tenantId, tenantLoading]);
 
   const getProfessionalName = (id: string) => professionals.find((p) => p.id === id)?.name || "—";
   const getClientAvatar = (userId: string) => profiles.find((p) => p.user_id === userId)?.avatar_url || null;
