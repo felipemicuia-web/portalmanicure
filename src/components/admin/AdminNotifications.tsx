@@ -53,17 +53,19 @@ export function AdminNotifications() {
   };
 
   useEffect(() => {
+    if (tenantLoading || !tenantId) return;
     fetchNotifications();
 
     // Subscribe to realtime updates
     const channel = supabase
-      .channel("admin_notifications_changes")
+      .channel(`admin_notifications_${tenantId}`)
       .on(
         "postgres_changes",
         {
           event: "INSERT",
           schema: "public",
           table: "admin_notifications",
+          filter: `tenant_id=eq.${tenantId}`,
         },
         (payload) => {
           setNotifications((prev) => [payload.new as Notification, ...prev]);
@@ -75,7 +77,7 @@ export function AdminNotifications() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [tenantId, tenantLoading]);
 
   const formatDate = (dateStr: string) => formatDateTimeBR(dateStr);
 
