@@ -50,10 +50,16 @@ export function TenantScopeProvider({ children }: TenantScopeProviderProps) {
       return;
     }
 
-    async function resolve() {
-      setLoading(true);
-      setNotFound(false);
+    // Reset state immediately to prevent stale tenant data
+    setTenantId(null);
+    setTenantSlug(null);
+    setTenantName(null);
+    setMembershipRole(null);
+    setIsSuperAdmin(false);
+    setNotFound(false);
+    setLoading(true);
 
+    async function resolve() {
       const { data, error } = await supabase
         .from("tenants")
         .select("id, slug, name")

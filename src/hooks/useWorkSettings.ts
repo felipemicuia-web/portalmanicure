@@ -53,7 +53,7 @@ export function useWorkSettings() {
           lunch_start: data.lunch_start,
           lunch_end: data.lunch_end,
           working_days: data.working_days || [1, 2, 3, 4, 5, 6],
-          day_schedules: (data as any).day_schedules || {},
+          day_schedules: (data.day_schedules as Record<string, { start_time: string; end_time: string }>) || {},
         });
       }
       setLoading(false);

@@ -94,7 +94,8 @@ export function AdminWorkHours() {
     const { error } = await supabase
       .from("work_settings")
       .update(updateData)
-      .eq("id", settings.id);
+      .eq("id", settings.id)
+      .eq("tenant_id", tenantId);
 
     setSaving(false);
 
