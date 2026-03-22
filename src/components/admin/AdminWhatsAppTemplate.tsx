@@ -31,16 +31,19 @@ const PLACEHOLDERS = [
 ];
 
 export function AdminWhatsAppTemplate() {
+  const { tenantId, loading: tenantLoading } = useTenant();
   const [template, setTemplate] = useState(DEFAULT_TEMPLATE);
   const [originalTemplate, setOriginalTemplate] = useState(DEFAULT_TEMPLATE);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
+    if (tenantLoading || !tenantId) return;
     async function fetch() {
       const { data } = await supabase
         .from("work_settings")
         .select("whatsapp_template")
+        .eq("tenant_id", tenantId)
         .limit(1)
         .single();
 
@@ -51,7 +54,7 @@ export function AdminWhatsAppTemplate() {
       setLoading(false);
     }
     fetch();
-  }, []);
+  }, [tenantId, tenantLoading]);
 
   const handleSave = async () => {
     setSaving(true);
