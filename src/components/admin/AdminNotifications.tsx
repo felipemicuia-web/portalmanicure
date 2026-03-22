@@ -29,16 +29,19 @@ interface Notification {
 }
 
 export function AdminNotifications() {
+  const { tenantId, loading: tenantLoading } = useTenant();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const [clearingAll, setClearingAll] = useState(false);
   const [showClearDialog, setShowClearDialog] = useState(false);
 
   const fetchNotifications = async () => {
+    if (!tenantId) return;
     setLoading(true);
     const { data, error } = await supabase
       .from("admin_notifications")
       .select("*")
+      .eq("tenant_id", tenantId)
       .order("created_at", { ascending: false });
 
     if (error) {
