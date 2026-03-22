@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useTenant } from "@/contexts/TenantContext";
 import { logger } from "@/lib/logger";
 import { formatDateTimeBR } from "@/lib/dateFormat";
 import { Bell, Check, Trash2, RefreshCw, Calendar, X } from "lucide-react";
