@@ -12,6 +12,7 @@ import { Slider } from "@/components/ui/slider";
 import { FONT_OPTIONS } from "@/hooks/useBranding";
 
 export function AdminBranding() {
+  const { tenantId, loading: tenantLoading } = useTenant();
   const [siteName, setSiteName] = useState("Agendamento");
   const [siteSubtitle, setSiteSubtitle] = useState("Agende seu horário");
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
@@ -29,10 +30,12 @@ export function AdminBranding() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    if (tenantLoading || !tenantId) return;
     async function fetch() {
       const { data } = await supabase
         .from("work_settings")
         .select("site_name, site_subtitle, logo_url, logo_display_mode, site_font, show_brand_name, logo_size")
+        .eq("tenant_id", tenantId)
         .limit(1)
         .single();
 
