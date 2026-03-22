@@ -62,7 +62,7 @@ export function AdminBranding() {
       setLoading(false);
     }
     fetch();
-  }, []);
+  }, [tenantId, tenantLoading]);
 
   const handleUploadLogo = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
