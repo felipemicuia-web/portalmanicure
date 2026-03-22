@@ -120,7 +120,7 @@ export function AdminBranding() {
         show_brand_name: showBrandName,
         logo_size: logoSize,
       } as any)
-      .not("id", "is", null);
+      .eq("tenant_id", tenantId!);
 
     setSaving(false);
     if (error) {

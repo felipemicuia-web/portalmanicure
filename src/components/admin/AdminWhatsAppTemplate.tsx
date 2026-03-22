@@ -61,7 +61,7 @@ export function AdminWhatsAppTemplate() {
     const { error } = await supabase
       .from("work_settings")
       .update({ whatsapp_template: template })
-      .not("id", "is", null);
+      .eq("tenant_id", tenantId!);
 
     setSaving(false);
     if (error) {
