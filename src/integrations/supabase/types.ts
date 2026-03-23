@@ -804,6 +804,7 @@ export type Database = {
           photo_url: string | null
           subtitle: string | null
           tenant_id: string
+          user_id: string | null
           working_days: number[] | null
         }
         Insert: {
@@ -817,6 +818,7 @@ export type Database = {
           photo_url?: string | null
           subtitle?: string | null
           tenant_id: string
+          user_id?: string | null
           working_days?: number[] | null
         }
         Update: {
@@ -830,6 +832,7 @@ export type Database = {
           photo_url?: string | null
           subtitle?: string | null
           tenant_id?: string
+          user_id?: string | null
           working_days?: number[] | null
         }
         Relationships: [
@@ -1265,6 +1268,10 @@ export type Database = {
             Args: { p_professional_id: string; p_tenant_id?: string }
             Returns: number
           }
+      get_my_linked_professional: {
+        Args: { p_tenant_id: string }
+        Returns: string
+      }
       get_photo_like_count: { Args: { p_photo_id: string }; Returns: number }
       get_plan_insights: { Args: never; Returns: Json }
       get_platform_booking_activity: { Args: never; Returns: Json }
@@ -1332,6 +1339,10 @@ export type Database = {
           p_slug: string
         }
         Returns: string
+      }
+      professional_can_access_booking: {
+        Args: { p_professional_id: string; p_tenant_id: string }
+        Returns: boolean
       }
       resolve_tenant: {
         Args: { p_domain?: string; p_slug?: string }
