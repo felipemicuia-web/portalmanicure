@@ -64,8 +64,9 @@ export function AdminProfessionalSchedule() {
   const { toast } = useToast();
 
   useEffect(() => {
+    if (!tenantId) return;
     fetchProfessionals();
-  }, []);
+  }, [tenantId]);
 
   useEffect(() => {
     if (selectedProfessionalId) {
