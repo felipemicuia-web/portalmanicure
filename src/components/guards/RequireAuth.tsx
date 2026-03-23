@@ -1,8 +1,9 @@
-import { ReactNode } from "react";
+import { ReactNode, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTenant } from "@/contexts/TenantContext";
 import { useTenantPath } from "@/contexts/TenantScopeProvider";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Shield, UserX } from "lucide-react";
 
@@ -14,14 +15,36 @@ interface RequireAuthProps {
 }
 
 export function RequireAuth({ children, fallbackPath, skipTenantCheck = false }: RequireAuthProps) {
-  const { user, loading, hasTenantProfile, checkingTenantProfile, signOut } = useAuth();
+  const { user, loading, signOut } = useAuth();
   const { tenantId, loading: tenantLoading } = useTenant();
   const navigate = useNavigate();
   const tp = useTenantPath();
-
   const authPath = fallbackPath || tp("/auth");
 
-  if (loading || tenantLoading || checkingTenantProfile) {
+  const [hasTenantProfile, setHasTenantProfile] = useState<boolean | null>(null);
+
+  // Check tenant profile when user and tenant are resolved
+  useEffect(() => {
+    if (skipTenantCheck || !user || !tenantId) {
+      setHasTenantProfile(null);
+      return;
+    }
+
+    setHasTenantProfile(null); // reset while checking
+
+    supabase
+      .rpc("user_has_profile_in_tenant", {
+        _user_id: user.id,
+        _tenant_id: tenantId,
+      })
+      .then(({ data }) => {
+        setHasTenantProfile(!!data);
+      });
+  }, [user, tenantId, skipTenantCheck]);
+
+  const isLoading = loading || tenantLoading || (!skipTenantCheck && tenantId && user && hasTenantProfile === null);
+
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
@@ -45,13 +68,12 @@ export function RequireAuth({ children, fallbackPath, skipTenantCheck = false }:
     );
   }
 
-  // For platform/superadmin routes, skip tenant profile verification
   if (skipTenantCheck) {
     return <>{children}</>;
   }
 
   // User is authenticated but has no profile in the current tenant
-  if (tenantId && !hasTenantProfile) {
+  if (tenantId && hasTenantProfile === false) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="galaxy-bg" />
