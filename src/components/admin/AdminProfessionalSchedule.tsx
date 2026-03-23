@@ -128,7 +128,8 @@ export function AdminProfessionalSchedule() {
       .update({ 
         working_days: useCustomDays ? customWorkingDays : null 
       })
-      .eq("id", selectedProfessionalId);
+      .eq("id", selectedProfessionalId)
+      .eq("tenant_id", tenantId);
 
     setSaving(false);
 
