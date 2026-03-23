@@ -243,6 +243,16 @@ export function BookingTopbar({
                 <CalendarCheck className="w-5 h-5" />
                 <span>Meus Agendamentos</span>
               </button>
+              {isProfessional && (
+                <Link
+                  to={tp("/my-agenda")}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-3 px-3 py-3 rounded-xl text-white/80 hover:bg-white/10 transition-all"
+                >
+                  <CalendarDays className="w-5 h-5" />
+                  <span>Minha Agenda</span>
+                </Link>
+              )}
               {isAdmin && (
                 <Link 
                   to={tp("/admin")} 
