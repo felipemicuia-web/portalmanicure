@@ -27,14 +27,12 @@ export function useLinkedProfessional() {
     }
 
     setLoading(true);
-    console.log("[useLinkedProfessional] Checking email:", user.email, "tenant:", tenantId);
     supabase
       .rpc("get_professional_by_user_email", {
         p_user_email: user.email,
         p_tenant_id: tenantId,
       })
       .then(({ data, error }) => {
-        console.log("[useLinkedProfessional] Result:", { data, error });
         setProfessionalId(!error && data ? data : null);
         setLoading(false);
       });
