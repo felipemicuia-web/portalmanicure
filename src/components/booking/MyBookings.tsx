@@ -79,6 +79,8 @@ export function MyBookings({ user }: Props) {
   const [loading, setLoading] = useState(true);
   const isMobile = useIsMobile();
   const { tenantId } = useTenant();
+  const [activeTab, setActiveTab] = useState("active");
+  const [filterDate, setFilterDate] = useState("");
 
   // Edit state
   const [editingBooking, setEditingBooking] = useState<Booking | null>(null);
