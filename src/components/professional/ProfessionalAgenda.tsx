@@ -65,6 +65,12 @@ export function ProfessionalAgenda({ professionalId }: Props) {
 
       if (error) throw error;
 
+      logger.info("[ProfessionalAgenda] Bookings fetched", {
+        tenantId,
+        professionalId,
+        bookingsCount: data?.length || 0,
+      });
+
       // Fetch services for each booking
       if (data && data.length > 0) {
         const bookingIds = data.map((b) => b.id);
@@ -248,10 +254,10 @@ export function ProfessionalAgenda({ professionalId }: Props) {
           </TabsTrigger>
         </TabsList>
         <TabsContent value="active" className="mt-4">
-          {renderList(activeBookings, "Nenhum agendamento ativo")}
+          {renderList(activeBookings, "Nenhum agendamento encontrado")}
         </TabsContent>
         <TabsContent value="completed" className="mt-4">
-          {renderList(completedBookings, "Nenhum agendamento finalizado")}
+          {renderList(completedBookings, "Nenhum agendamento encontrado")}
         </TabsContent>
       </Tabs>
     </div>

@@ -100,6 +100,42 @@ export function TenantProvider({ children }: { children: ReactNode }) {
 
   // Resolve user role + superadmin status when auth changes
   useEffect(() => {
+    async function resolveAccess(userId: string) {
+      const [superRes, roleRes] = await Promise.all([
+        supabase.rpc("is_superadmin", { _user_id: userId }),
+        tenantId
+          ? supabase.rpc("get_user_role_in_tenant" as any, {
+              _user_id: userId,
+              _tenant_id: tenantId,
+            })
+          : Promise.resolve({ data: null }),
+      ]);
+
+      const nextIsSuperAdmin = !!superRes.data;
+      const nextRole = (roleRes.data as string) || null;
+
+      setIsSuperAdmin(nextIsSuperAdmin);
+      setMembershipRole(nextRole);
+
+      logger.info("[Tenant] Access resolved", {
+        tenantId,
+        userId,
+        membershipRole: nextRole,
+        isSuperAdmin: nextIsSuperAdmin,
+      });
+    }
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      const userId = session?.user?.id;
+      if (!userId) {
+        setMembershipRole(null);
+        setIsSuperAdmin(false);
+        return;
+      }
+
+      void resolveAccess(userId);
+    });
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       const userId = session?.user?.id;
       if (!userId) {
@@ -108,19 +144,7 @@ export function TenantProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      // Fire and forget - don't await inside onAuthStateChange
-      supabase.rpc("is_superadmin", { _user_id: userId }).then(({ data: superData }) => {
-        setIsSuperAdmin(!!superData);
-      });
-
-      if (tenantId) {
-        supabase.rpc("get_user_role_in_tenant" as any, {
-          _user_id: userId,
-          _tenant_id: tenantId,
-        }).then(({ data: roleData }) => {
-          setMembershipRole((roleData as string) || null);
-        });
-      }
+      void resolveAccess(userId);
     });
 
     return () => subscription.unsubscribe();
