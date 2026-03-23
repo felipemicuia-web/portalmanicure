@@ -53,6 +53,7 @@ interface Professional {
   photo_url: string | null;
   bio: string | null;
   instagram: string | null;
+  email: string | null;
   active: boolean;
   created_at: string;
 }
