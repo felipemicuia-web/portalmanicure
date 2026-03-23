@@ -244,7 +244,8 @@ export function AdminServices() {
     const { error } = await supabase
       .from("services")
       .update({ active: !currentActive })
-      .eq("id", id);
+      .eq("id", id)
+      .eq("tenant_id", tenantId);
 
     if (error) {
       logger.error("Error toggling service:", error);
