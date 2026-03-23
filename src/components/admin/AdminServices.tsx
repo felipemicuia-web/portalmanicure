@@ -284,7 +284,7 @@ export function AdminServices() {
     );
   }
 
-  const FormContent = () => (
+  const formContent = (
     <div className="space-y-4">
       {/* Image Upload */}
       <div className="space-y-2">
@@ -544,7 +544,7 @@ export function AdminServices() {
               <DrawerTitle>{editingService ? "Editar Serviço" : "Novo Serviço"}</DrawerTitle>
             </DrawerHeader>
             <div className="px-4 pb-4 max-h-[60vh] overflow-y-auto">
-              <FormContent />
+              {formContent}
             </div>
             <DrawerFooter className="pt-2">
               <Button onClick={handleSave} disabled={uploadingImage}>
@@ -563,7 +563,7 @@ export function AdminServices() {
               <DialogTitle>{editingService ? "Editar Serviço" : "Novo Serviço"}</DialogTitle>
             </DialogHeader>
             <div className="mt-4">
-              <FormContent />
+              {formContent}
             </div>
             <div className="flex justify-end gap-2 pt-4">
               <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
