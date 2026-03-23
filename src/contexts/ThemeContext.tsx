@@ -183,7 +183,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         const preset = getPresetById(cached);
         setCurrentThemeId(preset.id);
         applyThemeToDOM(preset.colors);
-        localStorage.setItem("site-theme-id", preset.id);
       }
 
       const { data } = await supabase
