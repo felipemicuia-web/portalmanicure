@@ -112,11 +112,11 @@ export function AdminProfessionals() {
   };
 
   useEffect(() => {
+    if (!tenantId) return;
     fetchProfessionals();
     fetchAllServices();
     // Fetch filter setting
     async function fetchFilter() {
-      if (!tenantId) return;
       const { data } = await supabase
         .from("work_settings")
         .select("show_professional_filter")
