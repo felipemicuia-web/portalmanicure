@@ -506,6 +506,20 @@ export default function BookingPage() {
     );
   }
 
+  if (!tenantId) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="galaxy-bg" />
+        <div className="glass-panel p-8 text-center relative z-10 max-w-md">
+          <h1 className="text-2xl font-bold mb-2">Estabelecimento não encontrado</h1>
+          <p className="text-muted-foreground">
+            O endereço acessado não corresponde a nenhum estabelecimento cadastrado.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <div className="galaxy-bg" />
