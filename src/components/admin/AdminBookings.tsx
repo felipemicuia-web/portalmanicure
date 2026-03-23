@@ -189,11 +189,22 @@ export function AdminBookings() {
     }
   };
 
-  const filteredBookings = bookings.filter((b) => {
-    if (filterStatus !== "all" && b.status !== filterStatus) return false;
-    if (filterProfessional !== "all" && b.professional_id !== filterProfessional) return false;
-    return true;
-  });
+  const applyFilters = (list: Booking[]) => {
+    return list.filter((b) => {
+      if (filterStatus !== "all" && b.status !== filterStatus) return false;
+      if (filterProfessional !== "all" && b.professional_id !== filterProfessional) return false;
+      if (filterDate && b.booking_date !== filterDate) return false;
+      return true;
+    });
+  };
+
+  // Separate active bookings into "not finished" and "completed/cancelled"
+  const pendingBookings = bookings.filter((b) => b.status === "confirmed");
+  const finishedBookings = bookings.filter((b) => b.status === "completed" || b.status === "cancelled");
+
+  const filteredPending = applyFilters(pendingBookings);
+  const filteredFinished = applyFilters(finishedBookings);
+  const filteredBookings = applyFilters(bookings);
 
   const openEditDialog = (booking: Booking) => {
     setEditingBooking(booking);
