@@ -83,7 +83,7 @@ export function useAvailableTimes(
 
   useEffect(() => {
     async function fetchTimes() {
-      if (!professionalId || !date || totalMinutes <= 0 || settingsLoading) {
+      if (!professionalId || !date || totalMinutes <= 0 || settingsLoading || !tenantId) {
         setTimes([]);
         return;
       }
