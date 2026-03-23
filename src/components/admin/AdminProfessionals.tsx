@@ -213,7 +213,8 @@ export function AdminProfessionals() {
     const { error } = await supabase
       .from("professionals")
       .delete()
-      .eq("id", deleteId);
+      .eq("id", deleteId)
+      .eq("tenant_id", tenantId);
 
     if (error) {
       logger.error("Error deleting professional:", error);
