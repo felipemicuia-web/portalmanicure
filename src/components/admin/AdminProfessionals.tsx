@@ -320,6 +320,7 @@ export function AdminProfessionals() {
     setEditSubtitle(prof.subtitle || "");
     setEditBio(prof.bio || "");
     setEditInstagram(prof.instagram || "");
+    setEditEmail(prof.email || "");
     fetchProfessionalServices(prof.id);
   };
 
