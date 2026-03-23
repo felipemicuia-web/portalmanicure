@@ -127,8 +127,9 @@ export function MyBookings({ user }: Props) {
   };
 
   useEffect(() => {
+    if (!tenantId) return;
     fetchData();
-  }, [user.id]);
+  }, [user.id, tenantId]);
 
   const getProfessionalName = (id: string) => {
     return professionals.find((p) => p.id === id)?.name || "—";
