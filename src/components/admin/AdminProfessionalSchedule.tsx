@@ -80,11 +80,13 @@ export function AdminProfessionalSchedule() {
   }, [selectedProfessionalId, professionals]);
 
   async function fetchProfessionals() {
+    if (!tenantId) return;
     setLoading(true);
     const { data, error } = await supabase
       .from("professionals")
       .select("id, name, working_days")
       .eq("active", true)
+      .eq("tenant_id", tenantId)
       .order("name");
 
     if (error) {
