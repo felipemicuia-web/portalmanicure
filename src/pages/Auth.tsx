@@ -67,18 +67,42 @@ const Auth = () => {
         userId,
       });
 
-      const { data: hasProfile } = await supabase.rpc("user_has_profile_in_tenant", {
-        _user_id: userId,
-        _tenant_id: tenantId,
-      });
+      const [{ data: hasProfile }, { data: linkedProfessionalId, error: linkedProfessionalError }] = await Promise.all([
+        supabase.rpc("user_has_profile_in_tenant", {
+          _user_id: userId,
+          _tenant_id: tenantId,
+        }),
+        supabase.rpc("get_my_linked_professional" as any, {
+          p_tenant_id: tenantId,
+        }),
+      ]);
 
       logger.info("[Auth] Tenant profile check", {
         authEmail: normalizedEmail,
         tenantId,
         hasProfile: !!hasProfile,
+        linkedProfessionalId: linkedProfessionalId || null,
+        linkedProfessionalError: linkedProfessionalError?.message || null,
       });
 
-      if (hasProfile) {
+      if (hasProfile || linkedProfessionalId) {
+        if (!hasProfile && linkedProfessionalId) {
+          const { error: professionalProfileError } = await supabase.from("profiles").insert({
+            user_id: userId,
+            tenant_id: tenantId,
+            name: `${firstName.trim()} ${lastName.trim()}`.trim() || null,
+            phone: normalizePhone(phone) || null,
+          });
+
+          logger.info("[Auth] Professional access bootstrap", {
+            authEmail: normalizedEmail,
+            tenantId,
+            linkedProfessionalId,
+            createdProfile: !professionalProfileError,
+            bootstrapError: professionalProfileError?.message || null,
+          });
+        }
+
         navigate(redirectTo);
         return;
       }
