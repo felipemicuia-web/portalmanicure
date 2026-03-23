@@ -46,7 +46,7 @@ export function BookingTopbar({
       topbarReason: professionalLoading
         ? "professional context still loading"
         : isProfessional
-          ? "professional topbar enabled"
+          ? "professional topbar enabled with dedicated agenda entry"
           : "professional topbar hidden because no linked professional was resolved for current tenant",
     });
   }, [user, tenantId, professionalId, isProfessional, professionalLoading, membershipRole, isAdmin, isSuperAdmin]);
