@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
+import { useThemeContext } from "@/contexts/ThemeContext";
 
 type BackgroundType = "stars" | "bubbles" | "petals" | "leaves" | "rays" | "snow" | "butterflies";
 
@@ -17,156 +18,55 @@ const THEME_BACKGROUNDS: Record<string, ThemeBackground> = {
   "lavanda": { type: "butterflies", particleCount: 12 },
 };
 
-function getThemeId(): string {
-  try {
-    const stored = localStorage.getItem("site-theme-id");
-    return stored || "galaxy";
-  } catch {
-    return "galaxy";
-  }
-}
-
-// Star component
 function Star({ delay, size, left, duration }: { delay: number; size: number; left: number; duration: number }) {
   return (
-    <div
-      className="bg-star"
-      style={{
-        left: `${left}%`,
-        top: `${Math.random() * 100}%`,
-        width: size,
-        height: size,
-        animationDelay: `${delay}s`,
-        animationDuration: `${duration}s`,
-      }}
-    />
+    <div className="bg-star" style={{ left: `${left}%`, top: `${Math.random() * 100}%`, width: size, height: size, animationDelay: `${delay}s`, animationDuration: `${duration}s` }} />
   );
 }
 
-// Bubble component (for Oceano theme)
 function Bubble({ delay, size, left, duration }: { delay: number; size: number; left: number; duration: number }) {
   return (
-    <div
-      className="bg-bubble"
-      style={{
-        left: `${left}%`,
-        width: size,
-        height: size,
-        animationDelay: `${delay}s`,
-        animationDuration: `${duration}s`,
-      }}
-    />
+    <div className="bg-bubble" style={{ left: `${left}%`, width: size, height: size, animationDelay: `${delay}s`, animationDuration: `${duration}s` }} />
   );
 }
 
-// Petal component (for Rosa theme)
 function Petal({ delay, size, left, duration }: { delay: number; size: number; left: number; duration: number }) {
   return (
-    <div
-      className="bg-petal"
-      style={{
-        left: `${left}%`,
-        width: size,
-        height: size * 1.5,
-        animationDelay: `${delay}s`,
-        animationDuration: `${duration}s`,
-      }}
-    />
+    <div className="bg-petal" style={{ left: `${left}%`, width: size, height: size * 1.5, animationDelay: `${delay}s`, animationDuration: `${duration}s` }} />
   );
 }
 
-// Leaf component (for Floresta theme)
 function Leaf({ delay, size, left, duration }: { delay: number; size: number; left: number; duration: number }) {
   return (
-    <div
-      className="bg-leaf"
-      style={{
-        left: `${left}%`,
-        width: size,
-        height: size,
-        animationDelay: `${delay}s`,
-        animationDuration: `${duration}s`,
-      }}
-    />
+    <div className="bg-leaf" style={{ left: `${left}%`, width: size, height: size, animationDelay: `${delay}s`, animationDuration: `${duration}s` }} />
   );
 }
 
-// Ray component (for Pôr do Sol theme)
 function Ray({ delay, left, duration }: { delay: number; left: number; duration: number }) {
   return (
-    <div
-      className="bg-ray"
-      style={{
-        left: `${left}%`,
-        animationDelay: `${delay}s`,
-        animationDuration: `${duration}s`,
-      }}
-    />
+    <div className="bg-ray" style={{ left: `${left}%`, animationDelay: `${delay}s`, animationDuration: `${duration}s` }} />
   );
 }
 
-// Snowflake component (for Meia-Noite theme)
 function Snowflake({ delay, size, left, duration }: { delay: number; size: number; left: number; duration: number }) {
   return (
-    <div
-      className="bg-snowflake"
-      style={{
-        left: `${left}%`,
-        width: size,
-        height: size,
-        animationDelay: `${delay}s`,
-        animationDuration: `${duration}s`,
-      }}
-    />
+    <div className="bg-snowflake" style={{ left: `${left}%`, width: size, height: size, animationDelay: `${delay}s`, animationDuration: `${duration}s` }} />
   );
 }
 
-// Butterfly component (for Lavanda theme)
 function Butterfly({ delay, size, left, duration }: { delay: number; size: number; left: number; duration: number }) {
   return (
-    <div
-      className="bg-butterfly"
-      style={{
-        left: `${left}%`,
-        top: `${Math.random() * 80}%`,
-        width: size,
-        height: size * 0.6,
-        animationDelay: `${delay}s`,
-        animationDuration: `${duration}s`,
-      }}
-    />
+    <div className="bg-butterfly" style={{ left: `${left}%`, top: `${Math.random() * 80}%`, width: size, height: size * 0.6, animationDelay: `${delay}s`, animationDuration: `${duration}s` }} />
   );
 }
 
 export function ThemedBackground() {
-  const [themeId, setThemeId] = useState(getThemeId);
-  const [particles, setParticles] = useState<JSX.Element[]>([]);
+  // Use ThemeContext directly instead of polling localStorage
+  const { currentThemeId } = useThemeContext();
 
-  useEffect(() => {
-    // Listen for theme changes
-    const handleStorageChange = () => {
-      setThemeId(getThemeId());
-    };
-
-    window.addEventListener("storage", handleStorageChange);
-    
-    // Also check periodically for same-tab changes
-    const interval = setInterval(() => {
-      const current = getThemeId();
-      if (current !== themeId) {
-        setThemeId(current);
-      }
-    }, 500);
-
-    return () => {
-      window.removeEventListener("storage", handleStorageChange);
-      clearInterval(interval);
-    };
-  }, [themeId]);
-
-  useEffect(() => {
-    const config = THEME_BACKGROUNDS[themeId] || THEME_BACKGROUNDS["galaxy"];
-    const newParticles: JSX.Element[] = [];
+  const particles = useMemo(() => {
+    const config = THEME_BACKGROUNDS[currentThemeId] || THEME_BACKGROUNDS["galaxy"];
+    const result: JSX.Element[] = [];
 
     for (let i = 0; i < config.particleCount; i++) {
       const delay = Math.random() * 10;
@@ -176,45 +76,30 @@ export function ThemedBackground() {
 
       switch (config.type) {
         case "stars":
-          newParticles.push(
-            <Star key={i} delay={delay} size={size} left={left} duration={duration} />
-          );
+          result.push(<Star key={i} delay={delay} size={size} left={left} duration={duration} />);
           break;
         case "bubbles":
-          newParticles.push(
-            <Bubble key={i} delay={delay} size={size * 1.5} left={left} duration={duration} />
-          );
+          result.push(<Bubble key={i} delay={delay} size={size * 1.5} left={left} duration={duration} />);
           break;
         case "petals":
-          newParticles.push(
-            <Petal key={i} delay={delay} size={size} left={left} duration={duration} />
-          );
+          result.push(<Petal key={i} delay={delay} size={size} left={left} duration={duration} />);
           break;
         case "leaves":
-          newParticles.push(
-            <Leaf key={i} delay={delay} size={size * 1.2} left={left} duration={duration} />
-          );
+          result.push(<Leaf key={i} delay={delay} size={size * 1.2} left={left} duration={duration} />);
           break;
         case "rays":
-          newParticles.push(
-            <Ray key={i} delay={delay} left={left} duration={duration * 0.5} />
-          );
+          result.push(<Ray key={i} delay={delay} left={left} duration={duration * 0.5} />);
           break;
         case "snow":
-          newParticles.push(
-            <Snowflake key={i} delay={delay} size={size * 0.8} left={left} duration={duration} />
-          );
+          result.push(<Snowflake key={i} delay={delay} size={size * 0.8} left={left} duration={duration} />);
           break;
         case "butterflies":
-          newParticles.push(
-            <Butterfly key={i} delay={delay} size={size * 1.5} left={left} duration={duration * 1.5} />
-          );
+          result.push(<Butterfly key={i} delay={delay} size={size * 1.5} left={left} duration={duration * 1.5} />);
           break;
       }
     }
-
-    setParticles(newParticles);
-  }, [themeId]);
+    return result;
+  }, [currentThemeId]);
 
   return (
     <div className="themed-bg-container">
