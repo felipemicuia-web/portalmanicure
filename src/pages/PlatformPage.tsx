@@ -9,6 +9,7 @@ import { PlatformOverview } from "@/components/platform/PlatformOverview";
 import { PlatformUsers } from "@/components/platform/PlatformUsers";
 import { PlatformPlans } from "@/components/platform/PlatformPlans";
 import { PlatformInsights } from "@/components/platform/PlatformInsights";
+import { PlatformTenantDashboards } from "@/components/platform/PlatformTenantDashboards";
 import {
   Shield,
   LogOut,
