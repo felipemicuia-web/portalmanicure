@@ -144,10 +144,10 @@ export default function AdminPage() {
   const ActiveIcon = activeItem?.icon ?? CalendarDays;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-[100dvh] bg-background">
       <div className="galaxy-bg" />
 
-      <div className="relative z-10 flex">
+      <div className="relative z-10 flex min-h-[100dvh]">
         {/* Desktop Sidebar */}
         <aside className="hidden md:flex flex-col w-56 lg:w-64 min-h-screen border-r border-border/50 bg-background/80 backdrop-blur-xl sticky top-0 h-screen">
           <div className="p-4 border-b border-border/50 flex items-center gap-2">
