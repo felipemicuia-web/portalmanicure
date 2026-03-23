@@ -9,6 +9,7 @@ import { PlatformOverview } from "@/components/platform/PlatformOverview";
 import { PlatformUsers } from "@/components/platform/PlatformUsers";
 import { PlatformPlans } from "@/components/platform/PlatformPlans";
 import { PlatformInsights } from "@/components/platform/PlatformInsights";
+import { PlatformTenantDashboards } from "@/components/platform/PlatformTenantDashboards";
 import {
   Shield,
   LogOut,
@@ -19,12 +20,14 @@ import {
   BarChart3,
   Crown,
   DollarSign,
+  LayoutDashboard,
   type LucideIcon,
 } from "lucide-react";
 
 const MENU_ITEMS: { value: string; label: string; icon: LucideIcon }[] = [
   { value: "overview", label: "Visão Geral", icon: BarChart3 },
   { value: "tenants", label: "Tenants", icon: Building2 },
+  { value: "dashboards", label: "Dashboards", icon: LayoutDashboard },
   { value: "users", label: "Usuários", icon: Users },
   { value: "insights", label: "Valores e Insights", icon: DollarSign },
   { value: "plans", label: "Planos", icon: Crown },
@@ -159,6 +162,7 @@ export default function PlatformPage() {
           <main className="p-4 sm:p-6 max-w-6xl">
             {activeTab === "overview" && <PlatformOverview onSelectTenant={handleSelectTenantFromOverview} />}
             {activeTab === "tenants" && <PlatformTenants />}
+            {activeTab === "dashboards" && <PlatformTenantDashboards />}
             {activeTab === "users" && <PlatformUsers />}
             {activeTab === "insights" && <PlatformInsights />}
             {activeTab === "plans" && <PlatformPlans />}
