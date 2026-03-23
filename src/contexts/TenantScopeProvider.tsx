@@ -84,8 +84,30 @@ export function TenantScopeProvider({ children }: TenantScopeProviderProps) {
     resolve();
   }, [slug]);
 
-  // Resolve user role when auth changes
+  // Resolve user role when auth changes or tenantId resolves
   useEffect(() => {
+    if (!tenantId) return;
+
+    async function resolveUserRole(userId: string) {
+      const [superRes, roleRes] = await Promise.all([
+        supabase.rpc("is_superadmin", { _user_id: userId }),
+        supabase.rpc("get_user_role_in_tenant" as any, {
+          _user_id: userId,
+          _tenant_id: tenantId,
+        }),
+      ]);
+      setIsSuperAdmin(!!superRes.data);
+      setMembershipRole((roleRes.data as string) || null);
+    }
+
+    // Check current session immediately
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user?.id) {
+        resolveUserRole(session.user.id);
+      }
+    });
+
+    // Listen for future auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       const userId = session?.user?.id;
       if (!userId) {
@@ -93,19 +115,7 @@ export function TenantScopeProvider({ children }: TenantScopeProviderProps) {
         setIsSuperAdmin(false);
         return;
       }
-
-      supabase.rpc("is_superadmin", { _user_id: userId }).then(({ data }) => {
-        setIsSuperAdmin(!!data);
-      });
-
-      if (tenantId) {
-        supabase.rpc("get_user_role_in_tenant" as any, {
-          _user_id: userId,
-          _tenant_id: tenantId,
-        }).then(({ data: roleData }) => {
-          setMembershipRole((roleData as string) || null);
-        });
-      }
+      resolveUserRole(userId);
     });
 
     return () => subscription.unsubscribe();
