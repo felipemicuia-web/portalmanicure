@@ -85,9 +85,11 @@ export function AdminServices() {
   const { tenantId } = useTenant();
 
   const fetchServices = async () => {
+    if (!tenantId) return;
     const { data, error } = await supabase
       .from("services")
       .select("*")
+      .eq("tenant_id", tenantId)
       .order("created_at", { ascending: true });
 
     if (error) {
@@ -99,8 +101,9 @@ export function AdminServices() {
   };
 
   useEffect(() => {
+    if (!tenantId) return;
     fetchServices();
-  }, []);
+  }, [tenantId]);
 
   const openAddDialog = () => {
     setEditingService(null);
