@@ -215,7 +215,8 @@ export function AdminServices() {
       const { error } = await supabase
         .from("services")
         .update(payload)
-        .eq("id", editingService.id);
+        .eq("id", editingService.id)
+        .eq("tenant_id", tenantId);
 
       if (error) {
         logger.error("Error updating service:", error);
