@@ -284,7 +284,7 @@ export default function AdminPage() {
           </header>
 
           {/* Content */}
-          <main className="p-4 sm:p-6 max-w-5xl">
+          <main className="flex-1 overflow-y-auto p-4 sm:p-6 max-w-5xl">
             {TAB_CONTENT[activeTab]}
           </main>
         </div>
