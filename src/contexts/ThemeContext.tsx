@@ -167,37 +167,57 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     const preset = getPresetById(id);
     setCurrentThemeId(preset.id);
     applyThemeToDOM(preset.colors);
-    // Scope localStorage by tenant only — no global key
-    const scopeKey = tid || tenantId || "global";
-    localStorage.setItem(`site-theme-id-${scopeKey}`, preset.id);
+    const scopeKey = tid || tenantId;
+    if (scopeKey) {
+      localStorage.setItem(`site-theme-id-${scopeKey}`, preset.id);
+    }
   }, [tenantId]);
 
   // Load initial theme from DB
   useEffect(() => {
-    if (tenantLoading || !tenantId) return;
+    if (tenantLoading) return;
+
+    if (!tenantId) {
+      const fallbackPreset = getPresetById("galaxy");
+      setCurrentThemeId(fallbackPreset.id);
+      applyThemeToDOM(fallbackPreset.colors);
+      setLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+    setLoading(true);
 
     async function loadTheme() {
-      // First try tenant-scoped localStorage for instant paint
       const cached = localStorage.getItem(`site-theme-id-${tenantId}`);
-      if (cached) {
-        const preset = getPresetById(cached);
-        setCurrentThemeId(preset.id);
-        applyThemeToDOM(preset.colors);
-      }
+      const cachedPreset = getPresetById(cached || "galaxy");
+
+      setCurrentThemeId(cachedPreset.id);
+      applyThemeToDOM(cachedPreset.colors);
 
       const { data } = await supabase
         .from("work_settings")
         .select("theme_id")
         .eq("tenant_id", tenantId!)
         .limit(1)
-        .single();
+        .maybeSingle();
+
+      if (cancelled) return;
 
       if (data?.theme_id) {
         applyById(data.theme_id, tenantId);
+      } else {
+        applyById("galaxy", tenantId);
       }
+
       setLoading(false);
     }
+
     loadTheme();
+
+    return () => {
+      cancelled = true;
+    };
   }, [tenantId, tenantLoading, applyById]);
 
   // Subscribe to realtime changes
