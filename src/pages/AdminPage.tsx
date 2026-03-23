@@ -214,7 +214,7 @@ export default function AdminPage() {
                       <Shield className="w-5 h-5 text-primary" />
                       <h2 className="font-bold gradient-text">Painel Admin</h2>
                     </div>
-                    <nav className="py-2">
+                    <nav className="py-2 overflow-y-auto max-h-[calc(100dvh-140px)]">
                       {MENU_ITEMS.map((item) => {
                         const Icon = item.icon;
                         const isActive = activeTab === item.value;
