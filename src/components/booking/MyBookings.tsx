@@ -363,7 +363,70 @@ export function MyBookings({ user }: Props) {
     </div>
   );
 
-  return (
+    const BookingCard = ({ booking }: { booking: Booking }) => (
+      <div key={booking.id} className="glass-panel p-4">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap mb-2">
+              {getStatusBadge(booking.status)}
+            </div>
+            <div className="flex items-center gap-3 text-sm mb-2">
+              <div className="flex items-center gap-1">
+                <Calendar className="w-4 h-4 text-muted-foreground" />
+                <span className="font-medium">{formatDate(booking.booking_date)}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Clock className="w-4 h-4 text-muted-foreground" />
+                <span className="font-medium">{booking.booking_time.slice(0, 5)}</span>
+              </div>
+            </div>
+            <div className="flex items-center gap-1 text-sm text-muted-foreground mb-1">
+              <UserIcon className="w-4 h-4" />
+              <span>Profissional: {getProfessionalName(booking.professional_id)}</span>
+            </div>
+            <div className="text-sm font-medium text-primary">
+              {formatPrice(booking.total_price)}
+            </div>
+            {booking.notes && (
+              <p className="text-xs text-muted-foreground mt-2 italic">
+                "{booking.notes}"
+              </p>
+            )}
+          </div>
+          {canModify(booking) && (
+            <div className="flex flex-col gap-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => openEditDialog(booking)}
+                className="h-9 w-9"
+                title="Editar agendamento"
+              >
+                <Pencil className="w-4 h-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setDeletingBooking(booking)}
+                className="h-9 w-9 text-destructive hover:text-destructive"
+                title="Cancelar agendamento"
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+
+    const EmptyState = ({ message }: { message: string }) => (
+      <div className="glass-panel p-8 text-center text-muted-foreground">
+        <Calendar className="w-12 h-12 mx-auto mb-3 opacity-50" />
+        <p>{message}</p>
+      </div>
+    );
+
+    return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -376,71 +439,57 @@ export function MyBookings({ user }: Props) {
         </Button>
       </div>
 
-      {bookings.length === 0 ? (
-        <div className="glass-panel p-8 text-center text-muted-foreground">
-          <Calendar className="w-12 h-12 mx-auto mb-3 opacity-50" />
-          <p>Você ainda não tem agendamentos.</p>
-          <p className="text-sm mt-1">Faça seu primeiro agendamento!</p>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {bookings.map((booking) => (
-            <div key={booking.id} className="glass-panel p-4">
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap mb-2">
-                    {getStatusBadge(booking.status)}
-                  </div>
-                  <div className="flex items-center gap-3 text-sm mb-2">
-                    <div className="flex items-center gap-1">
-                      <Calendar className="w-4 h-4 text-muted-foreground" />
-                      <span className="font-medium">{formatDate(booking.booking_date)}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Clock className="w-4 h-4 text-muted-foreground" />
-                      <span className="font-medium">{booking.booking_time.slice(0, 5)}</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1 text-sm text-muted-foreground mb-1">
-                    <UserIcon className="w-4 h-4" />
-                    <span>Profissional: {getProfessionalName(booking.professional_id)}</span>
-                  </div>
-                  <div className="text-sm font-medium text-primary">
-                    {formatPrice(booking.total_price)}
-                  </div>
-                  {booking.notes && (
-                    <p className="text-xs text-muted-foreground mt-2 italic">
-                      "{booking.notes}"
-                    </p>
-                  )}
-                </div>
-                {canModify(booking) && (
-                  <div className="flex flex-col gap-1">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => openEditDialog(booking)}
-                      className="h-9 w-9"
-                      title="Editar agendamento"
-                    >
-                      <Pencil className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setDeletingBooking(booking)}
-                      className="h-9 w-9 text-destructive hover:text-destructive"
-                      title="Cancelar agendamento"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                )}
-              </div>
+      {/* Date filter */}
+      <div className="flex items-center gap-2">
+        <Filter className="w-4 h-4 text-muted-foreground" />
+        <Input
+          type="date"
+          value={filterDate}
+          onChange={(e) => setFilterDate(e.target.value)}
+          className="w-auto text-sm"
+          placeholder="Filtrar por data"
+        />
+        {filterDate && (
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setFilterDate("")}>
+            <X className="w-4 h-4" />
+          </Button>
+        )}
+      </div>
+
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="w-full grid grid-cols-2">
+          <TabsTrigger value="active" className="text-sm">
+            Ativos ({filteredActive.length})
+          </TabsTrigger>
+          <TabsTrigger value="completed" className="text-sm">
+            Finalizados ({filteredCompleted.length})
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="active" className="mt-3">
+          {filteredActive.length === 0 ? (
+            <EmptyState message={filterDate ? "Nenhum agendamento ativo nesta data." : "Nenhum agendamento ativo."} />
+          ) : (
+            <div className="space-y-3">
+              {filteredActive.map((booking) => (
+                <BookingCard key={booking.id} booking={booking} />
+              ))}
             </div>
-          ))}
-        </div>
-      )}
+          )}
+        </TabsContent>
+
+        <TabsContent value="completed" className="mt-3">
+          {filteredCompleted.length === 0 ? (
+            <EmptyState message={filterDate ? "Nenhum agendamento finalizado nesta data." : "Nenhum agendamento finalizado."} />
+          ) : (
+            <div className="space-y-3">
+              {filteredCompleted.map((booking) => (
+                <BookingCard key={booking.id} booking={booking} />
+              ))}
+            </div>
+          )}
+        </TabsContent>
+      </Tabs>
 
       {/* Edit: Drawer for mobile, Dialog for desktop */}
       {isMobile ? (
