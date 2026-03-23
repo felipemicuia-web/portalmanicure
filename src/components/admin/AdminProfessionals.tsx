@@ -409,6 +409,7 @@ export function AdminProfessionals() {
         <p className="text-xs text-muted-foreground">
           Vincule um e-mail para que o profissional acesse sua própria agenda.
         </p>
+      </div>
       {allServices.length > 0 && (
         <div className="space-y-2">
           <Label className="flex items-center gap-1.5">
