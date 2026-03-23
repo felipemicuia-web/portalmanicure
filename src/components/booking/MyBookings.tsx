@@ -197,7 +197,8 @@ export function MyBookings({ user }: Props) {
         booking_time: editForm.booking_time,
         notes: editForm.notes || null,
       })
-      .eq("id", editingBooking.id);
+      .eq("id", editingBooking.id)
+      .eq("user_id", user.id);
 
     if (error) {
       logger.error("Error updating booking:", error);
