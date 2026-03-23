@@ -13,9 +13,14 @@ export function useBookingData() {
   const { tenantId, loading: tenantLoading } = useTenant();
 
   useEffect(() => {
+    if (tenantLoading) return;
+
+    if (!tenantId) {
+      setLoading(false);
+      return;
+    }
+
     async function fetchData() {
-      if (tenantLoading || !tenantId) return;
-      
       setLoading(true);
       
       let profsQuery = supabase.from("professionals").select("*").eq("active", true);
