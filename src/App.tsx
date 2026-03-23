@@ -14,6 +14,7 @@ import Auth from "./pages/Auth";
 import AdminPage from "./pages/AdminPage";
 import PlatformPage from "./pages/PlatformPage";
 import ProfessionalProfilePage from "./pages/ProfessionalProfilePage";
+import ProfessionalAgendaPage from "./pages/ProfessionalAgendaPage";
 import TenantScopedApp from "./pages/TenantScopedApp";
 import NotFound from "./pages/NotFound";
 
@@ -72,6 +73,15 @@ const App = () => (
                     <ThemeProvider>
                       <ThemedBackground />
                       <ProfessionalProfilePage />
+                    </ThemeProvider>
+                  }
+                />
+                <Route
+                  path="/my-agenda"
+                  element={
+                    <ThemeProvider>
+                      <ThemedBackground />
+                      <ProfessionalAgendaPage />
                     </ThemeProvider>
                   }
                 />

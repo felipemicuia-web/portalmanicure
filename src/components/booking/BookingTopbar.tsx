@@ -1,10 +1,11 @@
 import { Link } from "react-router-dom";
 import { User } from "@supabase/supabase-js";
-import { LogOut, User as UserIcon, Shield, Menu, X, Calendar, CalendarCheck } from "lucide-react";
+import { LogOut, User as UserIcon, Shield, Menu, X, Calendar, CalendarCheck, CalendarDays } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAdmin } from "@/hooks/useAdmin";
 import { useBranding } from "@/hooks/useBranding";
 import { useTenantPath } from "@/contexts/TenantScopeProvider";
+import { useLinkedProfessional } from "@/hooks/useLinkedProfessional";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 
@@ -24,6 +25,7 @@ export function BookingTopbar({
   const { isAdmin } = useAdmin(user);
   const { branding } = useBranding();
   const tp = useTenantPath();
+  const { isProfessional } = useLinkedProfessional();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   const handlePageChange = (page: "booking" | "profile" | "my-bookings") => {
@@ -124,6 +126,18 @@ export function BookingTopbar({
                   >
                     Meus Agendamentos
                   </button>
+                  {isProfessional && (
+                    <Link to={tp("/my-agenda")}>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="gap-1.5 text-white/80 hover:text-white hover:bg-white/10 border border-primary/30"
+                      >
+                        <CalendarDays className="w-4 h-4" />
+                        Minha Agenda
+                      </Button>
+                    </Link>
+                  )}
                   {isAdmin && (
                     <Link to={tp("/admin")}>
                       <Button
@@ -229,6 +243,16 @@ export function BookingTopbar({
                 <CalendarCheck className="w-5 h-5" />
                 <span>Meus Agendamentos</span>
               </button>
+              {isProfessional && (
+                <Link
+                  to={tp("/my-agenda")}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-3 px-3 py-3 rounded-xl text-white/80 hover:bg-white/10 transition-all"
+                >
+                  <CalendarDays className="w-5 h-5" />
+                  <span>Minha Agenda</span>
+                </Link>
+              )}
               {isAdmin && (
                 <Link 
                   to={tp("/admin")} 

@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Plus, Pencil, Trash2, Check, X, Users, Upload, User, Image as ImageIcon, Sparkles } from "lucide-react";
+import { Plus, Pencil, Trash2, Check, X, Users, Upload, User, Image as ImageIcon, Sparkles, Mail } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -53,6 +53,7 @@ interface Professional {
   photo_url: string | null;
   bio: string | null;
   instagram: string | null;
+  email: string | null;
   active: boolean;
   created_at: string;
 }
@@ -70,6 +71,7 @@ export function AdminProfessionals() {
   const [editSubtitle, setEditSubtitle] = useState("");
   const [editBio, setEditBio] = useState("");
   const [editInstagram, setEditInstagram] = useState("");
+  const [editEmail, setEditEmail] = useState("");
   const [newName, setNewName] = useState("");
   const [isAdding, setIsAdding] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -161,6 +163,12 @@ export function AdminProfessionals() {
   const handleEdit = async () => {
     if (!editingProfessional || !editName.trim()) return;
 
+    const emailValue = editEmail.trim() || null;
+    if (emailValue && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue)) {
+      toast({ title: "Erro", description: "E-mail inválido.", variant: "destructive" });
+      return;
+    }
+
     const { error } = await supabase
       .from("professionals")
       .update({ 
@@ -168,6 +176,7 @@ export function AdminProfessionals() {
         subtitle: editSubtitle.trim() || null,
         bio: editBio.trim() || null,
         instagram: editInstagram.trim() || null,
+        email: emailValue,
       })
       .eq("id", editingProfessional.id)
       .eq("tenant_id", tenantId);
@@ -311,6 +320,7 @@ export function AdminProfessionals() {
     setEditSubtitle(prof.subtitle || "");
     setEditBio(prof.bio || "");
     setEditInstagram(prof.instagram || "");
+    setEditEmail(prof.email || "");
     fetchProfessionalServices(prof.id);
   };
 
@@ -384,6 +394,21 @@ export function AdminProfessionals() {
           onChange={(e) => setEditInstagram(e.target.value)}
           placeholder="@usuario (sem @)"
         />
+      </div>
+      <div className="space-y-2">
+        <Label className="flex items-center gap-1.5">
+          <Mail className="w-4 h-4" />
+          E-mail de acesso
+        </Label>
+        <Input
+          type="email"
+          value={editEmail}
+          onChange={(e) => setEditEmail(e.target.value)}
+          placeholder="profissional@email.com (opcional)"
+        />
+        <p className="text-xs text-muted-foreground">
+          Vincule um e-mail para que o profissional acesse sua própria agenda.
+        </p>
       </div>
       {allServices.length > 0 && (
         <div className="space-y-2">
