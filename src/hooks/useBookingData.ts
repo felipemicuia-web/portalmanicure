@@ -96,16 +96,19 @@ export function useAvailableTimes(
           .select("booking_time, duration_minutes")
           .eq("professional_id", professionalId)
           .eq("booking_date", date)
+          .eq("tenant_id", tenantId)
           .neq("status", "cancelled"),
         supabase
           .from("professionals")
           .select("working_days")
           .eq("id", professionalId)
+          .eq("tenant_id", tenantId)
           .single(),
         supabase
           .from("professional_blocked_dates")
           .select("blocked_date")
           .eq("professional_id", professionalId)
+          .eq("tenant_id", tenantId)
           .eq("blocked_date", date),
       ]);
 
