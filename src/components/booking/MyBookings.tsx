@@ -100,15 +100,17 @@ export function MyBookings({ user }: Props) {
   );
 
   const fetchData = async () => {
+    if (!tenantId) return;
     setLoading(true);
     const [bookingsRes, professionalsRes] = await Promise.all([
       supabase
         .from("bookings")
         .select("*")
         .eq("user_id", user.id)
+        .eq("tenant_id", tenantId)
         .order("booking_date", { ascending: true })
         .order("booking_time", { ascending: true }),
-      supabase.from("professionals").select("id, name"),
+      supabase.from("professionals").select("id, name").eq("tenant_id", tenantId),
     ]);
 
     if (bookingsRes.error) {
@@ -125,8 +127,9 @@ export function MyBookings({ user }: Props) {
   };
 
   useEffect(() => {
+    if (!tenantId) return;
     fetchData();
-  }, [user.id]);
+  }, [user.id, tenantId]);
 
   const getProfessionalName = (id: string) => {
     return professionals.find((p) => p.id === id)?.name || "—";
@@ -194,7 +197,8 @@ export function MyBookings({ user }: Props) {
         booking_time: editForm.booking_time,
         notes: editForm.notes || null,
       })
-      .eq("id", editingBooking.id);
+      .eq("id", editingBooking.id)
+      .eq("user_id", user.id);
 
     if (error) {
       logger.error("Error updating booking:", error);
@@ -233,7 +237,8 @@ export function MyBookings({ user }: Props) {
     const { error } = await supabase
       .from("bookings")
       .update({ status: "cancelled" })
-      .eq("id", deletingBooking.id);
+      .eq("id", deletingBooking.id)
+      .eq("user_id", user.id);
 
     if (error) {
       logger.error("Error cancelling booking:", error);

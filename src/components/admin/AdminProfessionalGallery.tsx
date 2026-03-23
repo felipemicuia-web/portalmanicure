@@ -56,11 +56,13 @@ export function AdminProfessionalGallery({
   const { tenantId } = useTenant();
 
   const fetchPhotos = async () => {
+    if (!tenantId) return;
     setLoading(true);
     const { data, error } = await supabase
       .from("professional_photos")
       .select("*")
       .eq("professional_id", professionalId)
+      .eq("tenant_id", tenantId)
       .order("created_at", { ascending: false });
 
     if (error) {
@@ -168,7 +170,8 @@ export function AdminProfessionalGallery({
       const { error } = await supabase
         .from("professional_photos")
         .delete()
-        .eq("id", deleteId);
+        .eq("id", deleteId)
+        .eq("tenant_id", tenantId);
 
       if (error) throw error;
 

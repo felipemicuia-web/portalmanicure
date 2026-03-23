@@ -49,6 +49,7 @@ export function useAvailableTimes(
   const [times, setTimes] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const { settings: workSettings, loading: settingsLoading } = useWorkSettings();
+  const { tenantId } = useTenant();
   const [refreshKey, setRefreshKey] = useState(0);
 
   // Realtime subscription: refresh slots when bookings change for this professional+date
@@ -82,7 +83,7 @@ export function useAvailableTimes(
 
   useEffect(() => {
     async function fetchTimes() {
-      if (!professionalId || !date || totalMinutes <= 0 || settingsLoading) {
+      if (!professionalId || !date || totalMinutes <= 0 || settingsLoading || !tenantId) {
         setTimes([]);
         return;
       }
@@ -95,16 +96,19 @@ export function useAvailableTimes(
           .select("booking_time, duration_minutes")
           .eq("professional_id", professionalId)
           .eq("booking_date", date)
+          .eq("tenant_id", tenantId)
           .neq("status", "cancelled"),
         supabase
           .from("professionals")
           .select("working_days")
           .eq("id", professionalId)
+          .eq("tenant_id", tenantId)
           .single(),
         supabase
           .from("professional_blocked_dates")
           .select("blocked_date")
           .eq("professional_id", professionalId)
+          .eq("tenant_id", tenantId)
           .eq("blocked_date", date),
       ]);
 
@@ -132,7 +136,7 @@ export function useAvailableTimes(
     }
 
     fetchTimes();
-  }, [professionalId, date, totalMinutes, workSettings, settingsLoading, refreshKey]);
+  }, [professionalId, date, totalMinutes, workSettings, settingsLoading, refreshKey, tenantId]);
 
   return { times, loading: loading || settingsLoading };
 }

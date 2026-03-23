@@ -84,9 +84,11 @@ export function AdminProfessionals() {
   const { tenantId } = useTenant();
 
   const fetchProfessionals = async () => {
+    if (!tenantId) return;
     const { data, error } = await supabase
       .from("professionals")
       .select("*")
+      .eq("tenant_id", tenantId)
       .order("created_at", { ascending: true });
 
     if (error) {
@@ -98,21 +100,23 @@ export function AdminProfessionals() {
   };
 
   const fetchAllServices = async () => {
-    const { data } = await supabase.from("services").select("id, name").eq("active", true).order("name");
+    if (!tenantId) return;
+    const { data } = await supabase.from("services").select("id, name").eq("active", true).eq("tenant_id", tenantId).order("name");
     if (data) setAllServices(data);
   };
 
   const fetchProfessionalServices = async (profId: string) => {
-    const { data } = await supabase.from("professional_services").select("service_id").eq("professional_id", profId);
+    if (!tenantId) return;
+    const { data } = await supabase.from("professional_services").select("service_id").eq("professional_id", profId).eq("tenant_id", tenantId);
     setSelectedServiceIds(data?.map(d => d.service_id) || []);
   };
 
   useEffect(() => {
+    if (!tenantId) return;
     fetchProfessionals();
     fetchAllServices();
     // Fetch filter setting
     async function fetchFilter() {
-      if (!tenantId) return;
       const { data } = await supabase
         .from("work_settings")
         .select("show_professional_filter")
@@ -165,7 +169,8 @@ export function AdminProfessionals() {
         bio: editBio.trim() || null,
         instagram: editInstagram.trim() || null,
       })
-      .eq("id", editingProfessional.id);
+      .eq("id", editingProfessional.id)
+      .eq("tenant_id", tenantId);
 
     if (error) {
       logger.error("Error updating professional:", error);
@@ -176,7 +181,7 @@ export function AdminProfessionals() {
       });
     } else {
       // Save professional services
-      await supabase.from("professional_services").delete().eq("professional_id", editingProfessional.id);
+      await supabase.from("professional_services").delete().eq("professional_id", editingProfessional.id).eq("tenant_id", tenantId);
       if (selectedServiceIds.length > 0) {
         await supabase.from("professional_services").insert(
           selectedServiceIds.map(sid => ({ professional_id: editingProfessional.id, service_id: sid, tenant_id: tenantId }))
@@ -192,7 +197,8 @@ export function AdminProfessionals() {
     const { error } = await supabase
       .from("professionals")
       .update({ active: !currentActive })
-      .eq("id", id);
+      .eq("id", id)
+      .eq("tenant_id", tenantId);
 
     if (error) {
       logger.error("Error toggling professional:", error);
@@ -207,7 +213,8 @@ export function AdminProfessionals() {
     const { error } = await supabase
       .from("professionals")
       .delete()
-      .eq("id", deleteId);
+      .eq("id", deleteId)
+      .eq("tenant_id", tenantId);
 
     if (error) {
       logger.error("Error deleting professional:", error);
@@ -264,7 +271,8 @@ export function AdminProfessionals() {
       const { error: updateError } = await supabase
         .from("professionals")
         .update({ photo_url: photoUrl })
-        .eq("id", profId);
+        .eq("id", profId)
+        .eq("tenant_id", tenantId);
 
       if (updateError) throw updateError;
 

@@ -85,9 +85,11 @@ export function AdminServices() {
   const { tenantId } = useTenant();
 
   const fetchServices = async () => {
+    if (!tenantId) return;
     const { data, error } = await supabase
       .from("services")
       .select("*")
+      .eq("tenant_id", tenantId)
       .order("created_at", { ascending: true });
 
     if (error) {
@@ -99,8 +101,9 @@ export function AdminServices() {
   };
 
   useEffect(() => {
+    if (!tenantId) return;
     fetchServices();
-  }, []);
+  }, [tenantId]);
 
   const openAddDialog = () => {
     setEditingService(null);
@@ -212,7 +215,8 @@ export function AdminServices() {
       const { error } = await supabase
         .from("services")
         .update(payload)
-        .eq("id", editingService.id);
+        .eq("id", editingService.id)
+        .eq("tenant_id", tenantId);
 
       if (error) {
         logger.error("Error updating service:", error);
@@ -240,7 +244,8 @@ export function AdminServices() {
     const { error } = await supabase
       .from("services")
       .update({ active: !currentActive })
-      .eq("id", id);
+      .eq("id", id)
+      .eq("tenant_id", tenantId);
 
     if (error) {
       logger.error("Error toggling service:", error);
@@ -252,7 +257,7 @@ export function AdminServices() {
   const handleDelete = async () => {
     if (!deleteId) return;
 
-    const { error } = await supabase.from("services").delete().eq("id", deleteId);
+    const { error } = await supabase.from("services").delete().eq("id", deleteId).eq("tenant_id", tenantId);
 
     if (error) {
       logger.error("Error deleting service:", error);

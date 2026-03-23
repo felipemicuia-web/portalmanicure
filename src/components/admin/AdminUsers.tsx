@@ -72,7 +72,8 @@ export function AdminUsers() {
     const { error } = await supabase
       .from("profiles")
       .update({ blocked: newBlocked })
-      .eq("id", profile.id);
+      .eq("id", profile.id)
+      .eq("tenant_id", tenantId);
 
     if (error) {
       toast({ title: "Erro", description: error.message, variant: "destructive" });

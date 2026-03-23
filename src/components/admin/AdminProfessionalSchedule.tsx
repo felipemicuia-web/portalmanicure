@@ -64,8 +64,9 @@ export function AdminProfessionalSchedule() {
   const { toast } = useToast();
 
   useEffect(() => {
+    if (!tenantId) return;
     fetchProfessionals();
-  }, []);
+  }, [tenantId]);
 
   useEffect(() => {
     if (selectedProfessionalId) {
@@ -79,11 +80,13 @@ export function AdminProfessionalSchedule() {
   }, [selectedProfessionalId, professionals]);
 
   async function fetchProfessionals() {
+    if (!tenantId) return;
     setLoading(true);
     const { data, error } = await supabase
       .from("professionals")
       .select("id, name, working_days")
       .eq("active", true)
+      .eq("tenant_id", tenantId)
       .order("name");
 
     if (error) {
@@ -98,12 +101,13 @@ export function AdminProfessionalSchedule() {
   }
 
   async function fetchBlockedDates() {
-    if (!selectedProfessionalId) return;
+    if (!selectedProfessionalId || !tenantId) return;
     
     const { data, error } = await supabase
       .from("professional_blocked_dates")
       .select("*")
       .eq("professional_id", selectedProfessionalId)
+      .eq("tenant_id", tenantId)
       .gte("blocked_date", new Date().toISOString().split("T")[0])
       .order("blocked_date");
 
@@ -124,7 +128,8 @@ export function AdminProfessionalSchedule() {
       .update({ 
         working_days: useCustomDays ? customWorkingDays : null 
       })
-      .eq("id", selectedProfessionalId);
+      .eq("id", selectedProfessionalId)
+      .eq("tenant_id", tenantId);
 
     setSaving(false);
 
@@ -188,7 +193,8 @@ export function AdminProfessionalSchedule() {
     const { error } = await supabase
       .from("professional_blocked_dates")
       .delete()
-      .eq("id", id);
+      .eq("id", id)
+      .eq("tenant_id", tenantId);
 
     if (error) {
       console.error("Error removing blocked date:", error);

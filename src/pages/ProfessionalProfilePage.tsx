@@ -5,6 +5,7 @@ import { User } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
 import { logger } from "@/lib/logger";
 import { useTenantPath } from "@/contexts/TenantScopeProvider";
+import { useTenant } from "@/contexts/TenantContext";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { 
@@ -57,6 +58,7 @@ export default function ProfessionalProfilePage() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const tp = useTenantPath();
+  const { tenantId } = useTenant();
   
   const [user, setUser] = useState<User | null>(null);
   const { isAdmin } = useAdmin(user);
@@ -110,11 +112,12 @@ export default function ProfessionalProfilePage() {
         
         setServices(servicesData || []);
       } else {
-        // If no specific services, show all active services
+        // If no specific services, show all active services for this tenant
         const { data: allServices } = await supabase
           .from("services")
           .select("*")
-          .eq("active", true);
+          .eq("active", true)
+          .eq("tenant_id", tenantId!);
         
         setServices(allServices || []);
       }
