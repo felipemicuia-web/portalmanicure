@@ -81,11 +81,13 @@ export function ProfessionalGallery({ professionalId, user, isAdmin }: Professio
   const selectedPhoto = selectedIndex >= 0 ? photos[selectedIndex] : null;
 
   const fetchPhotos = async () => {
+    if (!tenantId) return;
     setLoading(true);
     const { data, error } = await supabase
       .from("professional_photos")
       .select("*")
       .eq("professional_id", professionalId)
+      .eq("tenant_id", tenantId)
       .order("created_at", { ascending: false });
 
     if (error) {
@@ -101,7 +103,8 @@ export function ProfessionalGallery({ professionalId, user, isAdmin }: Professio
           const { count } = await supabase
             .from("photo_likes")
             .select("*", { count: "exact", head: true })
-            .eq("photo_id", photo.id);
+            .eq("photo_id", photo.id)
+            .eq("tenant_id", tenantId);
 
           counts[photo.id] = count || 0;
 
@@ -111,6 +114,7 @@ export function ProfessionalGallery({ professionalId, user, isAdmin }: Professio
               .select("id")
               .eq("photo_id", photo.id)
               .eq("user_id", user.id)
+              .eq("tenant_id", tenantId)
               .maybeSingle();
 
             likes[photo.id] = !!likeData;
