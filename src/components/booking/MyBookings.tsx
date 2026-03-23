@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { logger } from "@/lib/logger";
@@ -6,8 +6,9 @@ import { formatDateWeekdayBR, formatDateBR } from "@/lib/dateFormat";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useAvailableTimes } from "@/hooks/useBookingData";
 import { useTenant } from "@/contexts/TenantContext";
-import { Calendar, Clock, User as UserIcon, Pencil, Trash2, RefreshCw } from "lucide-react";
+import { Calendar, Clock, User as UserIcon, Pencil, Trash2, RefreshCw, Filter, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
