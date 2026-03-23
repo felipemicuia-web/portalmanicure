@@ -181,7 +181,7 @@ export function AdminProfessionals() {
       });
     } else {
       // Save professional services
-      await supabase.from("professional_services").delete().eq("professional_id", editingProfessional.id);
+      await supabase.from("professional_services").delete().eq("professional_id", editingProfessional.id).eq("tenant_id", tenantId);
       if (selectedServiceIds.length > 0) {
         await supabase.from("professional_services").insert(
           selectedServiceIds.map(sid => ({ professional_id: editingProfessional.id, service_id: sid, tenant_id: tenantId }))
