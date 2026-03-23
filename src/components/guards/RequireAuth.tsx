@@ -14,7 +14,7 @@ interface RequireAuthProps {
 }
 
 export function RequireAuth({ children, fallbackPath, skipTenantCheck = false }: RequireAuthProps) {
-  const { user, loading, hasTenantProfile, checkingTenantProfile } = useAuth();
+  const { user, loading, hasTenantProfile, checkingTenantProfile, signOut } = useAuth();
   const { tenantId, loading: tenantLoading } = useTenant();
   const navigate = useNavigate();
   const tp = useTenantPath();
