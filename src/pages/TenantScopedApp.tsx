@@ -6,6 +6,7 @@ import BookingPage from "./BookingPage";
 import Auth from "./Auth";
 import AdminPage from "./AdminPage";
 import ProfessionalProfilePage from "./ProfessionalProfilePage";
+import ProfessionalAgendaPage from "./ProfessionalAgendaPage";
 
 /**
  * All routes under /tenant/:slug/* are wrapped with TenantScopeProvider.
