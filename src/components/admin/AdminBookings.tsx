@@ -68,7 +68,9 @@ export function AdminBookings() {
   const [loading, setLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [filterProfessional, setFilterProfessional] = useState<string>("all");
+  const [filterDate, setFilterDate] = useState<string>("");
   const [activeTab, setActiveTab] = useState("active");
+  const isMobile = useIsMobile();
   const isMobile = useIsMobile();
 
   // Edit state
