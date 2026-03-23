@@ -100,15 +100,17 @@ export function MyBookings({ user }: Props) {
   );
 
   const fetchData = async () => {
+    if (!tenantId) return;
     setLoading(true);
     const [bookingsRes, professionalsRes] = await Promise.all([
       supabase
         .from("bookings")
         .select("*")
         .eq("user_id", user.id)
+        .eq("tenant_id", tenantId)
         .order("booking_date", { ascending: true })
         .order("booking_time", { ascending: true }),
-      supabase.from("professionals").select("id, name"),
+      supabase.from("professionals").select("id, name").eq("tenant_id", tenantId),
     ]);
 
     if (bookingsRes.error) {
