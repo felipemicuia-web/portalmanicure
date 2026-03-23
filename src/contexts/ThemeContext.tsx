@@ -162,8 +162,14 @@ export function useThemeContext() {
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [currentThemeId, setCurrentThemeId] = useState("galaxy");
   const [loading, setLoading] = useState(true);
-   const { tenantId, isSuperAdmin, loading: tenantLoading } = useTenant();
-   const canEditTheme = !!tenantId && !isSuperAdmin;
+  const { tenantId, isSuperAdmin, loading: tenantLoading } = useTenant();
+  const canEditTheme = !!tenantId && !isSuperAdmin;
+  const currentThemeIdRef = useRef(currentThemeId);
+
+  // Keep ref in sync
+  useEffect(() => {
+    currentThemeIdRef.current = currentThemeId;
+  }, [currentThemeId]);
 
   // Apply theme by id — localStorage keys are now tenant-scoped
   const applyById = useCallback((id: string, tid?: string) => {
@@ -223,7 +229,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     };
   }, [tenantId, tenantLoading, applyById]);
 
-  // Subscribe to realtime changes
+  // Subscribe to realtime changes — stable deps, use ref for currentThemeId
   useEffect(() => {
     if (tenantLoading || !tenantId) return;
 
@@ -239,7 +245,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         },
         (payload) => {
           const newThemeId = (payload.new as any)?.theme_id;
-          if (newThemeId && newThemeId !== currentThemeId) {
+          if (newThemeId && newThemeId !== currentThemeIdRef.current) {
             applyById(newThemeId, tenantId);
           }
         }
@@ -249,7 +255,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [tenantId, tenantLoading, applyById, currentThemeId]);
+  }, [tenantId, tenantLoading, applyById]);
 
   // Save theme to DB (admin action)
   const setTheme = useCallback(
