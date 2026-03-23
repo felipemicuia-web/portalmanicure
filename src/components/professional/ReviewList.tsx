@@ -36,14 +36,19 @@ interface ReviewListProps {
 
 export function ReviewList({ reviews, currentUserId, isAdmin, onReviewDeleted }: ReviewListProps) {
   const { toast } = useToast();
+  const { tenantId } = useTenant();
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
 
   const handleDelete = async () => {
-    if (!deleteTarget) return;
+    if (!deleteTarget || !tenantId) return;
     setDeleting(true);
 
-    const { error } = await supabase.from("reviews").delete().eq("id", deleteTarget);
+    const { error } = await supabase
+      .from("reviews")
+      .delete()
+      .eq("id", deleteTarget)
+      .eq("tenant_id", tenantId);
 
     if (error) {
       toast({ title: "Erro", description: "Não foi possível excluir a avaliação.", variant: "destructive" });

@@ -346,6 +346,7 @@ export default function BookingPage() {
         .select("booking_time, duration_minutes")
         .eq("professional_id", professionalId)
         .eq("booking_date", selectedDate)
+        .eq("tenant_id", tenantId!)
         .neq("status", "cancelled");
 
       const toMin = (t: string) => { const [h, m] = t.split(":").map(Number); return h * 60 + m; };

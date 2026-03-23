@@ -173,30 +173,32 @@ export default function ProfessionalProfilePage() {
 
   // Check if user can review (has a completed booking with this professional)
   const checkCanReview = useCallback(async () => {
-    if (!user || !id) {
+    if (!user || !id || !tenantId) {
       setCanReview(false);
       return;
     }
 
-    // Check if user has a booking with this professional
+    // Check if user has a booking with this professional in this tenant
     const { data: bookings } = await supabase
       .from("bookings")
       .select("id")
       .eq("user_id", user.id)
       .eq("professional_id", id)
+      .eq("tenant_id", tenantId)
       .limit(1);
 
-    // Check if user already reviewed this professional
+    // Check if user already reviewed this professional in this tenant
     const { data: existingReview } = await supabase
       .from("reviews")
       .select("id")
       .eq("user_id", user.id)
       .eq("professional_id", id)
+      .eq("tenant_id", tenantId)
       .is("booking_id", null)
       .limit(1);
 
     setCanReview(bookings && bookings.length > 0 && (!existingReview || existingReview.length === 0));
-  }, [user, id]);
+  }, [user, id, tenantId]);
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {

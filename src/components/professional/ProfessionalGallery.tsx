@@ -253,7 +253,8 @@ export function ProfessionalGallery({ professionalId, user, isAdmin }: Professio
       const { error } = await supabase
         .from("photo_comments")
         .delete()
-        .eq("id", deleteCommentTarget);
+        .eq("id", deleteCommentTarget)
+        .eq("tenant_id", tenantId!);
 
       if (error) throw error;
 

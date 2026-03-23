@@ -63,12 +63,13 @@ export function FollowButton({
 
     try {
       if (isFollowing) {
-        // Unfollow
+        // Unfollow — scoped to tenant
         const { error } = await supabase
           .from("followers")
           .delete()
           .eq("user_id", user.id)
-          .eq("professional_id", professionalId);
+          .eq("professional_id", professionalId)
+          .eq("tenant_id", tenantId!);
 
         if (error) throw error;
 
