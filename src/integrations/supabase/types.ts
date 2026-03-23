@@ -797,6 +797,7 @@ export type Database = {
           active: boolean
           bio: string | null
           created_at: string
+          email: string | null
           id: string
           instagram: string | null
           name: string
@@ -809,6 +810,7 @@ export type Database = {
           active?: boolean
           bio?: string | null
           created_at?: string
+          email?: string | null
           id?: string
           instagram?: string | null
           name: string
@@ -821,6 +823,7 @@ export type Database = {
           active?: boolean
           bio?: string | null
           created_at?: string
+          email?: string | null
           id?: string
           instagram?: string | null
           name?: string
@@ -1268,6 +1271,10 @@ export type Database = {
       get_platform_stats: { Args: never; Returns: Json }
       get_platform_tenant_growth: { Args: never; Returns: Json }
       get_platform_tenant_list: { Args: never; Returns: Json }
+      get_professional_by_user_email: {
+        Args: { p_tenant_id: string; p_user_email: string }
+        Returns: string
+      }
       get_public_gallery_photos: {
         Args: { limit_count?: number }
         Returns: {
