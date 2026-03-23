@@ -1,10 +1,11 @@
 import { Link } from "react-router-dom";
 import { User } from "@supabase/supabase-js";
-import { LogOut, User as UserIcon, Shield, Menu, X, Calendar, CalendarCheck } from "lucide-react";
+import { LogOut, User as UserIcon, Shield, Menu, X, Calendar, CalendarCheck, CalendarDays } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAdmin } from "@/hooks/useAdmin";
 import { useBranding } from "@/hooks/useBranding";
 import { useTenantPath } from "@/contexts/TenantScopeProvider";
+import { useLinkedProfessional } from "@/hooks/useLinkedProfessional";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 
