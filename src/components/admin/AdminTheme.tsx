@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Palette, Check, RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTenant } from "@/contexts/TenantContext";
 import { useThemeContext, themePresets, ThemePreset } from "@/contexts/ThemeContext";
 
 function ThemeCard({
@@ -52,10 +53,19 @@ function ThemeCard({
 }
 
 export function AdminTheme() {
-  const { currentThemeId, setTheme } = useThemeContext();
+  const { currentThemeId, setTheme, canEditTheme } = useThemeContext();
+  const { isSuperAdmin } = useTenant();
   const { toast } = useToast();
 
   const handleSelectTheme = async (preset: ThemePreset) => {
+    if (!canEditTheme) {
+      toast({
+        title: "Alteração bloqueada",
+        description: "Contas superadmin não podem alterar o tema dos tenants.",
+      });
+      return;
+    }
+
     await setTheme(preset.id);
     toast({
       title: "Tema aplicado!",
@@ -64,6 +74,14 @@ export function AdminTheme() {
   };
 
   const handleReset = async () => {
+    if (!canEditTheme) {
+      toast({
+        title: "Alteração bloqueada",
+        description: "Contas superadmin não podem alterar o tema dos tenants.",
+      });
+      return;
+    }
+
     const defaultPreset = themePresets[0];
     await setTheme(defaultPreset.id);
     toast({
@@ -81,11 +99,13 @@ export function AdminTheme() {
             <div>
               <h2 className="text-xl font-bold">Escolha o Estilo do Site</h2>
               <p className="text-muted-foreground text-sm">
-                Clique em um tema para aplicar instantaneamente para todos
+                {isSuperAdmin
+                  ? "Conta superadmin não pode alterar o tema dos tenants"
+                  : "Clique em um tema para aplicar instantaneamente para todos"}
               </p>
             </div>
           </div>
-          <Button variant="ghost" onClick={handleReset} className="gap-2 text-muted-foreground">
+          <Button variant="ghost" onClick={handleReset} disabled={!canEditTheme} className="gap-2 text-muted-foreground disabled:opacity-50">
             <RotateCcw className="w-4 h-4" />
             Restaurar Padrão
           </Button>

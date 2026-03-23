@@ -145,12 +145,14 @@ interface ThemeContextType {
   currentThemeId: string;
   loading: boolean;
   setTheme: (themeId: string) => Promise<void>;
+  canEditTheme: boolean;
 }
 
 const ThemeContext = createContext<ThemeContextType>({
   currentThemeId: "galaxy",
   loading: true,
   setTheme: async () => {},
+  canEditTheme: false,
 });
 
 export function useThemeContext() {
@@ -160,7 +162,8 @@ export function useThemeContext() {
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [currentThemeId, setCurrentThemeId] = useState("galaxy");
   const [loading, setLoading] = useState(true);
-  const { tenantId, loading: tenantLoading } = useTenant();
+   const { tenantId, isSuperAdmin, loading: tenantLoading } = useTenant();
+   const canEditTheme = !!tenantId && !isSuperAdmin;
 
   // Apply theme by id — localStorage keys are now tenant-scoped
   const applyById = useCallback((id: string, tid?: string) => {
@@ -251,7 +254,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   // Save theme to DB (admin action)
   const setTheme = useCallback(
     async (themeId: string) => {
-      if (!tenantId) return;
+      if (!tenantId || isSuperAdmin) return;
       applyById(themeId, tenantId);
 
       await supabase
@@ -259,11 +262,11 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         .update({ theme_id: themeId })
         .eq("tenant_id", tenantId);
     },
-    [tenantId, applyById]
+    [tenantId, isSuperAdmin, applyById]
   );
 
   return (
-    <ThemeContext.Provider value={{ currentThemeId, loading, setTheme }}>
+    <ThemeContext.Provider value={{ currentThemeId, loading, setTheme, canEditTheme }}>
       {children}
     </ThemeContext.Provider>
   );
