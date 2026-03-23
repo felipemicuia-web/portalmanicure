@@ -162,21 +162,32 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const { tenantId, loading: tenantLoading } = useTenant();
 
-  // Apply theme by id
-  const applyById = useCallback((id: string) => {
+  // Apply theme by id — localStorage keys are now tenant-scoped
+  const applyById = useCallback((id: string, tid?: string) => {
     const preset = getPresetById(id);
     setCurrentThemeId(preset.id);
     applyThemeToDOM(preset.colors);
-    // Keep localStorage in sync for fast initial paint
+    // Scope localStorage by tenant to prevent cross-tenant contamination
+    const scopeKey = tid || tenantId || "global";
+    localStorage.setItem(`site-theme-id-${scopeKey}`, preset.id);
+    // Keep a "current" key for ThemedBackground (overwritten on every tenant switch)
     localStorage.setItem("site-theme-id", preset.id);
-    localStorage.setItem("site-theme-colors", JSON.stringify(preset.colors));
-  }, []);
+  }, [tenantId]);
 
   // Load initial theme from DB
   useEffect(() => {
     if (tenantLoading || !tenantId) return;
 
     async function loadTheme() {
+      // First try tenant-scoped localStorage for instant paint
+      const cached = localStorage.getItem(`site-theme-id-${tenantId}`);
+      if (cached) {
+        const preset = getPresetById(cached);
+        setCurrentThemeId(preset.id);
+        applyThemeToDOM(preset.colors);
+        localStorage.setItem("site-theme-id", preset.id);
+      }
+
       const { data } = await supabase
         .from("work_settings")
         .select("theme_id")
@@ -185,7 +196,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         .single();
 
       if (data?.theme_id) {
-        applyById(data.theme_id);
+        applyById(data.theme_id, tenantId);
       }
       setLoading(false);
     }
@@ -209,7 +220,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         (payload) => {
           const newThemeId = (payload.new as any)?.theme_id;
           if (newThemeId && newThemeId !== currentThemeId) {
-            applyById(newThemeId);
+            applyById(newThemeId, tenantId);
           }
         }
       )
@@ -224,8 +235,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const setTheme = useCallback(
     async (themeId: string) => {
       if (!tenantId) return;
-      // Optimistic: apply immediately
-      applyById(themeId);
+      applyById(themeId, tenantId);
 
       await supabase
         .from("work_settings")
