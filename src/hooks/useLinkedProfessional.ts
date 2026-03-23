@@ -9,12 +9,17 @@ import { useAuth } from "@/contexts/AuthContext";
  * Returns the professional_id if linked, null otherwise.
  */
 export function useLinkedProfessional() {
-  const { user } = useAuth();
-  const { tenantId } = useTenant();
+  const { user, loading: authLoading } = useAuth();
+  const { tenantId, loading: tenantLoading } = useTenant();
   const [professionalId, setProfessionalId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Wait for both auth and tenant to finish loading
+    if (authLoading || tenantLoading) {
+      return;
+    }
+
     if (!user?.email || !tenantId) {
       setProfessionalId(null);
       setLoading(false);
@@ -28,11 +33,10 @@ export function useLinkedProfessional() {
         p_tenant_id: tenantId,
       })
       .then(({ data, error }) => {
-        console.log("[useLinkedProfessional] email:", user.email, "tenantId:", tenantId, "data:", data, "error:", error);
         setProfessionalId(!error && data ? data : null);
         setLoading(false);
       });
-  }, [user?.email, tenantId]);
+  }, [user?.email, tenantId, authLoading, tenantLoading]);
 
   return { professionalId, isProfessional: !!professionalId, loading };
 }
