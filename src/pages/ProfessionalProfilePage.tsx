@@ -112,11 +112,12 @@ export default function ProfessionalProfilePage() {
         
         setServices(servicesData || []);
       } else {
-        // If no specific services, show all active services
+        // If no specific services, show all active services for this tenant
         const { data: allServices } = await supabase
           .from("services")
           .select("*")
-          .eq("active", true);
+          .eq("active", true)
+          .eq("tenant_id", tenantId!);
         
         setServices(allServices || []);
       }
