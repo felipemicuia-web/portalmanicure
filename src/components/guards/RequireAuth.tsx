@@ -67,7 +67,6 @@ export function RequireAuth({ children, fallbackPath, skipTenantCheck = false }:
               Cadastrar neste estabelecimento
             </Button>
             <Button variant="ghost" onClick={async () => {
-              const { signOut } = useAuth();
               await signOut();
               navigate(authPath);
             }}>
