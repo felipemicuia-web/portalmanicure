@@ -16,13 +16,16 @@ export function useAdmin(user: User | null) {
         return;
       }
 
-      // Check if user is tenant admin via is_tenant_admin function
-      const { data, error } = await supabase.rpc("is_tenant_admin", {
-        _user_id: user.id,
-        _tenant_id: tenantId,
-      });
+      // Check tenant admin OR superadmin in parallel
+      const [adminRes, superRes] = await Promise.all([
+        supabase.rpc("is_tenant_admin", {
+          _user_id: user.id,
+          _tenant_id: tenantId,
+        }),
+        supabase.rpc("is_superadmin", { _user_id: user.id }),
+      ]);
 
-      setIsAdmin(!error && !!data);
+      setIsAdmin((!adminRes.error && !!adminRes.data) || (!superRes.error && !!superRes.data));
       setLoading(false);
     }
 
