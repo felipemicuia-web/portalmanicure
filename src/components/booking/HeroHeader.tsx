@@ -1,13 +1,16 @@
 import { Link } from "react-router-dom";
 import { User } from "@supabase/supabase-js";
-import { LogOut, User as UserIcon, Shield, Menu, X, Calendar, CalendarCheck, Globe } from "lucide-react";
+import { LogOut, User as UserIcon, Shield, Menu, X, Calendar, CalendarCheck, Globe, CalendarDays } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAdmin } from "@/hooks/useAdmin";
 import { useSuperAdmin } from "@/hooks/useSuperAdmin";
 import { useBranding } from "@/hooks/useBranding";
 import { useTenantPath } from "@/contexts/TenantScopeProvider";
+import { useLinkedProfessional } from "@/hooks/useLinkedProfessional";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import { useTenant } from "@/contexts/TenantContext";
+import { logger } from "@/lib/logger";
 
 function loadHeroFont(fontName: string) {
   const fontSlug = fontName.replace(/ /g, "+");
@@ -31,12 +34,34 @@ export function HeroHeader({ user, activePage, onPageChange, onLogout }: HeroHea
   const { branding } = useBranding();
   const { isAdmin } = useAdmin(user);
   const { isSuperAdmin } = useSuperAdmin(user);
+  const { isProfessional, professionalId, loading: professionalLoading } = useLinkedProfessional();
+  const { tenantId, membershipRole } = useTenant();
   const tp = useTenantPath();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     if (branding.heroFont) loadHeroFont(branding.heroFont);
   }, [branding.heroFont]);
+
+  useEffect(() => {
+    if (!user) return;
+
+    logger.info("[HeroHeader] Professional menu resolution", {
+      authEmail: user.email?.trim().toLowerCase() || null,
+      tenantId,
+      professionalId,
+      isProfessional,
+      professionalLoading,
+      membershipRole,
+      isAdmin,
+      isSuperAdmin,
+      professionalMenuReason: professionalLoading
+        ? "professional context still loading"
+        : isProfessional
+          ? "professional agenda menu enabled"
+          : "professional agenda menu hidden because no linked professional was resolved for current tenant",
+    });
+  }, [user, tenantId, professionalId, isProfessional, professionalLoading, membershipRole, isAdmin, isSuperAdmin]);
 
   const handlePageChange = (page: "booking" | "profile" | "my-bookings") => {
     onPageChange(page);
@@ -105,6 +130,18 @@ export function HeroHeader({ user, activePage, onPageChange, onLogout }: HeroHea
               >
                 Meus Agendamentos
               </button>
+              {isProfessional && (
+                <Link to={tp("/my-agenda")}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="gap-1.5 text-white/80 hover:text-white hover:bg-white/10 border border-primary/30"
+                  >
+                    <CalendarDays className="w-4 h-4" />
+                    Minha Agenda
+                  </Button>
+                </Link>
+              )}
               {isAdmin && (
                 <Link to={tp("/admin")}>
                   <Button
@@ -214,6 +251,16 @@ export function HeroHeader({ user, activePage, onPageChange, onLogout }: HeroHea
             <CalendarCheck className="w-5 h-5" />
             <span>Meus Agendamentos</span>
           </button>
+          {isProfessional && (
+            <Link
+              to={tp("/my-agenda")}
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center gap-3 px-3 py-3 rounded-xl text-white/80 hover:bg-white/10 transition-all"
+            >
+              <CalendarDays className="w-5 h-5" />
+              <span>Minha Agenda</span>
+            </Link>
+          )}
           {isAdmin && (
             <Link
               to={tp("/admin")}

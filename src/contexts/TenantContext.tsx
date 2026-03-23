@@ -122,6 +122,11 @@ export function TenantProvider({ children }: { children: ReactNode }) {
         userId,
         membershipRole: nextRole,
         isSuperAdmin: nextIsSuperAdmin,
+        accessReason: nextRole
+          ? "membership role loaded for tenant"
+          : nextIsSuperAdmin
+            ? "superadmin access loaded"
+            : "no tenant membership role found for current user",
       });
     }
 

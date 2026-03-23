@@ -8,11 +8,13 @@ import { ProfessionalAgenda } from "@/components/professional/ProfessionalAgenda
 import { Button } from "@/components/ui/button";
 import { Shield, ArrowLeft, CalendarDays } from "lucide-react";
 import { logger } from "@/lib/logger";
+import { useTenant } from "@/contexts/TenantContext";
 
 export default function ProfessionalAgendaPage() {
   const [user, setUser] = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
   const { professionalId, isProfessional, loading } = useLinkedProfessional();
+  const { tenantId, membershipRole, isSuperAdmin } = useTenant();
   const navigate = useNavigate();
   const tp = useTenantPath();
 
@@ -38,6 +40,34 @@ export default function ProfessionalAgendaPage() {
     });
     return () => subscription.unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if (!user && !authLoading) {
+      logger.info("[ProfessionalAgendaPage] Access resolution", {
+        authEmail: null,
+        tenantId,
+        professionalId: null,
+        membershipRole,
+        isSuperAdmin,
+        reason: "no authenticated user",
+      });
+      return;
+    }
+
+    if (!user || authLoading || loading) return;
+
+    logger.info("[ProfessionalAgendaPage] Access resolution", {
+      authEmail: user.email?.trim().toLowerCase() || null,
+      tenantId,
+      professionalFound: isProfessional,
+      professionalId,
+      membershipRole,
+      isSuperAdmin,
+      reason: isProfessional
+        ? "linked professional can access dedicated agenda"
+        : "authenticated user has no linked professional in current tenant",
+    });
+  }, [user, authLoading, loading, tenantId, isProfessional, professionalId, membershipRole, isSuperAdmin]);
 
   if (authLoading || loading) {
     return (
