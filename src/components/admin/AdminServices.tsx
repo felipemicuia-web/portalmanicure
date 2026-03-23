@@ -543,7 +543,7 @@ export function AdminServices() {
             <DrawerHeader>
               <DrawerTitle>{editingService ? "Editar Serviço" : "Novo Serviço"}</DrawerTitle>
             </DrawerHeader>
-            <div className="px-4 pb-4 max-h-[60vh] overflow-y-auto">
+            <div className="px-4 pb-4">
               {formContent}
             </div>
             <DrawerFooter className="pt-2">

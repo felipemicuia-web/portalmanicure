@@ -772,7 +772,7 @@ export function AdminBookings() {
               <DrawerTitle>Editar Agendamento</DrawerTitle>
               <DrawerDescription>Altere as informações do agendamento.</DrawerDescription>
             </DrawerHeader>
-            <div className="px-4 pb-4 max-h-[60vh] overflow-y-auto"><EditFormContent /></div>
+            <div className="px-4 pb-4"><EditFormContent /></div>
             <DrawerFooter className="pt-2">
               <Button onClick={handleSaveEdit} disabled={saving}>{saving ? "Salvando..." : "Salvar"}</Button>
               <DrawerClose asChild><Button variant="outline">Cancelar</Button></DrawerClose>
