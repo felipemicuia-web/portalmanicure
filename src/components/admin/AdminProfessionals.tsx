@@ -395,6 +395,20 @@ export function AdminProfessionals() {
           placeholder="@usuario (sem @)"
         />
       </div>
+      <div className="space-y-2">
+        <Label className="flex items-center gap-1.5">
+          <Mail className="w-4 h-4" />
+          E-mail de acesso
+        </Label>
+        <Input
+          type="email"
+          value={editEmail}
+          onChange={(e) => setEditEmail(e.target.value)}
+          placeholder="profissional@email.com (opcional)"
+        />
+        <p className="text-xs text-muted-foreground">
+          Vincule um e-mail para que o profissional acesse sua própria agenda.
+        </p>
       {allServices.length > 0 && (
         <div className="space-y-2">
           <Label className="flex items-center gap-1.5">
