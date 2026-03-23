@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Plus, Pencil, Trash2, Check, X, Users, Upload, User, Image as ImageIcon, Sparkles } from "lucide-react";
+import { Plus, Pencil, Trash2, Check, X, Users, Upload, User, Image as ImageIcon, Sparkles, Mail } from "lucide-react";
 import {
   Table,
   TableBody,
