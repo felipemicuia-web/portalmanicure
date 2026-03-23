@@ -23,6 +23,7 @@ export default function TenantScopedApp() {
           <Route path="auth" element={<Auth />} />
           <Route path="admin" element={<AdminPage />} />
           <Route path="professional/:id" element={<ProfessionalProfilePage />} />
+          <Route path="my-agenda" element={<ProfessionalAgendaPage />} />
         </Routes>
       </ThemeProvider>
     </TenantScopeProvider>

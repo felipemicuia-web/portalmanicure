@@ -76,6 +76,15 @@ const App = () => (
                     </ThemeProvider>
                   }
                 />
+                <Route
+                  path="/my-agenda"
+                  element={
+                    <ThemeProvider>
+                      <ThemedBackground />
+                      <ProfessionalAgendaPage />
+                    </ThemeProvider>
+                  }
+                />
                 {/* Tenant-scoped routes: ThemeProvider is inside TenantScopedApp,
                     nested under TenantScopeProvider, so it reads the correct tenant's theme */}
                 <Route path="/tenant/:slug/*" element={<TenantScopedApp />} />
