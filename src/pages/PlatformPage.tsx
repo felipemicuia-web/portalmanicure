@@ -20,6 +20,7 @@ import {
   BarChart3,
   Crown,
   DollarSign,
+  LayoutDashboard,
   type LucideIcon,
 } from "lucide-react";
 
