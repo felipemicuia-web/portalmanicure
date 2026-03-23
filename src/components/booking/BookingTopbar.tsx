@@ -126,6 +126,18 @@ export function BookingTopbar({
                   >
                     Meus Agendamentos
                   </button>
+                  {isProfessional && (
+                    <Link to={tp("/my-agenda")}>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="gap-1.5 text-white/80 hover:text-white hover:bg-white/10 border border-primary/30"
+                      >
+                        <CalendarDays className="w-4 h-4" />
+                        Minha Agenda
+                      </Button>
+                    </Link>
+                  )}
                   {isAdmin && (
                     <Link to={tp("/admin")}>
                       <Button
