@@ -28,6 +28,7 @@ export function useLinkedProfessional() {
         p_tenant_id: tenantId,
       })
       .then(({ data, error }) => {
+        console.log("[useLinkedProfessional] email:", user.email, "tenantId:", tenantId, "data:", data, "error:", error);
         setProfessionalId(!error && data ? data : null);
         setLoading(false);
       });
