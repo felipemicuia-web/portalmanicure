@@ -162,6 +162,7 @@ export default function PlatformPage() {
           <main className="p-4 sm:p-6 max-w-6xl">
             {activeTab === "overview" && <PlatformOverview onSelectTenant={handleSelectTenantFromOverview} />}
             {activeTab === "tenants" && <PlatformTenants />}
+            {activeTab === "dashboards" && <PlatformTenantDashboards />}
             {activeTab === "users" && <PlatformUsers />}
             {activeTab === "insights" && <PlatformInsights />}
             {activeTab === "plans" && <PlatformPlans />}
