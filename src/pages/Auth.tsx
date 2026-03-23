@@ -54,7 +54,7 @@ const Auth = () => {
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (!session?.user || !tenantId) return;
-      if (event !== "SIGNED_IN") return; // Only act on explicit sign-in
+      if (event !== "SIGNED_IN") return;
 
       const userId = session.user.id;
 
@@ -68,8 +68,8 @@ const Auth = () => {
         return;
       }
 
-      if (mode === "link-account") {
-        // User confirmed they want to link their existing account to this tenant
+      // For signup and link-account modes, create the profile
+      if (mode === "signup" || mode === "link-account") {
         const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
         const { error: profileError } = await supabase.from("profiles").insert({
           user_id: userId,
@@ -82,14 +82,19 @@ const Auth = () => {
           console.error("Error creating tenant profile:", profileError);
           toast({
             title: "Erro",
-            description: "Não foi possível vincular sua conta a este estabelecimento.",
+            description: "Não foi possível criar seu perfil neste estabelecimento.",
             variant: "destructive",
           });
           await supabase.auth.signOut();
           return;
         }
 
-        toast({ title: "Conta vinculada!", description: `Sua conta foi vinculada a ${tenantName || "este estabelecimento"}.` });
+        toast({
+          title: mode === "signup" ? "Conta criada!" : "Conta vinculada!",
+          description: mode === "signup"
+            ? "Bem-vindo! Sua conta foi criada com sucesso."
+            : `Sua conta foi vinculada a ${tenantName || "este estabelecimento"}.`,
+        });
         navigate(redirectTo);
         return;
       }
