@@ -27,6 +27,7 @@ import {
 const MENU_ITEMS: { value: string; label: string; icon: LucideIcon }[] = [
   { value: "overview", label: "Visão Geral", icon: BarChart3 },
   { value: "tenants", label: "Tenants", icon: Building2 },
+  { value: "dashboards", label: "Dashboards", icon: LayoutDashboard },
   { value: "users", label: "Usuários", icon: Users },
   { value: "insights", label: "Valores e Insights", icon: DollarSign },
   { value: "plans", label: "Planos", icon: Crown },
