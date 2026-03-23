@@ -69,11 +69,11 @@ export function TenantProvider({ children }: { children: ReactNode }) {
         }
         const { data, error } = await query;
         if (error || !data) {
-          // No silent fallback — tenant stays null, components must handle this
-          logger.error("Tenant not found for slug:", slug);
-          setTenantId(null);
-          setTenantSlug(null);
-          setTenantName(null);
+          // Fallback to default tenant
+          logger.warn("Tenant not found for slug:", slug, "— falling back to default");
+          setTenantId(TENANT_DEFAULT_ID);
+          setTenantSlug(TENANT_DEFAULT_SLUG);
+          setTenantName(TENANT_DEFAULT_NAME);
         } else {
           setTenantId(data.id);
           setTenantSlug(data.slug);
@@ -81,9 +81,9 @@ export function TenantProvider({ children }: { children: ReactNode }) {
         }
       } catch (err) {
         logger.error("Error resolving tenant:", err);
-        setTenantId(null);
-        setTenantSlug(null);
-        setTenantName(null);
+        setTenantId(TENANT_DEFAULT_ID);
+        setTenantSlug(TENANT_DEFAULT_SLUG);
+        setTenantName(TENANT_DEFAULT_NAME);
       } finally {
         setLoading(false);
       }
