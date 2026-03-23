@@ -163,6 +163,12 @@ export function AdminProfessionals() {
   const handleEdit = async () => {
     if (!editingProfessional || !editName.trim()) return;
 
+    const emailValue = editEmail.trim() || null;
+    if (emailValue && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue)) {
+      toast({ title: "Erro", description: "E-mail inválido.", variant: "destructive" });
+      return;
+    }
+
     const { error } = await supabase
       .from("professionals")
       .update({ 
@@ -170,6 +176,7 @@ export function AdminProfessionals() {
         subtitle: editSubtitle.trim() || null,
         bio: editBio.trim() || null,
         instagram: editInstagram.trim() || null,
+        email: emailValue,
       })
       .eq("id", editingProfessional.id)
       .eq("tenant_id", tenantId);
