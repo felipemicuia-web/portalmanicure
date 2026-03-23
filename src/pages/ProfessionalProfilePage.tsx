@@ -5,6 +5,7 @@ import { User } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
 import { logger } from "@/lib/logger";
 import { useTenantPath } from "@/contexts/TenantScopeProvider";
+import { useTenant } from "@/contexts/TenantContext";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { 
