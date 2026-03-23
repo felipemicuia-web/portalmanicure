@@ -49,6 +49,7 @@ export function useAvailableTimes(
   const [times, setTimes] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const { settings: workSettings, loading: settingsLoading } = useWorkSettings();
+  const { tenantId } = useTenant();
   const [refreshKey, setRefreshKey] = useState(0);
 
   // Realtime subscription: refresh slots when bookings change for this professional+date
