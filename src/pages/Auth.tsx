@@ -207,21 +207,7 @@ const Auth = () => {
           }
         } else if (data.user) {
           if (data.session) {
-            // Auto-confirmed — create profile immediately
-            const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
-            const { error: profileError } = await supabase.from("profiles").insert({
-              user_id: data.user.id,
-              tenant_id: tenantId,
-              name: fullName,
-              phone: normalizePhone(phone),
-            });
-
-            if (profileError && !profileError.message.includes("duplicate")) {
-              console.error("Error creating tenant profile:", profileError);
-            }
-
-            toast({ title: "Conta criada!", description: "Bem-vindo! Sua conta foi criada com sucesso." });
-            // onAuthStateChange will navigate
+            // Auto-confirmed — onAuthStateChange will handle profile creation and navigation
           } else {
             toast({
               title: "Conta criada!",
