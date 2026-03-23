@@ -136,7 +136,7 @@ export function useAvailableTimes(
     }
 
     fetchTimes();
-  }, [professionalId, date, totalMinutes, workSettings, settingsLoading, refreshKey]);
+  }, [professionalId, date, totalMinutes, workSettings, settingsLoading, refreshKey, tenantId]);
 
   return { times, loading: loading || settingsLoading };
 }
