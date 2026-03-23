@@ -197,7 +197,8 @@ export function AdminProfessionals() {
     const { error } = await supabase
       .from("professionals")
       .update({ active: !currentActive })
-      .eq("id", id);
+      .eq("id", id)
+      .eq("tenant_id", tenantId);
 
     if (error) {
       logger.error("Error toggling professional:", error);
