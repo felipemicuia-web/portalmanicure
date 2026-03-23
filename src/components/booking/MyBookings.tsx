@@ -276,6 +276,24 @@ export function MyBookings({ user }: Props) {
     );
   }
 
+  // Separate bookings
+  const activeBookings = useMemo(() =>
+    bookings.filter((b) => b.status === "confirmed"),
+    [bookings]
+  );
+  const completedBookings = useMemo(() =>
+    bookings.filter((b) => b.status === "completed" || b.status === "cancelled"),
+    [bookings]
+  );
+
+  const applyDateFilter = (list: Booking[]) => {
+    if (!filterDate) return list;
+    return list.filter((b) => b.booking_date === filterDate);
+  };
+
+  const filteredActive = applyDateFilter(activeBookings);
+  const filteredCompleted = applyDateFilter(completedBookings);
+
   // Include the current booking time as an option (since it's already booked by this user)
   const allAvailableTimes = editingBooking
     ? [...new Set([editingBooking.booking_time.slice(0, 5), ...availableTimes])].sort()
