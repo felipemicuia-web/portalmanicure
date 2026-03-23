@@ -55,16 +55,8 @@ export function TenantProvider({ children }: { children: ReactNode }) {
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Resolve tenant
+  // Resolve tenant — always resolve from DB, never fallback silently
   useEffect(() => {
-    if (!MULTI_TENANT_MODE) {
-      setTenantId(TENANT_DEFAULT_ID);
-      setTenantSlug(TENANT_DEFAULT_SLUG);
-      setTenantName(TENANT_DEFAULT_NAME);
-      setLoading(false);
-      return;
-    }
-
     async function resolveTenant() {
       try {
         const slug = resolveSlugFromUrl();
@@ -77,10 +69,11 @@ export function TenantProvider({ children }: { children: ReactNode }) {
         }
         const { data, error } = await query;
         if (error || !data) {
-          setTenantId(TENANT_DEFAULT_ID);
-          setTenantSlug(TENANT_DEFAULT_SLUG);
-          setTenantName(TENANT_DEFAULT_NAME);
-          logger.error("Tenant not found, falling back to default:", slug);
+          // No silent fallback — tenant stays null, components must handle this
+          logger.error("Tenant not found for slug:", slug);
+          setTenantId(null);
+          setTenantSlug(null);
+          setTenantName(null);
         } else {
           setTenantId(data.id);
           setTenantSlug(data.slug);
@@ -88,9 +81,9 @@ export function TenantProvider({ children }: { children: ReactNode }) {
         }
       } catch (err) {
         logger.error("Error resolving tenant:", err);
-        setTenantId(TENANT_DEFAULT_ID);
-        setTenantSlug(TENANT_DEFAULT_SLUG);
-        setTenantName(TENANT_DEFAULT_NAME);
+        setTenantId(null);
+        setTenantSlug(null);
+        setTenantName(null);
       } finally {
         setLoading(false);
       }

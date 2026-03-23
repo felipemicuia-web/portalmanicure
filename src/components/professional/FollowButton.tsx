@@ -34,10 +34,12 @@ export function FollowButton({
     }
 
     const checkFollowing = async () => {
+      if (!tenantId) return;
       const { data } = await supabase
         .rpc("is_following", { 
           p_user_id: user.id, 
-          p_professional_id: professionalId 
+          p_professional_id: professionalId,
+          p_tenant_id: tenantId,
         });
       
       setIsFollowing(!!data);
@@ -61,12 +63,13 @@ export function FollowButton({
 
     try {
       if (isFollowing) {
-        // Unfollow
+        // Unfollow — scoped to tenant
         const { error } = await supabase
           .from("followers")
           .delete()
           .eq("user_id", user.id)
-          .eq("professional_id", professionalId);
+          .eq("professional_id", professionalId)
+          .eq("tenant_id", tenantId!);
 
         if (error) throw error;
 

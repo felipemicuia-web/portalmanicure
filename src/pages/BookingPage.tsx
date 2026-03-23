@@ -55,17 +55,18 @@ export default function BookingPage() {
   const [draftRestored, setDraftRestored] = useState(false);
   const [professionalServiceIds, setProfessionalServiceIds] = useState<string[]>([]);
 
-  // Fetch services linked to selected professional
+  // Fetch services linked to selected professional — scoped to tenant
   useEffect(() => {
     async function fetchProfessionalServices() {
-      if (!professionalId) {
+      if (!professionalId || !tenantId) {
         setProfessionalServiceIds([]);
         return;
       }
       const { data } = await supabase
         .from("professional_services")
         .select("service_id")
-        .eq("professional_id", professionalId);
+        .eq("professional_id", professionalId)
+        .eq("tenant_id", tenantId);
       
       if (data && data.length > 0) {
         setProfessionalServiceIds(data.map(d => d.service_id));
@@ -75,7 +76,7 @@ export default function BookingPage() {
       }
     }
     fetchProfessionalServices();
-  }, [professionalId, services]);
+  }, [professionalId, services, tenantId]);
 
   // Filter services by professional
   const filteredServices = useMemo(
@@ -345,6 +346,7 @@ export default function BookingPage() {
         .select("booking_time, duration_minutes")
         .eq("professional_id", professionalId)
         .eq("booking_date", selectedDate)
+        .eq("tenant_id", tenantId!)
         .neq("status", "cancelled");
 
       const toMin = (t: string) => { const [h, m] = t.split(":").map(Number); return h * 60 + m; };
