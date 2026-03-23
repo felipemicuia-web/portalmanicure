@@ -71,6 +71,7 @@ export function AdminProfessionals() {
   const [editSubtitle, setEditSubtitle] = useState("");
   const [editBio, setEditBio] = useState("");
   const [editInstagram, setEditInstagram] = useState("");
+  const [editEmail, setEditEmail] = useState("");
   const [newName, setNewName] = useState("");
   const [isAdding, setIsAdding] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
