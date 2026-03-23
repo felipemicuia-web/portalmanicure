@@ -13,6 +13,7 @@ import { Star, User, Trash2 } from "lucide-react";
 import { formatDateBR } from "@/lib/dateFormat";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useTenant } from "@/contexts/TenantContext";
 
 interface Review {
   id: string;
