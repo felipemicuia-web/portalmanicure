@@ -563,7 +563,7 @@ export function AdminServices() {
               <DialogTitle>{editingService ? "Editar Serviço" : "Novo Serviço"}</DialogTitle>
             </DialogHeader>
             <div className="mt-4">
-              <FormContent />
+              {formContent}
             </div>
             <div className="flex justify-end gap-2 pt-4">
               <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
