@@ -84,9 +84,11 @@ export function AdminProfessionals() {
   const { tenantId } = useTenant();
 
   const fetchProfessionals = async () => {
+    if (!tenantId) return;
     const { data, error } = await supabase
       .from("professionals")
       .select("*")
+      .eq("tenant_id", tenantId)
       .order("created_at", { ascending: true });
 
     if (error) {
@@ -98,12 +100,14 @@ export function AdminProfessionals() {
   };
 
   const fetchAllServices = async () => {
-    const { data } = await supabase.from("services").select("id, name").eq("active", true).order("name");
+    if (!tenantId) return;
+    const { data } = await supabase.from("services").select("id, name").eq("active", true).eq("tenant_id", tenantId).order("name");
     if (data) setAllServices(data);
   };
 
   const fetchProfessionalServices = async (profId: string) => {
-    const { data } = await supabase.from("professional_services").select("service_id").eq("professional_id", profId);
+    if (!tenantId) return;
+    const { data } = await supabase.from("professional_services").select("service_id").eq("professional_id", profId).eq("tenant_id", tenantId);
     setSelectedServiceIds(data?.map(d => d.service_id) || []);
   };
 
