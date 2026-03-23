@@ -101,12 +101,13 @@ export function AdminProfessionalSchedule() {
   }
 
   async function fetchBlockedDates() {
-    if (!selectedProfessionalId) return;
+    if (!selectedProfessionalId || !tenantId) return;
     
     const { data, error } = await supabase
       .from("professional_blocked_dates")
       .select("*")
       .eq("professional_id", selectedProfessionalId)
+      .eq("tenant_id", tenantId)
       .gte("blocked_date", new Date().toISOString().split("T")[0])
       .order("blocked_date");
 
