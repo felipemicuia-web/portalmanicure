@@ -169,7 +169,8 @@ export function AdminProfessionals() {
         bio: editBio.trim() || null,
         instagram: editInstagram.trim() || null,
       })
-      .eq("id", editingProfessional.id);
+      .eq("id", editingProfessional.id)
+      .eq("tenant_id", tenantId);
 
     if (error) {
       logger.error("Error updating professional:", error);
