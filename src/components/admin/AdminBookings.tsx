@@ -5,7 +5,7 @@ import { useTenant } from "@/contexts/TenantContext";
 import { formatPhone } from "@/lib/validation";
 import { formatDateBR } from "@/lib/dateFormat";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Calendar, Clock, User, Phone, CalendarDays, Pencil, Trash2, MessageCircle, RotateCcw, Archive, AlertTriangle, CheckCircle } from "lucide-react";
+import { Calendar, Clock, User, Phone, CalendarDays, Pencil, Trash2, MessageCircle, RotateCcw, Archive, AlertTriangle, CheckCircle, Filter, X } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -68,6 +68,7 @@ export function AdminBookings() {
   const [loading, setLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [filterProfessional, setFilterProfessional] = useState<string>("all");
+  const [filterDate, setFilterDate] = useState<string>("");
   const [activeTab, setActiveTab] = useState("active");
   const isMobile = useIsMobile();
 
@@ -188,11 +189,22 @@ export function AdminBookings() {
     }
   };
 
-  const filteredBookings = bookings.filter((b) => {
-    if (filterStatus !== "all" && b.status !== filterStatus) return false;
-    if (filterProfessional !== "all" && b.professional_id !== filterProfessional) return false;
-    return true;
-  });
+  const applyFilters = (list: Booking[]) => {
+    return list.filter((b) => {
+      if (filterStatus !== "all" && b.status !== filterStatus) return false;
+      if (filterProfessional !== "all" && b.professional_id !== filterProfessional) return false;
+      if (filterDate && b.booking_date !== filterDate) return false;
+      return true;
+    });
+  };
+
+  // Separate active bookings into "not finished" and "completed/cancelled"
+  const pendingBookings = bookings.filter((b) => b.status === "confirmed");
+  const finishedBookings = bookings.filter((b) => b.status === "completed" || b.status === "cancelled");
+
+  const filteredPending = applyFilters(pendingBookings);
+  const filteredFinished = applyFilters(finishedBookings);
+  const filteredBookings = applyFilters(bookings);
 
   const openEditDialog = (booking: Booking) => {
     setEditingBooking(booking);
@@ -589,7 +601,11 @@ export function AdminBookings() {
           <TabsList>
             <TabsTrigger value="active" className="gap-1.5">
               <CalendarDays className="w-4 h-4" />
-              Ativos ({bookings.length})
+              Ativos ({filteredPending.length})
+            </TabsTrigger>
+            <TabsTrigger value="completed" className="gap-1.5">
+              <CheckCircle className="w-4 h-4" />
+              Finalizados ({filteredFinished.length})
             </TabsTrigger>
             <TabsTrigger value="trash" className="gap-1.5">
               <Archive className="w-4 h-4" />
@@ -598,18 +614,23 @@ export function AdminBookings() {
           </TabsList>
         </div>
 
-        <TabsContent value="active" className="space-y-4 mt-4">
-          {/* Filters */}
-          <div className="flex gap-2">
-            <Select value={filterStatus} onValueChange={setFilterStatus}>
-              <SelectTrigger className="w-full sm:w-32"><SelectValue placeholder="Status" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todos</SelectItem>
-                <SelectItem value="confirmed">Confirmados</SelectItem>
-                <SelectItem value="completed">Concluídos</SelectItem>
-                <SelectItem value="cancelled">Cancelados</SelectItem>
-              </SelectContent>
-            </Select>
+        {/* Shared Filters */}
+        {(activeTab === "active" || activeTab === "completed") && (
+          <div className="flex flex-wrap gap-2 mt-4">
+            <div className="flex items-center gap-2">
+              <Filter className="w-4 h-4 text-muted-foreground" />
+              <Input
+                type="date"
+                value={filterDate}
+                onChange={(e) => setFilterDate(e.target.value)}
+                className="w-auto text-sm"
+              />
+              {filterDate && (
+                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setFilterDate("")}>
+                  <X className="w-4 h-4" />
+                </Button>
+              )}
+            </div>
             <Select value={filterProfessional} onValueChange={setFilterProfessional}>
               <SelectTrigger className="w-full sm:w-36"><SelectValue placeholder="Profissional" /></SelectTrigger>
               <SelectContent>
@@ -620,14 +641,16 @@ export function AdminBookings() {
               </SelectContent>
             </Select>
           </div>
+        )}
 
-          {/* Active bookings */}
+        {/* Active (pending) bookings */}
+        <TabsContent value="active" className="space-y-4 mt-4">
           {isMobile ? (
             <div className="space-y-3">
-              {filteredBookings.length === 0 ? (
-                <div className="glass-panel p-8 text-center text-muted-foreground">Nenhum agendamento encontrado</div>
+              {filteredPending.length === 0 ? (
+                <div className="glass-panel p-8 text-center text-muted-foreground">Nenhum agendamento ativo</div>
               ) : (
-                filteredBookings.map((booking) => <BookingCard key={booking.id} booking={booking} />)
+                filteredPending.map((booking) => <BookingCard key={booking.id} booking={booking} />)
               )}
             </div>
           ) : (
@@ -645,12 +668,12 @@ export function AdminBookings() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredBookings.length === 0 ? (
+                  {filteredPending.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={7} className="text-center text-muted-foreground py-8">Nenhum agendamento encontrado</TableCell>
+                      <TableCell colSpan={7} className="text-center text-muted-foreground py-8">Nenhum agendamento ativo</TableCell>
                     </TableRow>
                   ) : (
-                    filteredBookings.map((booking) => <BookingTableRow key={booking.id} booking={booking} />)
+                    filteredPending.map((booking) => <BookingTableRow key={booking.id} booking={booking} />)
                   )}
                 </TableBody>
               </Table>
@@ -658,6 +681,45 @@ export function AdminBookings() {
           )}
         </TabsContent>
 
+        {/* Completed/Cancelled bookings */}
+        <TabsContent value="completed" className="space-y-4 mt-4">
+          {isMobile ? (
+            <div className="space-y-3">
+              {filteredFinished.length === 0 ? (
+                <div className="glass-panel p-8 text-center text-muted-foreground">Nenhum agendamento finalizado</div>
+              ) : (
+                filteredFinished.map((booking) => <BookingCard key={booking.id} booking={booking} />)
+              )}
+            </div>
+          ) : (
+            <div className="glass-panel overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead><div className="flex items-center gap-1"><Calendar className="w-4 h-4" /> Data</div></TableHead>
+                    <TableHead><div className="flex items-center gap-1"><Clock className="w-4 h-4" /> Horário</div></TableHead>
+                    <TableHead><div className="flex items-center gap-1"><User className="w-4 h-4" /> Cliente</div></TableHead>
+                    <TableHead>Profissional</TableHead>
+                    <TableHead className="text-right">Valor</TableHead>
+                    <TableHead className="text-center">Status</TableHead>
+                    <TableHead className="text-center">Ações</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredFinished.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={7} className="text-center text-muted-foreground py-8">Nenhum agendamento finalizado</TableCell>
+                    </TableRow>
+                  ) : (
+                    filteredFinished.map((booking) => <BookingTableRow key={booking.id} booking={booking} />)
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </TabsContent>
+
+        {/* Trash */}
         <TabsContent value="trash" className="space-y-4 mt-4">
           {isMobile ? (
             <div className="space-y-3">
