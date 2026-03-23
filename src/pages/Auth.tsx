@@ -11,6 +11,7 @@ import { z } from "zod";
 import { isValidBrazilianPhone, normalizePhone, formatPhone } from "@/lib/validation";
 import { useTenantPath } from "@/contexts/TenantScopeProvider";
 import { useTenant } from "@/contexts/TenantContext";
+import { logger } from "@/lib/logger";
 
 const emailSchema = z.string().email("Email inválido");
 const passwordSchema = z.string().min(6, "Senha deve ter pelo menos 6 caracteres");
@@ -57,10 +58,24 @@ const Auth = () => {
       if (event !== "SIGNED_IN") return;
 
       const userId = session.user.id;
+      const normalizedEmail = session.user.email?.trim().toLowerCase() || null;
+
+      logger.info("[Auth] SIGNED_IN received", {
+        authEmail: normalizedEmail,
+        tenantId,
+        mode,
+        userId,
+      });
 
       const { data: hasProfile } = await supabase.rpc("user_has_profile_in_tenant", {
         _user_id: userId,
         _tenant_id: tenantId,
+      });
+
+      logger.info("[Auth] Tenant profile check", {
+        authEmail: normalizedEmail,
+        tenantId,
+        hasProfile: !!hasProfile,
       });
 
       if (hasProfile) {

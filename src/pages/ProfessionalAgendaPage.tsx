@@ -7,6 +7,7 @@ import { useLinkedProfessional } from "@/hooks/useLinkedProfessional";
 import { ProfessionalAgenda } from "@/components/professional/ProfessionalAgenda";
 import { Button } from "@/components/ui/button";
 import { Shield, ArrowLeft, CalendarDays } from "lucide-react";
+import { logger } from "@/lib/logger";
 
 export default function ProfessionalAgendaPage() {
   const [user, setUser] = useState<User | null>(null);
@@ -16,9 +17,24 @@ export default function ProfessionalAgendaPage() {
   const tp = useTenantPath();
 
   useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+      setAuthLoading(false);
+
+      logger.info("[ProfessionalAgendaPage] Initial auth session", {
+        authEmail: session?.user?.email?.trim().toLowerCase() || null,
+        userId: session?.user?.id || null,
+      });
+    });
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
       setAuthLoading(false);
+
+      logger.info("[ProfessionalAgendaPage] Auth state changed", {
+        authEmail: session?.user?.email?.trim().toLowerCase() || null,
+        userId: session?.user?.id || null,
+      });
     });
     return () => subscription.unsubscribe();
   }, []);

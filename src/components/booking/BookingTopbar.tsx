@@ -6,8 +6,10 @@ import { useAdmin } from "@/hooks/useAdmin";
 import { useBranding } from "@/hooks/useBranding";
 import { useTenantPath } from "@/contexts/TenantScopeProvider";
 import { useLinkedProfessional } from "@/hooks/useLinkedProfessional";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
+import { logger } from "@/lib/logger";
+import { useTenant } from "@/contexts/TenantContext";
 
 interface BookingTopbarProps {
   user: User | null;
@@ -25,8 +27,29 @@ export function BookingTopbar({
   const { isAdmin } = useAdmin(user);
   const { branding } = useBranding();
   const tp = useTenantPath();
-  const { isProfessional } = useLinkedProfessional();
+  const { isProfessional, professionalId, loading: professionalLoading } = useLinkedProfessional();
+  const { tenantId, membershipRole, isSuperAdmin } = useTenant();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+
+    logger.info("[BookingTopbar] Access context resolved", {
+      authEmail: user.email?.trim().toLowerCase() || null,
+      tenantId,
+      professionalId,
+      isProfessional,
+      professionalLoading,
+      membershipRole,
+      isAdmin,
+      isSuperAdmin,
+      topbarReason: professionalLoading
+        ? "professional context still loading"
+        : isProfessional
+          ? "professional topbar enabled"
+          : "professional topbar hidden because no linked professional was resolved for current tenant",
+    });
+  }, [user, tenantId, professionalId, isProfessional, professionalLoading, membershipRole, isAdmin, isSuperAdmin]);
   
   const handlePageChange = (page: "booking" | "profile" | "my-bookings") => {
     onPageChange(page);
