@@ -25,8 +25,10 @@ interface FormErrors {
   phone?: string;
 }
 
+type AuthMode = "login" | "signup" | "link-account";
+
 const Auth = () => {
-  const [isLogin, setIsLogin] = useState(true);
+  const [mode, setMode] = useState<AuthMode>("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -43,35 +45,66 @@ const Auth = () => {
   
   const redirectTo = new URLSearchParams(window.location.search).get("redirect") || tp("/");
 
+  /**
+   * After auth state changes, handle tenant profile logic:
+   * - login mode: verify profile exists, block if not
+   * - signup mode: profile was already created in handleAuth
+   * - link-account mode: create profile then grant access
+   */
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (!session?.user || !tenantId) return;
+      if (event !== "SIGNED_IN") return; // Only act on explicit sign-in
 
       const userId = session.user.id;
 
-      // Check if user has a profile in the current tenant
       const { data: hasProfile } = await supabase.rpc("user_has_profile_in_tenant", {
         _user_id: userId,
         _tenant_id: tenantId,
       });
 
       if (hasProfile) {
-        // User belongs to this tenant — allow access
         navigate(redirectTo);
-      } else if (event === "SIGNED_IN") {
-        // User logged in but does NOT belong to this tenant — block
-        toast({
-          title: "Conta não encontrada",
-          description: `Sua conta não está registrada neste estabelecimento${tenantName ? ` (${tenantName})` : ""}. Cadastre-se primeiro.`,
-          variant: "destructive",
-        });
-        await supabase.auth.signOut();
+        return;
       }
-      // For INITIAL_SESSION or other events, do nothing — let the page render
+
+      if (mode === "link-account") {
+        // User confirmed they want to link their existing account to this tenant
+        const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
+        const { error: profileError } = await supabase.from("profiles").insert({
+          user_id: userId,
+          tenant_id: tenantId,
+          name: fullName || session.user.user_metadata?.first_name || null,
+          phone: normalizePhone(phone) || session.user.user_metadata?.phone || null,
+        });
+
+        if (profileError && !profileError.message.includes("duplicate")) {
+          console.error("Error creating tenant profile:", profileError);
+          toast({
+            title: "Erro",
+            description: "Não foi possível vincular sua conta a este estabelecimento.",
+            variant: "destructive",
+          });
+          await supabase.auth.signOut();
+          return;
+        }
+
+        toast({ title: "Conta vinculada!", description: `Sua conta foi vinculada a ${tenantName || "este estabelecimento"}.` });
+        navigate(redirectTo);
+        return;
+      }
+
+      // Login mode — no profile in this tenant → block
+      toast({
+        title: "Conta não encontrada",
+        description: `Sua conta não está registrada neste estabelecimento${tenantName ? ` (${tenantName})` : ""}. Cadastre-se primeiro.`,
+        variant: "destructive",
+      });
+      await supabase.auth.signOut();
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate, redirectTo, tenantId, tenantName, toast]);
+  }, [navigate, redirectTo, tenantId, tenantName, toast, mode, firstName, lastName, phone]);
 
   const handlePhoneChange = (value: string) => {
     const digits = normalizePhone(value);
@@ -79,6 +112,8 @@ const Auth = () => {
       setPhone(formatPhone(digits));
     }
   };
+
+  const isSignupLike = mode === "signup" || mode === "link-account";
 
   const validateForm = () => {
     const newErrors: FormErrors = {};
@@ -89,8 +124,8 @@ const Auth = () => {
     const passwordResult = passwordSchema.safeParse(password);
     if (!passwordResult.success) newErrors.password = passwordResult.error.errors[0].message;
 
-    if (!isLogin) {
-      if (password !== confirmPassword) newErrors.confirmPassword = "As senhas não coincidem";
+    if (isSignupLike) {
+      if (mode === "signup" && password !== confirmPassword) newErrors.confirmPassword = "As senhas não coincidem";
       const firstNameResult = nameSchema.safeParse(firstName.trim());
       if (!firstNameResult.success) newErrors.firstName = firstNameResult.error.errors[0].message;
       const lastNameResult = nameSchema.safeParse(lastName.trim());
@@ -113,12 +148,8 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      if (isLogin) {
-        // LOGIN FLOW:
-        // 1. Authenticate with Supabase Auth
-        // 2. onAuthStateChange will verify tenant membership and block if missing
+      if (mode === "login") {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
-
         if (error) {
           toast({
             title: "Erro no login",
@@ -128,11 +159,22 @@ const Auth = () => {
             variant: "destructive",
           });
         }
-        // Success is handled by onAuthStateChange above
+        // onAuthStateChange handles the rest
+      } else if (mode === "link-account") {
+        // User has an existing auth account, login to link to this tenant
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) {
+          toast({
+            title: "Erro no login",
+            description: error.message.includes("Invalid login credentials")
+              ? "Email ou senha incorretos"
+              : error.message,
+            variant: "destructive",
+          });
+        }
+        // onAuthStateChange will create the profile in link-account mode
       } else {
-        // SIGNUP FLOW:
-        // 1. Create auth user
-        // 2. After confirmation/auto-confirm, create profile in current tenant
+        // SIGNUP FLOW
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
@@ -142,7 +184,6 @@ const Auth = () => {
               first_name: firstName.trim(),
               last_name: lastName.trim(),
               phone: normalizePhone(phone),
-              // Store tenant context in metadata for the trigger/post-signup flow
               signup_tenant_id: tenantId,
             },
           },
@@ -150,18 +191,18 @@ const Auth = () => {
 
         if (error) {
           if (error.message.includes("User already registered")) {
+            // Switch to link-account mode — user needs to login to link
+            setMode("link-account");
             toast({
-              title: "Usuário existente",
-              description: "Este email já está cadastrado. Tente fazer login.",
-              variant: "destructive",
+              title: "Email já cadastrado",
+              description: "Este email já possui uma conta. Faça login com sua senha para vincular ao estabelecimento.",
             });
           } else {
             toast({ title: "Erro no cadastro", description: error.message, variant: "destructive" });
           }
         } else if (data.user) {
-          // If auto-confirm is enabled, the user is immediately signed in
-          // Create the profile in the current tenant
           if (data.session) {
+            // Auto-confirmed — create profile immediately
             const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
             const { error: profileError } = await supabase.from("profiles").insert({
               user_id: data.user.id,
@@ -170,17 +211,13 @@ const Auth = () => {
               phone: normalizePhone(phone),
             });
 
-            if (profileError) {
-              // Profile might already exist (e.g., created by trigger)
-              if (!profileError.message.includes("duplicate")) {
-                console.error("Error creating tenant profile:", profileError);
-              }
+            if (profileError && !profileError.message.includes("duplicate")) {
+              console.error("Error creating tenant profile:", profileError);
             }
 
             toast({ title: "Conta criada!", description: "Bem-vindo! Sua conta foi criada com sucesso." });
-            // onAuthStateChange will handle navigation
+            // onAuthStateChange will navigate
           } else {
-            // Email confirmation required
             toast({
               title: "Conta criada!",
               description: "Verifique seu email para confirmar o cadastro.",
@@ -195,6 +232,25 @@ const Auth = () => {
     }
   };
 
+  const getTitle = () => {
+    if (mode === "login") return "Entrar na conta";
+    if (mode === "link-account") return "Vincular conta";
+    return "Criar conta";
+  };
+
+  const getDescription = () => {
+    const tn = tenantName ? ` ${tenantName}` : "";
+    if (mode === "login") return `Digite suas credenciais para acessar${tn}`;
+    if (mode === "link-account") return `Faça login para vincular sua conta a${tn}`;
+    return `Preencha os dados para se cadastrar em${tn}`;
+  };
+
+  const getSubmitLabel = () => {
+    if (mode === "login") return "Entrar";
+    if (mode === "link-account") return "Vincular e entrar";
+    return "Cadastrar";
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="galaxy-bg" />
@@ -204,10 +260,7 @@ const Auth = () => {
         
         <CardHeader className="space-y-3 pb-6">
           <div className="flex items-center gap-2">
-            <button 
-              onClick={() => navigate(tp("/"))}
-              className="p-2 rounded-lg hover:bg-muted transition-colors"
-            >
+            <button onClick={() => navigate(tp("/"))} className="p-2 rounded-lg hover:bg-muted transition-colors">
               <ArrowLeft className="w-5 h-5 text-muted-foreground" />
             </button>
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center">
@@ -215,14 +268,8 @@ const Auth = () => {
             </div>
           </div>
           <div>
-            <CardTitle className="text-2xl font-bold">
-              {isLogin ? "Entrar na conta" : "Criar conta"}
-            </CardTitle>
-            <CardDescription className="text-muted-foreground">
-              {isLogin 
-                ? `Digite suas credenciais para acessar${tenantName ? ` ${tenantName}` : ""}` 
-                : `Preencha os dados para se cadastrar${tenantName ? ` em ${tenantName}` : ""}`}
-            </CardDescription>
+            <CardTitle className="text-2xl font-bold">{getTitle()}</CardTitle>
+            <CardDescription className="text-muted-foreground">{getDescription()}</CardDescription>
           </div>
         </CardHeader>
 
@@ -232,12 +279,10 @@ const Auth = () => {
               <Label htmlFor="email" className="text-sm font-medium">Email</Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input
-                  id="email" type="email" placeholder="seu@email.com"
+                <Input id="email" type="email" placeholder="seu@email.com"
                   value={email} onChange={(e) => setEmail(e.target.value)}
                   className={`pl-10 h-11 ${errors.email ? "border-destructive" : ""}`}
-                  required
-                />
+                  required />
               </div>
               {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
             </div>
@@ -246,12 +291,10 @@ const Auth = () => {
               <Label htmlFor="password" className="text-sm font-medium">Senha</Label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input
-                  id="password" type={showPassword ? "text" : "password"} placeholder="••••••••"
+                <Input id="password" type={showPassword ? "text" : "password"} placeholder="••••••••"
                   value={password} onChange={(e) => setPassword(e.target.value)}
                   className={`pl-10 pr-10 h-11 ${errors.password ? "border-destructive" : ""}`}
-                  required
-                />
+                  required />
                 <button type="button" onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -260,7 +303,7 @@ const Auth = () => {
               {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
             </div>
 
-            {!isLogin && (
+            {isSignupLike && (
               <>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-2">
@@ -296,18 +339,28 @@ const Auth = () => {
                   {errors.phone && <p className="text-sm text-destructive">{errors.phone}</p>}
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="confirmPassword" className="text-sm font-medium">Confirmar Senha</Label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <Input id="confirmPassword" type={showPassword ? "text" : "password"} placeholder="••••••••"
-                      value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)}
-                      className={`pl-10 h-11 ${errors.confirmPassword ? "border-destructive" : ""}`}
-                      required />
+                {mode === "signup" && (
+                  <div className="space-y-2">
+                    <Label htmlFor="confirmPassword" className="text-sm font-medium">Confirmar Senha</Label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <Input id="confirmPassword" type={showPassword ? "text" : "password"} placeholder="••••••••"
+                        value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)}
+                        className={`pl-10 h-11 ${errors.confirmPassword ? "border-destructive" : ""}`}
+                        required />
+                    </div>
+                    {errors.confirmPassword && <p className="text-sm text-destructive">{errors.confirmPassword}</p>}
                   </div>
-                  {errors.confirmPassword && <p className="text-sm text-destructive">{errors.confirmPassword}</p>}
-                </div>
+                )}
               </>
+            )}
+
+            {mode === "link-account" && (
+              <div className="rounded-lg bg-muted/50 border border-border p-3">
+                <p className="text-xs text-muted-foreground">
+                  Este email já possui uma conta. Faça login com sua senha existente para vincular sua conta a este estabelecimento com um novo perfil.
+                </p>
+              </div>
             )}
 
             <Button type="submit" className="w-full h-11 font-semibold bg-primary hover:bg-primary/90 transition-all duration-200" disabled={loading}>
@@ -316,18 +369,19 @@ const Auth = () => {
                   <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
                   <span>Carregando...</span>
                 </div>
-              ) : (
-                isLogin ? "Entrar" : "Cadastrar"
-              )}
+              ) : getSubmitLabel()}
             </Button>
           </form>
 
           <div className="mt-6 text-center">
             <p className="text-sm text-muted-foreground">
-              {isLogin ? "Não tem uma conta?" : "Já tem uma conta?"}
-              <button type="button" onClick={() => { setIsLogin(!isLogin); setErrors({}); setFirstName(""); setLastName(""); setPhone(""); }}
-                className="ml-1 font-semibold text-primary hover:underline">
-                {isLogin ? "Cadastre-se" : "Entrar"}
+              {mode === "login" ? "Não tem uma conta?" : "Já tem uma conta neste estabelecimento?"}
+              <button type="button" onClick={() => {
+                setMode(mode === "login" ? "signup" : "login");
+                setErrors({});
+                if (mode !== "login") { setFirstName(""); setLastName(""); setPhone(""); }
+              }} className="ml-1 font-semibold text-primary hover:underline">
+                {mode === "login" ? "Cadastre-se" : "Entrar"}
               </button>
             </p>
           </div>
