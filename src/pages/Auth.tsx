@@ -10,6 +10,7 @@ import { Eye, EyeOff, Mail, Lock, User, ArrowLeft, Phone } from "lucide-react";
 import { z } from "zod";
 import { isValidBrazilianPhone, normalizePhone, formatPhone } from "@/lib/validation";
 import { useTenantPath } from "@/contexts/TenantScopeProvider";
+import { useTenant } from "@/contexts/TenantContext";
 
 const emailSchema = z.string().email("Email inválido");
 const passwordSchema = z.string().min(6, "Senha deve ter pelo menos 6 caracteres");
@@ -38,19 +39,39 @@ const Auth = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const tp = useTenantPath();
+  const { tenantId, tenantName } = useTenant();
   
-  // Get redirect URL from query params
   const redirectTo = new URLSearchParams(window.location.search).get("redirect") || tp("/");
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.user) {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (!session?.user || !tenantId) return;
+
+      const userId = session.user.id;
+
+      // Check if user has a profile in the current tenant
+      const { data: hasProfile } = await supabase.rpc("user_has_profile_in_tenant", {
+        _user_id: userId,
+        _tenant_id: tenantId,
+      });
+
+      if (hasProfile) {
+        // User belongs to this tenant — allow access
         navigate(redirectTo);
+      } else if (event === "SIGNED_IN") {
+        // User logged in but does NOT belong to this tenant — block
+        toast({
+          title: "Conta não encontrada",
+          description: `Sua conta não está registrada neste estabelecimento${tenantName ? ` (${tenantName})` : ""}. Cadastre-se primeiro.`,
+          variant: "destructive",
+        });
+        await supabase.auth.signOut();
       }
+      // For INITIAL_SESSION or other events, do nothing — let the page render
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate, redirectTo]);
+  }, [navigate, redirectTo, tenantId, tenantName, toast]);
 
   const handlePhoneChange = (value: string) => {
     const digits = normalizePhone(value);
@@ -63,33 +84,18 @@ const Auth = () => {
     const newErrors: FormErrors = {};
 
     const emailResult = emailSchema.safeParse(email);
-    if (!emailResult.success) {
-      newErrors.email = emailResult.error.errors[0].message;
-    }
+    if (!emailResult.success) newErrors.email = emailResult.error.errors[0].message;
 
     const passwordResult = passwordSchema.safeParse(password);
-    if (!passwordResult.success) {
-      newErrors.password = passwordResult.error.errors[0].message;
-    }
+    if (!passwordResult.success) newErrors.password = passwordResult.error.errors[0].message;
 
     if (!isLogin) {
-      if (password !== confirmPassword) {
-        newErrors.confirmPassword = "As senhas não coincidem";
-      }
-
+      if (password !== confirmPassword) newErrors.confirmPassword = "As senhas não coincidem";
       const firstNameResult = nameSchema.safeParse(firstName.trim());
-      if (!firstNameResult.success) {
-        newErrors.firstName = firstNameResult.error.errors[0].message;
-      }
-
+      if (!firstNameResult.success) newErrors.firstName = firstNameResult.error.errors[0].message;
       const lastNameResult = nameSchema.safeParse(lastName.trim());
-      if (!lastNameResult.success) {
-        newErrors.lastName = lastNameResult.error.errors[0].message;
-      }
-
-      if (!isValidBrazilianPhone(phone)) {
-        newErrors.phone = "Telefone inválido. Use DDD + número (ex: 11 99999-9999)";
-      }
+      if (!lastNameResult.success) newErrors.lastName = lastNameResult.error.errors[0].message;
+      if (!isValidBrazilianPhone(phone)) newErrors.phone = "Telefone inválido. Use DDD + número (ex: 11 99999-9999)";
     }
 
     setErrors(newErrors);
@@ -98,51 +104,47 @@ const Auth = () => {
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (!validateForm()) return;
-    
+    if (!tenantId) {
+      toast({ title: "Erro", description: "Estabelecimento não encontrado", variant: "destructive" });
+      return;
+    }
+
     setLoading(true);
 
     try {
       if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
+        // LOGIN FLOW:
+        // 1. Authenticate with Supabase Auth
+        // 2. onAuthStateChange will verify tenant membership and block if missing
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
 
         if (error) {
-          if (error.message.includes("Invalid login credentials")) {
-            toast({
-              title: "Erro no login",
-              description: "Email ou senha incorretos",
-              variant: "destructive",
-            });
-          } else {
-            toast({
-              title: "Erro",
-              description: error.message,
-              variant: "destructive",
-            });
-          }
-        } else {
           toast({
-            title: "Bem-vindo!",
-            description: "Login realizado com sucesso",
+            title: "Erro no login",
+            description: error.message.includes("Invalid login credentials")
+              ? "Email ou senha incorretos"
+              : error.message,
+            variant: "destructive",
           });
         }
+        // Success is handled by onAuthStateChange above
       } else {
-        // Signup flow - Supabase auth only
+        // SIGNUP FLOW:
+        // 1. Create auth user
+        // 2. After confirmation/auto-confirm, create profile in current tenant
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
             emailRedirectTo: `${window.location.origin}${tp("/")}`,
             data: {
-              // Store user info in auth metadata for later profile creation
               first_name: firstName.trim(),
               last_name: lastName.trim(),
               phone: normalizePhone(phone),
-            }
+              // Store tenant context in metadata for the trigger/post-signup flow
+              signup_tenant_id: tenantId,
+            },
           },
         });
 
@@ -154,25 +156,40 @@ const Auth = () => {
               variant: "destructive",
             });
           } else {
+            toast({ title: "Erro no cadastro", description: error.message, variant: "destructive" });
+          }
+        } else if (data.user) {
+          // If auto-confirm is enabled, the user is immediately signed in
+          // Create the profile in the current tenant
+          if (data.session) {
+            const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
+            const { error: profileError } = await supabase.from("profiles").insert({
+              user_id: data.user.id,
+              tenant_id: tenantId,
+              name: fullName,
+              phone: normalizePhone(phone),
+            });
+
+            if (profileError) {
+              // Profile might already exist (e.g., created by trigger)
+              if (!profileError.message.includes("duplicate")) {
+                console.error("Error creating tenant profile:", profileError);
+              }
+            }
+
+            toast({ title: "Conta criada!", description: "Bem-vindo! Sua conta foi criada com sucesso." });
+            // onAuthStateChange will handle navigation
+          } else {
+            // Email confirmation required
             toast({
-              title: "Erro no cadastro",
-              description: error.message,
-              variant: "destructive",
+              title: "Conta criada!",
+              description: "Verifique seu email para confirmar o cadastro.",
             });
           }
-        } else {
-          toast({
-            title: "Conta criada!",
-            description: "Verifique seu email para confirmar o cadastro. Um administrador irá ativar seu acesso.",
-          });
         }
       }
     } catch (error) {
-      toast({
-        title: "Erro",
-        description: "Ocorreu um erro inesperado",
-        variant: "destructive",
-      });
+      toast({ title: "Erro", description: "Ocorreu um erro inesperado", variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -203,8 +220,8 @@ const Auth = () => {
             </CardTitle>
             <CardDescription className="text-muted-foreground">
               {isLogin 
-                ? "Digite suas credenciais para acessar" 
-                : "Preencha os dados para se cadastrar"}
+                ? `Digite suas credenciais para acessar${tenantName ? ` ${tenantName}` : ""}` 
+                : `Preencha os dados para se cadastrar${tenantName ? ` em ${tenantName}` : ""}`}
             </CardDescription>
           </div>
         </CardHeader>
@@ -212,146 +229,88 @@ const Auth = () => {
         <CardContent>
           <form onSubmit={handleAuth} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-medium">
-                Email
-              </Label>
+              <Label htmlFor="email" className="text-sm font-medium">Email</Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
-                  id="email"
-                  type="email"
-                  placeholder="seu@email.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  id="email" type="email" placeholder="seu@email.com"
+                  value={email} onChange={(e) => setEmail(e.target.value)}
                   className={`pl-10 h-11 ${errors.email ? "border-destructive" : ""}`}
                   required
                 />
               </div>
-              {errors.email && (
-                <p className="text-sm text-destructive">{errors.email}</p>
-              )}
+              {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-sm font-medium">
-                Senha
-              </Label>
+              <Label htmlFor="password" className="text-sm font-medium">Senha</Label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  id="password" type={showPassword ? "text" : "password"} placeholder="••••••••"
+                  value={password} onChange={(e) => setPassword(e.target.value)}
                   className={`pl-10 pr-10 h-11 ${errors.password ? "border-destructive" : ""}`}
                   required
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                >
+                <button type="button" onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
-              {errors.password && (
-                <p className="text-sm text-destructive">{errors.password}</p>
-              )}
+              {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
             </div>
 
             {!isLogin && (
               <>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-2">
-                    <Label htmlFor="firstName" className="text-sm font-medium">
-                      Nome
-                    </Label>
+                    <Label htmlFor="firstName" className="text-sm font-medium">Nome</Label>
                     <div className="relative">
                       <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                      <Input
-                        id="firstName"
-                        type="text"
-                        placeholder="Maria"
-                        value={firstName}
-                        onChange={(e) => setFirstName(e.target.value)}
+                      <Input id="firstName" type="text" placeholder="Maria"
+                        value={firstName} onChange={(e) => setFirstName(e.target.value)}
                         className={`pl-10 h-11 ${errors.firstName ? "border-destructive" : ""}`}
-                        required
-                      />
+                        required />
                     </div>
-                    {errors.firstName && (
-                      <p className="text-sm text-destructive">{errors.firstName}</p>
-                    )}
+                    {errors.firstName && <p className="text-sm text-destructive">{errors.firstName}</p>}
                   </div>
-
                   <div className="space-y-2">
-                    <Label htmlFor="lastName" className="text-sm font-medium">
-                      Sobrenome
-                    </Label>
-                    <Input
-                      id="lastName"
-                      type="text"
-                      placeholder="Silva"
-                      value={lastName}
-                      onChange={(e) => setLastName(e.target.value)}
+                    <Label htmlFor="lastName" className="text-sm font-medium">Sobrenome</Label>
+                    <Input id="lastName" type="text" placeholder="Silva"
+                      value={lastName} onChange={(e) => setLastName(e.target.value)}
                       className={`h-11 ${errors.lastName ? "border-destructive" : ""}`}
-                      required
-                    />
-                    {errors.lastName && (
-                      <p className="text-sm text-destructive">{errors.lastName}</p>
-                    )}
+                      required />
+                    {errors.lastName && <p className="text-sm text-destructive">{errors.lastName}</p>}
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="phone" className="text-sm font-medium">
-                    WhatsApp (com DDD)
-                  </Label>
+                  <Label htmlFor="phone" className="text-sm font-medium">WhatsApp (com DDD)</Label>
                   <div className="relative">
                     <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <Input
-                      id="phone"
-                      type="tel"
-                      placeholder="(11) 99999-9999"
-                      value={phone}
-                      onChange={(e) => handlePhoneChange(e.target.value)}
+                    <Input id="phone" type="tel" placeholder="(11) 99999-9999"
+                      value={phone} onChange={(e) => handlePhoneChange(e.target.value)}
                       className={`pl-10 h-11 ${errors.phone ? "border-destructive" : ""}`}
-                      required
-                    />
+                      required />
                   </div>
-                  {errors.phone && (
-                    <p className="text-sm text-destructive">{errors.phone}</p>
-                  )}
+                  {errors.phone && <p className="text-sm text-destructive">{errors.phone}</p>}
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="confirmPassword" className="text-sm font-medium">
-                    Confirmar Senha
-                  </Label>
+                  <Label htmlFor="confirmPassword" className="text-sm font-medium">Confirmar Senha</Label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <Input
-                      id="confirmPassword"
-                      type={showPassword ? "text" : "password"}
-                      placeholder="••••••••"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
+                    <Input id="confirmPassword" type={showPassword ? "text" : "password"} placeholder="••••••••"
+                      value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)}
                       className={`pl-10 h-11 ${errors.confirmPassword ? "border-destructive" : ""}`}
-                      required
-                    />
+                      required />
                   </div>
-                  {errors.confirmPassword && (
-                    <p className="text-sm text-destructive">{errors.confirmPassword}</p>
-                  )}
+                  {errors.confirmPassword && <p className="text-sm text-destructive">{errors.confirmPassword}</p>}
                 </div>
               </>
             )}
 
-            <Button
-              type="submit" 
-              className="w-full h-11 font-semibold bg-primary hover:bg-primary/90 transition-all duration-200"
-              disabled={loading}
-            >
+            <Button type="submit" className="w-full h-11 font-semibold bg-primary hover:bg-primary/90 transition-all duration-200" disabled={loading}>
               {loading ? (
                 <div className="flex items-center gap-2">
                   <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
@@ -366,17 +325,8 @@ const Auth = () => {
           <div className="mt-6 text-center">
             <p className="text-sm text-muted-foreground">
               {isLogin ? "Não tem uma conta?" : "Já tem uma conta?"}
-              <button
-                type="button"
-                onClick={() => {
-                  setIsLogin(!isLogin);
-                  setErrors({});
-                  setFirstName("");
-                  setLastName("");
-                  setPhone("");
-                }}
-                className="ml-1 font-semibold text-primary hover:underline"
-              >
+              <button type="button" onClick={() => { setIsLogin(!isLogin); setErrors({}); setFirstName(""); setLastName(""); setPhone(""); }}
+                className="ml-1 font-semibold text-primary hover:underline">
                 {isLogin ? "Cadastre-se" : "Entrar"}
               </button>
             </p>
