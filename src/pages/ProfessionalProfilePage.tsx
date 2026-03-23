@@ -57,6 +57,7 @@ export default function ProfessionalProfilePage() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const tp = useTenantPath();
+  const { tenantId } = useTenant();
   
   const [user, setUser] = useState<User | null>(null);
   const { isAdmin } = useAdmin(user);
