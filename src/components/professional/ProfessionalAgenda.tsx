@@ -254,10 +254,10 @@ export function ProfessionalAgenda({ professionalId }: Props) {
           </TabsTrigger>
         </TabsList>
         <TabsContent value="active" className="mt-4">
-          {renderList(activeBookings, "Nenhum agendamento encontrado")}
+          {renderList(activeBookings, "Nenhum agendamento vinculado a esta profissional")}
         </TabsContent>
         <TabsContent value="completed" className="mt-4">
-          {renderList(completedBookings, "Nenhum agendamento encontrado")}
+          {renderList(completedBookings, "Nenhum agendamento vinculado a esta profissional")}
         </TabsContent>
       </Tabs>
     </div>
