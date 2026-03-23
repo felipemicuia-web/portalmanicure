@@ -1250,14 +1250,18 @@ export type Database = {
         Args: { p_new_role: string; p_tenant_id: string; p_user_id: string }
         Returns: undefined
       }
-      get_average_rating: {
-        Args: { p_professional_id: string }
-        Returns: number
-      }
-      get_follower_count: {
-        Args: { p_professional_id: string }
-        Returns: number
-      }
+      get_average_rating:
+        | { Args: { p_professional_id: string }; Returns: number }
+        | {
+            Args: { p_professional_id: string; p_tenant_id?: string }
+            Returns: number
+          }
+      get_follower_count:
+        | { Args: { p_professional_id: string }; Returns: number }
+        | {
+            Args: { p_professional_id: string; p_tenant_id?: string }
+            Returns: number
+          }
       get_photo_like_count: { Args: { p_photo_id: string }; Returns: number }
       get_plan_insights: { Args: never; Returns: Json }
       get_platform_booking_activity: { Args: never; Returns: Json }
@@ -1295,10 +1299,19 @@ export type Database = {
         }
         Returns: boolean
       }
-      is_following: {
-        Args: { p_professional_id: string; p_user_id: string }
-        Returns: boolean
-      }
+      is_following:
+        | {
+            Args: { p_professional_id: string; p_user_id: string }
+            Returns: boolean
+          }
+        | {
+            Args: {
+              p_professional_id: string
+              p_tenant_id?: string
+              p_user_id: string
+            }
+            Returns: boolean
+          }
       is_superadmin: { Args: { _user_id?: string }; Returns: boolean }
       is_tenant_admin: {
         Args: { _tenant_id: string; _user_id: string }
