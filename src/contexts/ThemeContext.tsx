@@ -167,11 +167,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     const preset = getPresetById(id);
     setCurrentThemeId(preset.id);
     applyThemeToDOM(preset.colors);
-    // Scope localStorage by tenant to prevent cross-tenant contamination
+    // Scope localStorage by tenant only — no global key
     const scopeKey = tid || tenantId || "global";
     localStorage.setItem(`site-theme-id-${scopeKey}`, preset.id);
-    // Keep a "current" key for ThemedBackground (overwritten on every tenant switch)
-    localStorage.setItem("site-theme-id", preset.id);
   }, [tenantId]);
 
   // Load initial theme from DB
@@ -185,7 +183,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         const preset = getPresetById(cached);
         setCurrentThemeId(preset.id);
         applyThemeToDOM(preset.colors);
-        localStorage.setItem("site-theme-id", preset.id);
       }
 
       const { data } = await supabase

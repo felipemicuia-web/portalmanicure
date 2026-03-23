@@ -24,32 +24,64 @@ const App = () => (
     <TooltipProvider>
       <TenantProvider>
         <AuthProvider>
-          <ThemeProvider>
-            <Toaster />
-            <Sonner />
-            <div className="galaxy-bg" />
-            <ThemedBackground />
-            <ErrorBoundary>
-              <BrowserRouter>
-                <Routes>
-                  <Route path="/" element={<BookingPage />} />
-                  <Route path="/auth" element={<Auth />} />
-                  <Route path="/admin" element={<AdminPage />} />
-                  <Route
-                    path="/platform"
-                    element={
-                      <RequireSuperAdmin>
-                        <PlatformPage />
-                      </RequireSuperAdmin>
-                    }
-                  />
-                  <Route path="/professional/:id" element={<ProfessionalProfilePage />} />
-                  <Route path="/tenant/:slug/*" element={<TenantScopedApp />} />
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </BrowserRouter>
-            </ErrorBoundary>
-          </ThemeProvider>
+          <Toaster />
+          <Sonner />
+          <div className="galaxy-bg" />
+          <ErrorBoundary>
+            <BrowserRouter>
+              <Routes>
+                {/* Root routes use ThemeProvider scoped to the root TenantContext (default tenant) */}
+                <Route
+                  path="/"
+                  element={
+                    <ThemeProvider>
+                      <ThemedBackground />
+                      <BookingPage />
+                    </ThemeProvider>
+                  }
+                />
+                <Route
+                  path="/auth"
+                  element={
+                    <ThemeProvider>
+                      <ThemedBackground />
+                      <Auth />
+                    </ThemeProvider>
+                  }
+                />
+                <Route
+                  path="/admin"
+                  element={
+                    <ThemeProvider>
+                      <ThemedBackground />
+                      <AdminPage />
+                    </ThemeProvider>
+                  }
+                />
+                <Route
+                  path="/platform"
+                  element={
+                    <RequireSuperAdmin>
+                      <PlatformPage />
+                    </RequireSuperAdmin>
+                  }
+                />
+                <Route
+                  path="/professional/:id"
+                  element={
+                    <ThemeProvider>
+                      <ThemedBackground />
+                      <ProfessionalProfilePage />
+                    </ThemeProvider>
+                  }
+                />
+                {/* Tenant-scoped routes: ThemeProvider is inside TenantScopedApp,
+                    nested under TenantScopeProvider, so it reads the correct tenant's theme */}
+                <Route path="/tenant/:slug/*" element={<TenantScopedApp />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </ErrorBoundary>
         </AuthProvider>
       </TenantProvider>
     </TooltipProvider>
