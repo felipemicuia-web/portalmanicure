@@ -71,16 +71,17 @@ export default function ProfessionalProfilePage() {
   const [canReview, setCanReview] = useState(false);
 
   const fetchData = useCallback(async () => {
-    if (!id) return;
+    if (!id || !tenantId) return;
     
     setLoading(true);
     
     try {
-      // Fetch professional
+      // Fetch professional — scoped to tenant
       const { data: profData, error: profError } = await supabase
         .from("professionals")
         .select("*")
         .eq("id", id)
+        .eq("tenant_id", tenantId)
         .eq("active", true)
         .single();
 
@@ -96,11 +97,12 @@ export default function ProfessionalProfilePage() {
 
       setProfessional(profData);
 
-      // Fetch services for this professional
+      // Fetch services for this professional — scoped to tenant
       const { data: profServices } = await supabase
         .from("professional_services")
         .select("service_id")
-        .eq("professional_id", id);
+        .eq("professional_id", id)
+        .eq("tenant_id", tenantId);
 
       if (profServices && profServices.length > 0) {
         const serviceIds = profServices.map(ps => ps.service_id);
@@ -108,6 +110,7 @@ export default function ProfessionalProfilePage() {
           .from("services")
           .select("*")
           .in("id", serviceIds)
+          .eq("tenant_id", tenantId)
           .eq("active", true);
         
         setServices(servicesData || []);
@@ -117,25 +120,27 @@ export default function ProfessionalProfilePage() {
           .from("services")
           .select("*")
           .eq("active", true)
-          .eq("tenant_id", tenantId!);
+          .eq("tenant_id", tenantId);
         
         setServices(allServices || []);
       }
 
-      // Fetch reviews with profile info
+      // Fetch reviews with profile info — scoped to tenant
       const { data: reviewsData } = await supabase
         .from("reviews")
         .select("*")
         .eq("professional_id", id)
+        .eq("tenant_id", tenantId)
         .order("created_at", { ascending: false });
 
-      // Fetch profiles for reviews
+      // Fetch profiles for reviews — scoped to tenant
       if (reviewsData && reviewsData.length > 0) {
         const userIds = [...new Set(reviewsData.map(r => r.user_id))];
         const { data: profiles } = await supabase
           .from("profiles")
           .select("user_id, name, avatar_url")
-          .in("user_id", userIds);
+          .in("user_id", userIds)
+          .eq("tenant_id", tenantId);
 
         const reviewsWithProfiles = reviewsData.map(review => ({
           ...review,
@@ -147,15 +152,15 @@ export default function ProfessionalProfilePage() {
         setReviews([]);
       }
 
-      // Fetch follower count using RPC
+      // Fetch follower count using RPC — now tenant-aware
       const { data: countData } = await supabase
-        .rpc("get_follower_count", { p_professional_id: id });
+        .rpc("get_follower_count", { p_professional_id: id, p_tenant_id: tenantId });
       
       setFollowerCount(countData || 0);
 
-      // Fetch average rating using RPC
+      // Fetch average rating using RPC — now tenant-aware
       const { data: ratingData } = await supabase
-        .rpc("get_average_rating", { p_professional_id: id });
+        .rpc("get_average_rating", { p_professional_id: id, p_tenant_id: tenantId });
       
       setAverageRating(Number(ratingData) || 0);
 
@@ -164,7 +169,7 @@ export default function ProfessionalProfilePage() {
     } finally {
       setLoading(false);
     }
-  }, [id, navigate, toast]);
+  }, [id, tenantId, navigate, toast]);
 
   // Check if user can review (has a completed booking with this professional)
   const checkCanReview = useCallback(async () => {
