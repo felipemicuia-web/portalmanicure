@@ -170,7 +170,8 @@ export function AdminProfessionalGallery({
       const { error } = await supabase
         .from("professional_photos")
         .delete()
-        .eq("id", deleteId);
+        .eq("id", deleteId)
+        .eq("tenant_id", tenantId);
 
       if (error) throw error;
 

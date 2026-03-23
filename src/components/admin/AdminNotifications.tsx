@@ -135,11 +135,12 @@ export function AdminNotifications() {
   };
 
   const clearAllNotifications = async () => {
+    if (!tenantId) return;
     setClearingAll(true);
     const { error } = await supabase
       .from("admin_notifications")
       .delete()
-      .neq("id", "00000000-0000-0000-0000-000000000000"); // Delete all
+      .eq("tenant_id", tenantId);
 
     if (error) {
       logger.error("Error clearing notifications:", error);

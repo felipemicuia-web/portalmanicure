@@ -271,7 +271,8 @@ export function AdminProfessionals() {
       const { error: updateError } = await supabase
         .from("professionals")
         .update({ photo_url: photoUrl })
-        .eq("id", profId);
+        .eq("id", profId)
+        .eq("tenant_id", tenantId);
 
       if (updateError) throw updateError;
 

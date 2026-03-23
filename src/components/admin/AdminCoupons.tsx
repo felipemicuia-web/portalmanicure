@@ -120,7 +120,7 @@ export function AdminCoupons() {
 
     let error;
     if (editing) {
-      ({ error } = await supabase.from("coupons").update(payload).eq("id", editing.id));
+      ({ error } = await supabase.from("coupons").update(payload).eq("id", editing.id).eq("tenant_id", tenantId));
     } else {
       ({ error } = await supabase.from("coupons").insert(payload));
     }

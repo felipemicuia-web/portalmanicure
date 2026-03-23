@@ -193,7 +193,8 @@ export function AdminProfessionalSchedule() {
     const { error } = await supabase
       .from("professional_blocked_dates")
       .delete()
-      .eq("id", id);
+      .eq("id", id)
+      .eq("tenant_id", tenantId);
 
     if (error) {
       console.error("Error removing blocked date:", error);

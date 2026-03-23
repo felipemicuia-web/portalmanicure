@@ -237,7 +237,8 @@ export function MyBookings({ user }: Props) {
     const { error } = await supabase
       .from("bookings")
       .update({ status: "cancelled" })
-      .eq("id", deletingBooking.id);
+      .eq("id", deletingBooking.id)
+      .eq("user_id", user.id);
 
     if (error) {
       logger.error("Error cancelling booking:", error);

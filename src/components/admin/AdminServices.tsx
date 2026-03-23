@@ -257,7 +257,7 @@ export function AdminServices() {
   const handleDelete = async () => {
     if (!deleteId) return;
 
-    const { error } = await supabase.from("services").delete().eq("id", deleteId);
+    const { error } = await supabase.from("services").delete().eq("id", deleteId).eq("tenant_id", tenantId);
 
     if (error) {
       logger.error("Error deleting service:", error);
