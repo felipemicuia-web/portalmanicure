@@ -34,10 +34,12 @@ export function FollowButton({
     }
 
     const checkFollowing = async () => {
+      if (!tenantId) return;
       const { data } = await supabase
         .rpc("is_following", { 
           p_user_id: user.id, 
-          p_professional_id: professionalId 
+          p_professional_id: professionalId,
+          p_tenant_id: tenantId,
         });
       
       setIsFollowing(!!data);
