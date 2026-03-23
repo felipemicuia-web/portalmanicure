@@ -125,11 +125,13 @@ export function ProfessionalGallery({ professionalId, user, isAdmin }: Professio
   };
 
   const fetchComments = async (photoId: string) => {
+    if (!tenantId) return;
     setLoadingComments(true);
     const { data, error } = await supabase
       .from("photo_comments")
       .select("*")
       .eq("photo_id", photoId)
+      .eq("tenant_id", tenantId)
       .order("created_at", { ascending: true });
 
     if (error) {
@@ -140,7 +142,8 @@ export function ProfessionalGallery({ professionalId, user, isAdmin }: Professio
       const { data: profiles } = await supabase
         .from("profiles")
         .select("user_id, name, avatar_url")
-        .in("user_id", userIds);
+        .in("user_id", userIds)
+        .eq("tenant_id", tenantId);
 
       const commentsWithProfiles = data.map((comment) => ({
         ...comment,
