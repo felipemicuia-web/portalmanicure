@@ -1,7 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useTenant } from "@/contexts/TenantContext";
-import { useAuth } from "@/contexts/AuthContext";
 
 /**
  * Checks if the current authenticated user is linked to a professional
@@ -9,38 +8,51 @@ import { useAuth } from "@/contexts/AuthContext";
  * Returns the professional_id if linked, null otherwise.
  */
 export function useLinkedProfessional() {
-  const { user, loading: authLoading } = useAuth();
   const { tenantId, loading: tenantLoading } = useTenant();
   const [professionalId, setProfessionalId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    // Wait for both auth and tenant to finish loading
-    if (authLoading || tenantLoading) {
-      console.log("[useLinkedProfessional] Still loading - auth:", authLoading, "tenant:", tenantLoading);
-      return;
-    }
+  const checkLink = useCallback(async (email: string, tid: string) => {
+    setLoading(true);
+    const { data, error } = await supabase.rpc("get_professional_by_user_email", {
+      p_user_email: email,
+      p_tenant_id: tid,
+    });
+    setProfessionalId(!error && data ? data : null);
+    setLoading(false);
+  }, []);
 
-    if (!user?.email || !tenantId) {
-      console.log("[useLinkedProfessional] Missing data - email:", user?.email, "tenantId:", tenantId);
+  useEffect(() => {
+    if (tenantLoading) return;
+
+    if (!tenantId) {
       setProfessionalId(null);
       setLoading(false);
       return;
     }
 
-    setLoading(true);
-    console.log("[useLinkedProfessional] Calling RPC with email:", user.email, "tenant:", tenantId);
-    supabase
-      .rpc("get_professional_by_user_email", {
-        p_user_email: user.email,
-        p_tenant_id: tenantId,
-      })
-      .then(({ data, error }) => {
-        console.log("[useLinkedProfessional] RPC result - data:", data, "error:", error);
-        setProfessionalId(!error && data ? data : null);
+    // Check current session immediately
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user?.email) {
+        checkLink(session.user.email, tenantId);
+      } else {
+        setProfessionalId(null);
         setLoading(false);
-      });
-  }, [user?.email, tenantId, authLoading, tenantLoading]);
+      }
+    });
+
+    // Listen for auth changes (login/logout)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user?.email && tenantId) {
+        checkLink(session.user.email, tenantId);
+      } else {
+        setProfessionalId(null);
+        setLoading(false);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [tenantId, tenantLoading, checkLink]);
 
   return { professionalId, isProfessional: !!professionalId, loading };
 }
