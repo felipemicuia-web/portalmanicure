@@ -198,7 +198,7 @@ export default function AdminPage() {
         </aside>
 
         {/* Main area */}
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 flex flex-col">
           {/* Mobile Header */}
           <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50 md:hidden">
             <div className="px-4 py-3 flex items-center justify-between">
