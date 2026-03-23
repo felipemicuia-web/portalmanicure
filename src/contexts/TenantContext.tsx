@@ -31,6 +31,13 @@ export function useTenant() {
 }
 
 function resolveSlugFromUrl(): string {
+  const tenantPathMatch = window.location.pathname.match(/^\/tenant\/([a-zA-Z0-9_-]+)/);
+  if (tenantPathMatch) return tenantPathMatch[1];
+
+  if (!MULTI_TENANT_MODE) {
+    return TENANT_DEFAULT_SLUG;
+  }
+
   const hostname = window.location.hostname;
   if (!hostname.includes("lovable.app") && hostname !== "localhost" && !hostname.includes("127.0.0.1")) {
     return `domain:${hostname}`;
@@ -44,7 +51,7 @@ function resolveSlugFromUrl(): string {
   }
   const pathMatch = window.location.pathname.match(/^\/t\/([a-zA-Z0-9_-]+)/);
   if (pathMatch) return pathMatch[1];
-  return "default";
+  return TENANT_DEFAULT_SLUG;
 }
 
 export function TenantProvider({ children }: { children: ReactNode }) {
