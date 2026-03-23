@@ -284,7 +284,7 @@ export function AdminServices() {
     );
   }
 
-  const FormContent = () => (
+  const formContent = (
     <div className="space-y-4">
       {/* Image Upload */}
       <div className="space-y-2">
