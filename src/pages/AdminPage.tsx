@@ -144,10 +144,10 @@ export default function AdminPage() {
   const ActiveIcon = activeItem?.icon ?? CalendarDays;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-[100dvh] bg-background">
       <div className="galaxy-bg" />
 
-      <div className="relative z-10 flex">
+      <div className="relative z-10 flex min-h-[100dvh]">
         {/* Desktop Sidebar */}
         <aside className="hidden md:flex flex-col w-56 lg:w-64 min-h-screen border-r border-border/50 bg-background/80 backdrop-blur-xl sticky top-0 h-screen">
           <div className="p-4 border-b border-border/50 flex items-center gap-2">
@@ -198,7 +198,7 @@ export default function AdminPage() {
         </aside>
 
         {/* Main area */}
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 flex flex-col">
           {/* Mobile Header */}
           <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50 md:hidden">
             <div className="px-4 py-3 flex items-center justify-between">
@@ -214,7 +214,7 @@ export default function AdminPage() {
                       <Shield className="w-5 h-5 text-primary" />
                       <h2 className="font-bold gradient-text">Painel Admin</h2>
                     </div>
-                    <nav className="py-2">
+                    <nav className="py-2 overflow-y-auto max-h-[calc(100dvh-140px)]">
                       {MENU_ITEMS.map((item) => {
                         const Icon = item.icon;
                         const isActive = activeTab === item.value;
@@ -284,7 +284,7 @@ export default function AdminPage() {
           </header>
 
           {/* Content */}
-          <main className="p-4 sm:p-6 max-w-5xl">
+          <main className="flex-1 overflow-y-auto p-4 sm:p-6 max-w-5xl">
             {TAB_CONTENT[activeTab]}
           </main>
         </div>
