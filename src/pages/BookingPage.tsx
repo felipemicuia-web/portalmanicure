@@ -637,8 +637,21 @@ export default function BookingPage() {
           <PopupTrigger />
 
           <footer className="mt-6 sm:mt-8 flex flex-col sm:flex-row justify-between gap-2 sm:gap-4 text-[10px] sm:text-xs text-muted-foreground text-center sm:text-left">
-            <span>© {new Date().getFullYear()} Agendamento Manicure</span>
-            <span className="hidden sm:inline">Sistema de agendamento online</span>
+            {platformSettings.footer_url ? (
+              <a
+                href={platformSettings.footer_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:text-foreground transition-colors"
+              >
+                {platformSettings.footer_text || `© ${new Date().getFullYear()} Agendamento Manicure`}
+              </a>
+            ) : (
+              <span>{platformSettings.footer_text || `© ${new Date().getFullYear()} Agendamento Manicure`}</span>
+            )}
+            {platformSettings.footer_secondary_text && (
+              <span className="hidden sm:inline">{platformSettings.footer_secondary_text}</span>
+            )}
           </footer>
         </main>
       </div>
