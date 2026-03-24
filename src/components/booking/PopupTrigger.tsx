@@ -29,13 +29,13 @@ export function PopupTrigger() {
       <div className="w-full flex justify-center my-4">
         <button
           onClick={() => setOpen(true)}
-          className="rounded-xl overflow-hidden border border-border/40 shadow-md hover:shadow-lg transition-shadow cursor-pointer max-w-sm w-full group"
+          className="h-16 w-16 rounded-lg overflow-hidden border-2 border-border/40 shadow-md hover:shadow-lg transition-shadow cursor-pointer group flex-shrink-0"
           aria-label="Abrir promoção"
         >
           <img
             src={popup.trigger_image_url}
             alt={popup.title || "Promoção"}
-            className="w-full h-auto object-cover group-hover:scale-[1.02] transition-transform duration-300"
+            className="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-300"
             loading="lazy"
           />
         </button>
