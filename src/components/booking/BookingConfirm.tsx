@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, User, Briefcase, Calendar, Wallet, Phone, CheckCircle, Ticket, X, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatDateBR } from "@/lib/dateFormat";
+import { PaymentBlock } from "@/components/booking/PaymentBlock";
 
 export interface AppliedCoupon {
   coupon_id: string;
@@ -259,6 +260,9 @@ export function BookingConfirm({
           )}
         </div>
       )}
+
+      {/* Payment Block */}
+      {!isConfirmed && <PaymentBlock />}
 
       {/* Form - Stack on mobile */}
       <div className="space-y-4 sm:space-y-5">
