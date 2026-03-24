@@ -193,16 +193,19 @@ export function PlatformInsights() {
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={revenueChartData}>
                   <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                  <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-                  <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `R$${v}`} />
-                  <Tooltip
+                   <XAxis dataKey="name" tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
+                   <YAxis tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} tickFormatter={(v) => `R$${v}`} />
+                   <Tooltip
                     formatter={(v: number) => fmt(v)}
                     contentStyle={{
                       background: "hsl(var(--card))",
                       border: "1px solid hsl(var(--border))",
                       borderRadius: 8,
                       fontSize: 12,
+                      color: "hsl(var(--card-foreground))",
                     }}
+                    labelStyle={{ color: "hsl(var(--card-foreground))" }}
+                    itemStyle={{ color: "hsl(var(--card-foreground))" }}
                   />
                   <Bar dataKey="mensal" name="Mensal" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
                   <Bar dataKey="anual" name="Anual" fill="hsl(var(--accent-foreground))" opacity={0.6} radius={[4, 4, 0, 0]} />
