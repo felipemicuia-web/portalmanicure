@@ -153,17 +153,22 @@ export function AdminLocation() {
           </div>
 
           {/* Preview */}
-          {form.embed_url.trim() && isValidUrl(form.embed_url.trim()) && (
+          {form.address.trim() && (
             <div className="space-y-1.5">
               <Label>Preview do mapa</Label>
               <div className="rounded-lg overflow-hidden border border-border/50">
                 <iframe
-                  src={form.embed_url.trim()}
+                  src={
+                    form.embed_url.trim() && isValidUrl(form.embed_url.trim())
+                      ? form.embed_url.trim()
+                      : `https://maps.google.com/maps?q=${encodeURIComponent(form.address.trim())}&t=&z=15&ie=UTF8&iwloc=&output=embed`
+                  }
                   className="w-full h-48"
                   loading="lazy"
                   allowFullScreen
                   referrerPolicy="no-referrer-when-downgrade"
                   title="Mapa preview"
+                  style={{ border: 0 }}
                 />
               </div>
             </div>
