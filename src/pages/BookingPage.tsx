@@ -556,7 +556,6 @@ export default function BookingPage() {
               <div className="mt-3 sm:mt-4">
                 {currentStep === 1 && (
                   <>
-                    <LocationSection />
                     <ProfessionalSelect
                     professionals={professionals}
                     selectedId={professionalId}
