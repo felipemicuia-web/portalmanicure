@@ -40,6 +40,7 @@ import {
   Ticket,
   BarChart3,
   CreditCard,
+  Megaphone,
   type LucideIcon,
 } from "lucide-react";
 
