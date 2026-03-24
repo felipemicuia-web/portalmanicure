@@ -19,6 +19,7 @@ import { AdminHeroHeader } from "@/components/admin/AdminHeroHeader";
 import { AdminDashboard } from "@/components/admin/AdminDashboard";
 import { AdminPayment } from "@/components/admin/AdminPayment";
 import { AdminPopups } from "@/components/admin/AdminPopups";
+import { AdminLocation } from "@/components/admin/AdminLocation";
 
 import { AdminUsers } from "@/components/admin/AdminUsers";
 import { AdminCoupons } from "@/components/admin/AdminCoupons";
