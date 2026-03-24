@@ -570,6 +570,7 @@ export default function BookingPage() {
                     onNext={() => goToStep(2)}
                     showFilter={branding.showProfessionalFilter}
                   />
+                  <LocationSection />
                   </>
                 )}
 
