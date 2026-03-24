@@ -74,6 +74,7 @@ const TAB_CONTENT: Record<string, React.ReactNode> = {
   theme: <AdminTheme />,
   coupons: <AdminCoupons />,
   payment: <AdminPayment />,
+  popups: <AdminPopups />,
   users: <AdminUsers />,
 };
 
