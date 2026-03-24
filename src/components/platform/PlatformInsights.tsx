@@ -158,7 +158,8 @@ export function PlatformInsights() {
                     paddingAngle={4}
                     dataKey="value"
                     label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-                  >
+                    labelLine={{ stroke: "hsl(var(--muted-foreground))" }}
+                    style={{ fill: "hsl(var(--foreground))", fontSize: 12 }}
                     {planChartData.map((_, i) => (
                       <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
                     ))}
