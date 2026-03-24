@@ -54,6 +54,7 @@ export default function BookingPage() {
   const tp = useTenantPath();
   const { professionals, services, loading: dataLoading } = useBookingData();
   const { branding } = useBranding();
+  const { settings: platformSettings } = usePlatformSettings();
   const [draftRestored, setDraftRestored] = useState(false);
   const [professionalServiceIds, setProfessionalServiceIds] = useState<string[]>([]);
 
