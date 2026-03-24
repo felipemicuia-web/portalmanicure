@@ -42,6 +42,7 @@ import {
   BarChart3,
   CreditCard,
   Megaphone,
+  MapPin,
   type LucideIcon,
 } from "lucide-react";
 
