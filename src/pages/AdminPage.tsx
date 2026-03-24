@@ -70,6 +70,7 @@ const TAB_CONTENT: Record<string, React.ReactNode> = {
   hero: <AdminHeroHeader />,
   theme: <AdminTheme />,
   coupons: <AdminCoupons />,
+  payment: <AdminPayment />,
   users: <AdminUsers />,
 };
 

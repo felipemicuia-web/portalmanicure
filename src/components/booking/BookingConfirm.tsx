@@ -261,6 +261,9 @@ export function BookingConfirm({
         </div>
       )}
 
+      {/* Payment Block */}
+      {!isConfirmed && <PaymentBlock />}
+
       {/* Form - Stack on mobile */}
       <div className="space-y-4 sm:space-y-5">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">
