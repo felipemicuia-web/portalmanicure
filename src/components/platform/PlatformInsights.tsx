@@ -163,13 +163,15 @@ export function PlatformInsights() {
                       <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip
+                   <Tooltip
                     contentStyle={{
                       background: "hsl(var(--card))",
                       border: "1px solid hsl(var(--border))",
                       borderRadius: 8,
                       fontSize: 12,
+                      color: "hsl(var(--card-foreground))",
                     }}
+                    itemStyle={{ color: "hsl(var(--card-foreground))" }}
                   />
                 </PieChart>
               </ResponsiveContainer>
