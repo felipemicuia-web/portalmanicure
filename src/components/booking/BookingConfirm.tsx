@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, User, Briefcase, Calendar, Wallet, Phone, CheckCircle, Ticket, X, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatDateBR } from "@/lib/dateFormat";
+import { PaymentBlock } from "@/components/booking/PaymentBlock";
 
 export interface AppliedCoupon {
   coupon_id: string;
