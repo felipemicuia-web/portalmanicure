@@ -53,16 +53,18 @@ export function LocationSection() {
           variant="outline"
           size="sm"
           className="gap-2 w-full sm:w-auto"
-          asChild
+          onClick={() => {
+            const url = actionUrl!;
+            if (location.open_in_new_tab) {
+              const w = window.open(url, "_blank", "noopener,noreferrer");
+              if (!w) window.location.href = url;
+            } else {
+              window.location.href = url;
+            }
+          }}
         >
-          <a
-            href={actionUrl ?? "#"}
-            target={location.open_in_new_tab ? "_blank" : "_self"}
-            rel="noopener noreferrer"
-          >
-            <ExternalLink className="w-4 h-4" />
-            {location.button_text || "Ver no Google Maps"}
-          </a>
+          <ExternalLink className="w-4 h-4" />
+          {location.button_text || "Ver no Google Maps"}
         </Button>
       )}
     </div>
