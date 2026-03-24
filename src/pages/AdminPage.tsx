@@ -59,6 +59,7 @@ const MENU_ITEMS: { value: string; label: string; icon: LucideIcon }[] = [
   { value: "coupons", label: "Cupons", icon: Ticket },
   { value: "payment", label: "Pagamento", icon: CreditCard },
   { value: "popups", label: "Pop-ups", icon: Megaphone },
+  { value: "location", label: "Localização", icon: MapPin },
   { value: "users", label: "Clientes", icon: UsersRound },
   { value: "dashboard", label: "Dashboard", icon: BarChart3 },
 ];
