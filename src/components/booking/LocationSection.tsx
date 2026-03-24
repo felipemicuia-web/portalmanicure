@@ -3,12 +3,24 @@ import { isValidUrl } from "@/hooks/usePaymentSettings";
 import { MapPin, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+function buildEmbedUrl(address: string, embedUrl?: string): string | null {
+  // If admin provided a valid embed URL, use it
+  if (embedUrl && embedUrl.trim() !== "" && isValidUrl(embedUrl.trim())) {
+    return embedUrl.trim();
+  }
+  // Auto-generate from address
+  if (address.trim()) {
+    return `https://maps.google.com/maps?q=${encodeURIComponent(address.trim())}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+  }
+  return null;
+}
+
 export function LocationSection() {
   const { location, loading } = usePublicLocationSettings();
 
   if (loading || !location) return null;
 
-  const hasEmbed = location.embed_url.trim() !== "" && isValidUrl(location.embed_url.trim());
+  const embedSrc = buildEmbedUrl(location.address, location.embed_url);
   const hasMapsLink = location.google_maps_url.trim() !== "" && isValidUrl(location.google_maps_url.trim());
 
   return (
@@ -26,15 +38,16 @@ export function LocationSection() {
 
       <p className="text-xs sm:text-sm text-foreground/90">{location.address}</p>
 
-      {hasEmbed && (
+      {embedSrc && (
         <div className="rounded-lg overflow-hidden border border-border/40">
           <iframe
-            src={location.embed_url.trim()}
+            src={embedSrc}
             className="w-full h-40 sm:h-48"
             loading="lazy"
             allowFullScreen
             referrerPolicy="no-referrer-when-downgrade"
             title="Localização"
+            style={{ border: 0 }}
           />
         </div>
       )}
