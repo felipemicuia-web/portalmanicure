@@ -10,6 +10,7 @@ import { PlatformUsers } from "@/components/platform/PlatformUsers";
 import { PlatformPlans } from "@/components/platform/PlatformPlans";
 import { PlatformInsights } from "@/components/platform/PlatformInsights";
 import { PlatformTenantDashboards } from "@/components/platform/PlatformTenantDashboards";
+import { PlatformFooterSettings } from "@/components/platform/PlatformFooterSettings";
 import {
   Shield,
   LogOut,
@@ -21,6 +22,7 @@ import {
   Crown,
   DollarSign,
   LayoutDashboard,
+  Settings,
   type LucideIcon,
 } from "lucide-react";
 
@@ -31,6 +33,7 @@ const MENU_ITEMS: { value: string; label: string; icon: LucideIcon }[] = [
   { value: "users", label: "Usuários", icon: Users },
   { value: "insights", label: "Valores e Insights", icon: DollarSign },
   { value: "plans", label: "Planos", icon: Crown },
+  { value: "settings", label: "Configurações", icon: Settings },
 ];
 
 export default function PlatformPage() {
@@ -166,6 +169,7 @@ export default function PlatformPage() {
             {activeTab === "users" && <PlatformUsers />}
             {activeTab === "insights" && <PlatformInsights />}
             {activeTab === "plans" && <PlatformPlans />}
+            {activeTab === "settings" && <PlatformFooterSettings />}
           </main>
         </div>
       </div>
