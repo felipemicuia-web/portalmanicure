@@ -10,6 +10,7 @@ import { PlatformUsers } from "@/components/platform/PlatformUsers";
 import { PlatformPlans } from "@/components/platform/PlatformPlans";
 import { PlatformInsights } from "@/components/platform/PlatformInsights";
 import { PlatformTenantDashboards } from "@/components/platform/PlatformTenantDashboards";
+import { PlatformFooterSettings } from "@/components/platform/PlatformFooterSettings";
 import {
   Shield,
   LogOut,
@@ -21,6 +22,7 @@ import {
   Crown,
   DollarSign,
   LayoutDashboard,
+  Settings,
   type LucideIcon,
 } from "lucide-react";
 
