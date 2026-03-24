@@ -105,7 +105,7 @@ export function AdminLocation() {
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="loc-embed-url">Link de incorporação do mapa (embed)</Label>
+            <Label htmlFor="loc-embed-url">Link de incorporação do mapa (opcional)</Label>
             <Input
               id="loc-embed-url"
               value={form.embed_url}
@@ -116,7 +116,7 @@ export function AdminLocation() {
               <p className="text-xs text-destructive">URL inválida.</p>
             )}
             <p className="text-xs text-muted-foreground">
-              Cole aqui o link de incorporação do Google Maps (src do iframe).
+              Opcional. Se não preencher, o mapa será gerado automaticamente a partir do endereço.
             </p>
           </div>
 
@@ -153,17 +153,22 @@ export function AdminLocation() {
           </div>
 
           {/* Preview */}
-          {form.embed_url.trim() && isValidUrl(form.embed_url.trim()) && (
+          {form.address.trim() && (
             <div className="space-y-1.5">
               <Label>Preview do mapa</Label>
               <div className="rounded-lg overflow-hidden border border-border/50">
                 <iframe
-                  src={form.embed_url.trim()}
+                  src={
+                    form.embed_url.trim() && isValidUrl(form.embed_url.trim())
+                      ? form.embed_url.trim()
+                      : `https://maps.google.com/maps?q=${encodeURIComponent(form.address.trim())}&t=&z=15&ie=UTF8&iwloc=&output=embed`
+                  }
                   className="w-full h-48"
                   loading="lazy"
                   allowFullScreen
                   referrerPolicy="no-referrer-when-downgrade"
                   title="Mapa preview"
+                  style={{ border: 0 }}
                 />
               </div>
             </div>
