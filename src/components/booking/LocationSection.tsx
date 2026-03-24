@@ -1,18 +1,11 @@
 import { usePublicLocationSettings } from "@/hooks/useLocationSettings";
 import { isValidUrl } from "@/hooks/usePaymentSettings";
+import { buildGoogleMapsExternalUrl, normalizeGoogleMapsEmbedUrl } from "@/lib/maps";
 import { MapPin, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 function buildEmbedUrl(address: string, embedUrl?: string): string | null {
-  // If admin provided a valid embed URL, use it
-  if (embedUrl && embedUrl.trim() !== "" && isValidUrl(embedUrl.trim())) {
-    return embedUrl.trim();
-  }
-  // Auto-generate from address
-  if (address.trim()) {
-    return `https://maps.google.com/maps?q=${encodeURIComponent(address.trim())}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
-  }
-  return null;
+  return normalizeGoogleMapsEmbedUrl(embedUrl, address);
 }
 
 export function LocationSection() {
@@ -21,7 +14,10 @@ export function LocationSection() {
   if (loading || !location) return null;
 
   const embedSrc = buildEmbedUrl(location.address, location.embed_url);
-  const hasMapsLink = location.google_maps_url.trim() !== "" && isValidUrl(location.google_maps_url.trim());
+  const mapsUrl = location.google_maps_url.trim();
+  const fallbackMapsUrl = buildGoogleMapsExternalUrl(location.address);
+  const actionUrl = mapsUrl !== "" && isValidUrl(mapsUrl) ? mapsUrl : fallbackMapsUrl;
+  const hasMapsLink = Boolean(actionUrl);
 
   return (
     <div className="glass-panel p-4 sm:p-5 space-y-3 mb-4">
@@ -60,7 +56,7 @@ export function LocationSection() {
           asChild
         >
           <a
-            href={location.google_maps_url.trim()}
+            href={actionUrl ?? "#"}
             target={location.open_in_new_tab ? "_blank" : "_self"}
             rel="noopener noreferrer"
           >

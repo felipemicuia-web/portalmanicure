@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocationSettings, LocationSettings } from "@/hooks/useLocationSettings";
 import { isValidUrl } from "@/hooks/usePaymentSettings";
+import { normalizeGoogleMapsEmbedUrl } from "@/lib/maps";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -158,11 +159,7 @@ export function AdminLocation() {
               <Label>Preview do mapa</Label>
               <div className="rounded-lg overflow-hidden border border-border/50">
                 <iframe
-                  src={
-                    form.embed_url.trim() && isValidUrl(form.embed_url.trim())
-                      ? form.embed_url.trim()
-                      : `https://maps.google.com/maps?q=${encodeURIComponent(form.address.trim())}&t=&z=15&ie=UTF8&iwloc=&output=embed`
-                  }
+                  src={normalizeGoogleMapsEmbedUrl(form.embed_url, form.address) ?? undefined}
                   className="w-full h-48"
                   loading="lazy"
                   allowFullScreen
