@@ -20,6 +20,7 @@ import { normalizePhone, isValidBrazilianPhone, isValidName } from "@/lib/valida
 import { saveBookingDraft, loadBookingDraft, clearBookingDraft } from "@/lib/bookingDraft";
 import { useTenantPath } from "@/contexts/TenantScopeProvider";
 import { PopupTrigger } from "@/components/booking/PopupTrigger";
+import { LocationSection } from "@/components/booking/LocationSection";
 import { usePlatformSettings } from "@/hooks/usePlatformSettings";
 
 function getTodayISO(): string {
@@ -554,7 +555,9 @@ export default function BookingPage() {
 
               <div className="mt-3 sm:mt-4">
                 {currentStep === 1 && (
-                  <ProfessionalSelect
+                  <>
+                    <LocationSection />
+                    <ProfessionalSelect
                     professionals={professionals}
                     selectedId={professionalId}
                     onSelect={(id) => {
@@ -568,6 +571,7 @@ export default function BookingPage() {
                     onNext={() => goToStep(2)}
                     showFilter={branding.showProfessionalFilter}
                   />
+                  </>
                 )}
 
                 {currentStep === 2 && (
