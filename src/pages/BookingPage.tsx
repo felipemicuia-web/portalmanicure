@@ -631,6 +631,9 @@ export default function BookingPage() {
             <MyBookings user={user} />
           )}
 
+          {/* Pop-up promocional */}
+          <PopupTrigger />
+
           <footer className="mt-6 sm:mt-8 flex flex-col sm:flex-row justify-between gap-2 sm:gap-4 text-[10px] sm:text-xs text-muted-foreground text-center sm:text-left">
             <span>© {new Date().getFullYear()} Agendamento Manicure</span>
             <span className="hidden sm:inline">Sistema de agendamento online</span>
