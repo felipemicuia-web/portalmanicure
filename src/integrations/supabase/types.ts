@@ -991,6 +991,56 @@ export type Database = {
           },
         ]
       }
+      tenant_payment_settings: {
+        Row: {
+          button_text: string
+          created_at: string
+          description: string
+          enabled: boolean
+          id: string
+          open_in_new_tab: boolean
+          payment_url: string
+          tenant_id: string
+          title: string
+          updated_at: string
+          warning_message: string | null
+        }
+        Insert: {
+          button_text?: string
+          created_at?: string
+          description?: string
+          enabled?: boolean
+          id?: string
+          open_in_new_tab?: boolean
+          payment_url?: string
+          tenant_id: string
+          title?: string
+          updated_at?: string
+          warning_message?: string | null
+        }
+        Update: {
+          button_text?: string
+          created_at?: string
+          description?: string
+          enabled?: boolean
+          id?: string
+          open_in_new_tab?: boolean
+          payment_url?: string
+          tenant_id?: string
+          title?: string
+          updated_at?: string
+          warning_message?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tenant_payment_settings_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: true
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tenant_subscriptions: {
         Row: {
           billing_cycle: string
