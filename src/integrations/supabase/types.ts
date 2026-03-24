@@ -1015,6 +1015,59 @@ export type Database = {
           },
         ]
       }
+      tenant_location_settings: {
+        Row: {
+          address: string
+          button_text: string
+          created_at: string
+          description: string | null
+          embed_url: string
+          enabled: boolean
+          google_maps_url: string
+          id: string
+          open_in_new_tab: boolean
+          tenant_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          address?: string
+          button_text?: string
+          created_at?: string
+          description?: string | null
+          embed_url?: string
+          enabled?: boolean
+          google_maps_url?: string
+          id?: string
+          open_in_new_tab?: boolean
+          tenant_id: string
+          title?: string
+          updated_at?: string
+        }
+        Update: {
+          address?: string
+          button_text?: string
+          created_at?: string
+          description?: string | null
+          embed_url?: string
+          enabled?: boolean
+          google_maps_url?: string
+          id?: string
+          open_in_new_tab?: boolean
+          tenant_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tenant_location_settings_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: true
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tenant_payment_settings: {
         Row: {
           button_text: string
