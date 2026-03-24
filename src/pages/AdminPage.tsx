@@ -18,6 +18,7 @@ import { AdminWhatsAppTemplate } from "@/components/admin/AdminWhatsAppTemplate"
 import { AdminHeroHeader } from "@/components/admin/AdminHeroHeader";
 import { AdminDashboard } from "@/components/admin/AdminDashboard";
 import { AdminPayment } from "@/components/admin/AdminPayment";
+import { AdminPopups } from "@/components/admin/AdminPopups";
 
 import { AdminUsers } from "@/components/admin/AdminUsers";
 import { AdminCoupons } from "@/components/admin/AdminCoupons";
@@ -39,6 +40,7 @@ import {
   Ticket,
   BarChart3,
   CreditCard,
+  Megaphone,
   type LucideIcon,
 } from "lucide-react";
 
@@ -54,6 +56,7 @@ const MENU_ITEMS: { value: string; label: string; icon: LucideIcon }[] = [
   { value: "theme", label: "Cores", icon: Palette },
   { value: "coupons", label: "Cupons", icon: Ticket },
   { value: "payment", label: "Pagamento", icon: CreditCard },
+  { value: "popups", label: "Pop-ups", icon: Megaphone },
   { value: "users", label: "Clientes", icon: UsersRound },
   { value: "dashboard", label: "Dashboard", icon: BarChart3 },
 ];
@@ -71,6 +74,7 @@ const TAB_CONTENT: Record<string, React.ReactNode> = {
   theme: <AdminTheme />,
   coupons: <AdminCoupons />,
   payment: <AdminPayment />,
+  popups: <AdminPopups />,
   users: <AdminUsers />,
 };
 

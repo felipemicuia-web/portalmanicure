@@ -19,6 +19,7 @@ import { logger } from "@/lib/logger";
 import { normalizePhone, isValidBrazilianPhone, isValidName } from "@/lib/validation";
 import { saveBookingDraft, loadBookingDraft, clearBookingDraft } from "@/lib/bookingDraft";
 import { useTenantPath } from "@/contexts/TenantScopeProvider";
+import { PopupTrigger } from "@/components/booking/PopupTrigger";
 
 function getTodayISO(): string {
   const d = new Date();
@@ -629,6 +630,9 @@ export default function BookingPage() {
           {activePage === "my-bookings" && user && (
             <MyBookings user={user} />
           )}
+
+          {/* Pop-up promocional */}
+          <PopupTrigger />
 
           <footer className="mt-6 sm:mt-8 flex flex-col sm:flex-row justify-between gap-2 sm:gap-4 text-[10px] sm:text-xs text-muted-foreground text-center sm:text-left">
             <span>© {new Date().getFullYear()} Agendamento Manicure</span>

@@ -1041,6 +1041,62 @@ export type Database = {
           },
         ]
       }
+      tenant_popups: {
+        Row: {
+          button_text: string | null
+          button_url: string | null
+          created_at: string
+          description: string | null
+          enabled: boolean
+          id: string
+          modal_image_url: string | null
+          open_button_in_new_tab: boolean
+          position: string
+          tenant_id: string
+          title: string | null
+          trigger_image_url: string
+          updated_at: string
+        }
+        Insert: {
+          button_text?: string | null
+          button_url?: string | null
+          created_at?: string
+          description?: string | null
+          enabled?: boolean
+          id?: string
+          modal_image_url?: string | null
+          open_button_in_new_tab?: boolean
+          position?: string
+          tenant_id: string
+          title?: string | null
+          trigger_image_url?: string
+          updated_at?: string
+        }
+        Update: {
+          button_text?: string | null
+          button_url?: string | null
+          created_at?: string
+          description?: string | null
+          enabled?: boolean
+          id?: string
+          modal_image_url?: string | null
+          open_button_in_new_tab?: boolean
+          position?: string
+          tenant_id?: string
+          title?: string | null
+          trigger_image_url?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tenant_popups_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tenant_subscriptions: {
         Row: {
           billing_cycle: string
