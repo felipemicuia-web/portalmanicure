@@ -38,6 +38,7 @@ import {
   Menu,
   Ticket,
   BarChart3,
+  CreditCard,
   type LucideIcon,
 } from "lucide-react";
 
