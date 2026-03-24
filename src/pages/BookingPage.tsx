@@ -19,6 +19,7 @@ import { logger } from "@/lib/logger";
 import { normalizePhone, isValidBrazilianPhone, isValidName } from "@/lib/validation";
 import { saveBookingDraft, loadBookingDraft, clearBookingDraft } from "@/lib/bookingDraft";
 import { useTenantPath } from "@/contexts/TenantScopeProvider";
+import { PopupTrigger } from "@/components/booking/PopupTrigger";
 
 function getTodayISO(): string {
   const d = new Date();
