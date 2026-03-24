@@ -20,6 +20,7 @@ import { normalizePhone, isValidBrazilianPhone, isValidName } from "@/lib/valida
 import { saveBookingDraft, loadBookingDraft, clearBookingDraft } from "@/lib/bookingDraft";
 import { useTenantPath } from "@/contexts/TenantScopeProvider";
 import { PopupTrigger } from "@/components/booking/PopupTrigger";
+import { usePlatformSettings } from "@/hooks/usePlatformSettings";
 
 function getTodayISO(): string {
   const d = new Date();
