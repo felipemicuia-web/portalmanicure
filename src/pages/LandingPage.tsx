@@ -6,12 +6,15 @@ import { User } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
 import { useLandingContent } from "@/hooks/useLandingContent";
 import { LandingContent, LandingCard as LandingCardType, SectionDisplayMode } from "@/types/landing";
 import {
   Calendar, Users, Scissors, Clock, Shield, Smartphone,
   BarChart3, Globe, Star, ChevronRight, Menu, X, Zap,
-  Check, ArrowRight, Sparkles, Heart, Award,
+  Check, ArrowRight, Sparkles, Heart, Award, Loader2, Send,
   type LucideIcon,
 } from "lucide-react";
 
@@ -92,10 +95,8 @@ function LandingHeader({ content }: { content: LandingContent }) {
             <Button variant="ghost" size="sm" asChild>
               <Link to="/auth">{h.loginButtonText}</Link>
             </Button>
-            <Button size="sm" className="gap-1.5" asChild>
-              <Link to="/auth">
-                {h.ctaButtonText} <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
+            <Button size="sm" className="gap-1.5" onClick={() => scrollToSection("#teste-gratis")}>
+              {h.ctaButtonText} <ArrowRight className="w-3.5 h-3.5" />
             </Button>
           </div>
         </nav>
@@ -125,8 +126,8 @@ function LandingHeader({ content }: { content: LandingContent }) {
             <Button variant="outline" size="sm" asChild>
               <Link to="/auth">{h.loginButtonText}</Link>
             </Button>
-            <Button size="sm" asChild>
-              <Link to="/auth">{h.ctaButtonText}</Link>
+            <Button size="sm" onClick={() => { scrollToSection("#teste-gratis"); setOpen(false); }}>
+              {h.ctaButtonText}
             </Button>
           </div>
         </div>
