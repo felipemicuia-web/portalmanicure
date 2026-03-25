@@ -1,3 +1,5 @@
+export type SectionDisplayMode = "text" | "image" | "both";
+
 export interface LandingMenuItem {
   label: string;
   href: string;
@@ -24,6 +26,8 @@ export interface LandingHero {
   ctaText: string;
   secondaryCtaText: string;
   stats: LandingStat[];
+  imageUrl?: string;
+  displayMode?: SectionDisplayMode;
 }
 
 export interface LandingCard {
@@ -37,6 +41,8 @@ export interface LandingSection {
   badgeText: string;
   title: string;
   subtitle: string;
+  imageUrl?: string;
+  displayMode?: SectionDisplayMode;
 }
 
 export interface LandingBenefits extends LandingSection {
@@ -45,7 +51,6 @@ export interface LandingBenefits extends LandingSection {
 
 export interface LandingFeatures extends LandingSection {
   items: LandingCard[];
-  imageUrl: string;
 }
 
 export interface LandingPlanItem {
@@ -73,6 +78,8 @@ export interface LandingCta {
   title: string;
   description: string;
   ctaText: string;
+  imageUrl?: string;
+  displayMode?: SectionDisplayMode;
 }
 
 export interface LandingFooter {
@@ -116,12 +123,16 @@ export const DEFAULT_LANDING_CONTENT: LandingContent = {
       { label: "Profissionais ativos", value: "500+" },
       { label: "Uptime garantido", value: "99.9%" },
     ],
+    imageUrl: "",
+    displayMode: "text",
   },
   benefits: {
     enabled: true,
     badgeText: "Benefícios",
     title: "Tudo que você precisa para crescer",
     subtitle: "Uma plataforma completa que simplifica sua rotina e encanta seus clientes.",
+    imageUrl: "",
+    displayMode: "text",
     cards: [
       { title: "Economia de tempo", description: "Automatize agendamentos e reduza no-shows com confirmações automáticas.", icon: "Clock" },
       { title: "100% mobile", description: "Seus clientes agendam de qualquer dispositivo, a qualquer hora.", icon: "Smartphone" },
@@ -137,6 +148,7 @@ export const DEFAULT_LANDING_CONTENT: LandingContent = {
     title: "Funcionalidades que fazem a diferença",
     subtitle: "Do agendamento à gestão completa do seu negócio.",
     imageUrl: "",
+    displayMode: "text",
     items: [],
   },
   pricing: {
@@ -144,6 +156,8 @@ export const DEFAULT_LANDING_CONTENT: LandingContent = {
     badgeText: "Preços",
     title: "Planos para cada momento",
     subtitle: "Comece grátis e evolua conforme seu negócio cresce.",
+    imageUrl: "",
+    displayMode: "text",
     plans: [
       {
         name: "Gratuito",
@@ -179,6 +193,8 @@ export const DEFAULT_LANDING_CONTENT: LandingContent = {
     badgeText: "Demonstração",
     title: "Veja na prática",
     subtitle: "Acesse nosso ambiente de demonstração e experimente todas as funcionalidades.",
+    imageUrl: "",
+    displayMode: "text",
     description: "Acesse o ambiente demo e veja como é fácil gerenciar agendamentos, profissionais e serviços.",
     ctaText: "Acessar demo",
     demoUrl: "/tenant/default",
@@ -188,6 +204,8 @@ export const DEFAULT_LANDING_CONTENT: LandingContent = {
     title: "Pronto para transformar sua agenda?",
     description: "Crie sua conta gratuita em menos de 2 minutos e comece a receber agendamentos online hoje mesmo.",
     ctaText: "Criar conta grátis",
+    imageUrl: "",
+    displayMode: "text",
   },
   footer: {
     brandName: "Portal Manicure",
