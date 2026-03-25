@@ -14,8 +14,10 @@ import {
   Star, 
   Users, 
   Instagram,
-  Calendar
+  Calendar,
+  ChevronRight
 } from "lucide-react";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { FollowButton } from "@/components/professional/FollowButton";
 import { ReviewList } from "@/components/professional/ReviewList";
 import { ReviewForm } from "@/components/professional/ReviewForm";
