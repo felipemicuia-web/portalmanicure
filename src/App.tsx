@@ -9,6 +9,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { TenantProvider } from "@/contexts/TenantContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { RequireSuperAdmin } from "@/components/guards/RequireSuperAdmin";
+import LandingPage from "./pages/LandingPage";
 import BookingPage from "./pages/BookingPage";
 import Auth from "./pages/Auth";
 import AdminPage from "./pages/AdminPage";
