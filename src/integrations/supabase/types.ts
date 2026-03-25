@@ -1302,6 +1302,36 @@ export type Database = {
         }
         Relationships: []
       }
+      trial_leads: {
+        Row: {
+          city: string
+          company_name: string
+          created_at: string
+          full_name: string
+          id: string
+          state: string
+          whatsapp: string
+        }
+        Insert: {
+          city: string
+          company_name: string
+          created_at?: string
+          full_name: string
+          id?: string
+          state: string
+          whatsapp: string
+        }
+        Update: {
+          city?: string
+          company_name?: string
+          created_at?: string
+          full_name?: string
+          id?: string
+          state?: string
+          whatsapp?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
