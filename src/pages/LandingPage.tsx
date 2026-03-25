@@ -631,6 +631,7 @@ export default function LandingPage() {
         <PricingSection content={content} />
         <DemoSection content={content} />
         <CTASection content={content} />
+        <TrialFormSection />
         <LandingFooter content={content} />
       </div>
     </div>
