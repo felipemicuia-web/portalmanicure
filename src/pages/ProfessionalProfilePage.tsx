@@ -298,13 +298,17 @@ export default function ProfessionalProfilePage() {
 
                 {/* Stats */}
                 <div className="flex justify-center sm:justify-start gap-6 mb-4">
-                  <div className="text-center">
+                  <button
+                    onClick={() => setShowReviews(true)}
+                    className="text-center cursor-pointer hover:opacity-80 transition-opacity"
+                  >
                     <div className="flex items-center justify-center gap-1">
                       <Star className="w-4 h-4 fill-current text-primary" />
                       <span className="font-bold">{averageRating > 0 ? averageRating.toFixed(1) : "-"}</span>
+                      <ChevronRight className="w-3 h-3 text-muted-foreground" />
                     </div>
                     <p className="text-xs text-muted-foreground">{reviews.length} avaliações</p>
-                  </div>
+                  </button>
                   <div className="text-center">
                     <div className="flex items-center justify-center gap-1">
                       <Users className="w-4 h-4 text-primary" />
