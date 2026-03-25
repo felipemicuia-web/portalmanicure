@@ -4,7 +4,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Trash2, Plus } from "lucide-react";
-import { LandingPricing, LandingPlanItem } from "@/types/landing";
+import { LandingPricing, LandingPlanItem, SectionDisplayMode } from "@/types/landing";
+import { SectionImageUpload } from "./SectionImageUpload";
 
 interface Props {
   content: LandingPricing;
@@ -57,6 +58,8 @@ export function LandingAdminPricing({ content, onChange }: Props) {
     onChange({ ...content, plans: content.plans.filter((_, i) => i !== index) });
   };
 
+  const mode = content.displayMode || "text";
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -67,88 +70,100 @@ export function LandingAdminPricing({ content, onChange }: Props) {
         </div>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="space-y-2">
-          <Label>Badge</Label>
-          <Input value={content.badgeText} onChange={(e) => onChange({ ...content, badgeText: e.target.value })} />
-        </div>
-        <div className="space-y-2">
-          <Label>Título</Label>
-          <Input value={content.title} onChange={(e) => onChange({ ...content, title: e.target.value })} />
-        </div>
-      </div>
+      <SectionImageUpload
+        imageUrl={content.imageUrl || ""}
+        displayMode={mode}
+        onImageChange={(url) => onChange({ ...content, imageUrl: url })}
+        onDisplayModeChange={(m) => onChange({ ...content, displayMode: m })}
+        sectionLabel="precos"
+      />
 
-      <div className="space-y-2">
-        <Label>Subtítulo</Label>
-        <Input value={content.subtitle} onChange={(e) => onChange({ ...content, subtitle: e.target.value })} />
-      </div>
-
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <Label>Planos ({content.plans.length})</Label>
-          <Button variant="outline" size="sm" onClick={addPlan} className="gap-1.5">
-            <Plus className="w-3.5 h-3.5" /> Adicionar plano
-          </Button>
-        </div>
-
-        {content.plans.map((plan, pi) => (
-          <div key={pi} className="p-4 border border-border/50 rounded-lg space-y-3 bg-background/50">
-            <div className="flex items-center justify-between">
-              <h4 className="font-medium text-sm">{plan.name || "Plano"}</h4>
-              <div className="flex items-center gap-2">
-                <Label htmlFor={`plan-hl-${pi}`} className="text-xs">Destaque</Label>
-                <Switch id={`plan-hl-${pi}`} checked={plan.highlighted} onCheckedChange={(v) => updatePlan(pi, "highlighted", v)} />
-                <Button variant="ghost" size="icon" onClick={() => removePlan(pi)} className="text-destructive hover:text-destructive h-8 w-8">
-                  <Trash2 className="w-4 h-4" />
-                </Button>
-              </div>
-            </div>
-
-            <div className="grid gap-3 sm:grid-cols-3">
-              <div className="space-y-1">
-                <Label className="text-xs">Nome</Label>
-                <Input value={plan.name} onChange={(e) => updatePlan(pi, "name", e.target.value)} />
-              </div>
-              <div className="space-y-1">
-                <Label className="text-xs">Preço</Label>
-                <Input value={plan.price} onChange={(e) => updatePlan(pi, "price", e.target.value)} />
-              </div>
-              <div className="space-y-1">
-                <Label className="text-xs">Período</Label>
-                <Input value={plan.period} onChange={(e) => updatePlan(pi, "period", e.target.value)} />
-              </div>
-            </div>
-
-            <div className="grid gap-3 sm:grid-cols-2">
-              <div className="space-y-1">
-                <Label className="text-xs">Descrição</Label>
-                <Input value={plan.description} onChange={(e) => updatePlan(pi, "description", e.target.value)} />
-              </div>
-              <div className="space-y-1">
-                <Label className="text-xs">Texto do botão</Label>
-                <Input value={plan.ctaText} onChange={(e) => updatePlan(pi, "ctaText", e.target.value)} />
-              </div>
-            </div>
-
+      {(mode === "text" || mode === "both") && (
+        <>
+          <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label className="text-xs">Recursos</Label>
-                <Button variant="ghost" size="sm" onClick={() => addPlanFeature(pi)} className="gap-1 h-7 text-xs">
-                  <Plus className="w-3 h-3" /> Recurso
-                </Button>
-              </div>
-              {plan.features.map((f, fi) => (
-                <div key={fi} className="flex items-center gap-2">
-                  <Input value={f} onChange={(e) => updatePlanFeature(pi, fi, e.target.value)} className="flex-1 h-8 text-sm" />
-                  <Button variant="ghost" size="icon" onClick={() => removePlanFeature(pi, fi)} className="shrink-0 text-destructive hover:text-destructive h-8 w-8">
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </Button>
-                </div>
-              ))}
+              <Label>Badge</Label>
+              <Input value={content.badgeText} onChange={(e) => onChange({ ...content, badgeText: e.target.value })} />
+            </div>
+            <div className="space-y-2">
+              <Label>Título</Label>
+              <Input value={content.title} onChange={(e) => onChange({ ...content, title: e.target.value })} />
             </div>
           </div>
-        ))}
-      </div>
+
+          <div className="space-y-2">
+            <Label>Subtítulo</Label>
+            <Input value={content.subtitle} onChange={(e) => onChange({ ...content, subtitle: e.target.value })} />
+          </div>
+
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <Label>Planos ({content.plans.length})</Label>
+              <Button variant="outline" size="sm" onClick={addPlan} className="gap-1.5">
+                <Plus className="w-3.5 h-3.5" /> Adicionar plano
+              </Button>
+            </div>
+
+            {content.plans.map((plan, pi) => (
+              <div key={pi} className="p-4 border border-border/50 rounded-lg space-y-3 bg-background/50">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-medium text-sm">{plan.name || "Plano"}</h4>
+                  <div className="flex items-center gap-2">
+                    <Label htmlFor={`plan-hl-${pi}`} className="text-xs">Destaque</Label>
+                    <Switch id={`plan-hl-${pi}`} checked={plan.highlighted} onCheckedChange={(v) => updatePlan(pi, "highlighted", v)} />
+                    <Button variant="ghost" size="icon" onClick={() => removePlan(pi)} className="text-destructive hover:text-destructive h-8 w-8">
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-3">
+                  <div className="space-y-1">
+                    <Label className="text-xs">Nome</Label>
+                    <Input value={plan.name} onChange={(e) => updatePlan(pi, "name", e.target.value)} />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs">Preço</Label>
+                    <Input value={plan.price} onChange={(e) => updatePlan(pi, "price", e.target.value)} />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs">Período</Label>
+                    <Input value={plan.period} onChange={(e) => updatePlan(pi, "period", e.target.value)} />
+                  </div>
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="space-y-1">
+                    <Label className="text-xs">Descrição</Label>
+                    <Input value={plan.description} onChange={(e) => updatePlan(pi, "description", e.target.value)} />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs">Texto do botão</Label>
+                    <Input value={plan.ctaText} onChange={(e) => updatePlan(pi, "ctaText", e.target.value)} />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs">Recursos</Label>
+                    <Button variant="ghost" size="sm" onClick={() => addPlanFeature(pi)} className="gap-1 h-7 text-xs">
+                      <Plus className="w-3 h-3" /> Recurso
+                    </Button>
+                  </div>
+                  {plan.features.map((f, fi) => (
+                    <div key={fi} className="flex items-center gap-2">
+                      <Input value={f} onChange={(e) => updatePlanFeature(pi, fi, e.target.value)} className="flex-1 h-8 text-sm" />
+                      <Button variant="ghost" size="icon" onClick={() => removePlanFeature(pi, fi)} className="shrink-0 text-destructive hover:text-destructive h-8 w-8">
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }
