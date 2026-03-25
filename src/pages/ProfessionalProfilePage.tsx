@@ -354,23 +354,34 @@ export default function ProfessionalProfilePage() {
           {/* Gallery */}
           {id && <ProfessionalGallery professionalId={id} user={user} isAdmin={isAdmin} />}
 
-          {/* Review Form */}
-          {canReview && id && (
-            <ReviewForm
-              professionalId={id}
-              userId={user!.id}
-              onSubmitted={handleReviewSubmitted}
-            />
-          )}
-
-          {/* Reviews */}
-          <ReviewList
-            reviews={reviews}
-            currentUserId={user?.id}
-            isAdmin={isAdmin}
-            onReviewDeleted={handleReviewSubmitted}
-          />
         </main>
+
+        {/* Reviews Sheet */}
+        <Sheet open={showReviews} onOpenChange={setShowReviews}>
+          <SheetContent side="bottom" className="h-[85vh] overflow-y-auto">
+            <SheetHeader>
+              <SheetTitle className="flex items-center gap-2">
+                <Star className="w-5 h-5 fill-current text-primary" />
+                Avaliações ({reviews.length})
+              </SheetTitle>
+            </SheetHeader>
+            <div className="mt-4 space-y-4">
+              {canReview && id && (
+                <ReviewForm
+                  professionalId={id}
+                  userId={user!.id}
+                  onSubmitted={handleReviewSubmitted}
+                />
+              )}
+              <ReviewList
+                reviews={reviews}
+                currentUserId={user?.id}
+                isAdmin={isAdmin}
+                onReviewDeleted={handleReviewSubmitted}
+              />
+            </div>
+          </SheetContent>
+        </Sheet>
       </div>
     </div>
   );
