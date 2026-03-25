@@ -49,13 +49,10 @@ function SectionImage({ url, alt }: { url: string; alt: string }) {
 function LandingHeader({ content }: { content: LandingContent }) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
-  const { isSuperAdmin } = useSuperAdmin(user);
+  const { user } = useAuth();
+  const { isSuperAdmin, loading: superAdminLoading } = useSuperAdmin(user);
+  const showConsole = !superAdminLoading && isSuperAdmin;
   const h = content.header;
-
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setUser(data.user ?? null));
-  }, []);
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 20);
