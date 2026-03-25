@@ -136,12 +136,8 @@ export const DEFAULT_LANDING_CONTENT: LandingContent = {
     badgeText: "Funções",
     title: "Funcionalidades que fazem a diferença",
     subtitle: "Do agendamento à gestão completa do seu negócio.",
-    items: [
-      { title: "Agenda inteligente", description: "Controle horários, bloqueios e intervalos por profissional.", icon: "Calendar" },
-      { title: "Gestão de clientes", description: "Cadastro automático, histórico completo e anotações.", icon: "Users" },
-      { title: "Catálogo de serviços", description: "Preços, durações e vínculo com profissionais específicos.", icon: "Scissors" },
-      { title: "Multi-tenant", description: "Cada estabelecimento com ambiente totalmente isolado.", icon: "Globe" },
-    ],
+    imageUrl: "",
+    items: [],
   },
   pricing: {
     enabled: true,
