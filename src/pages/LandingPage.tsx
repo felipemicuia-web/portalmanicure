@@ -6,12 +6,15 @@ import { User } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
 import { useLandingContent } from "@/hooks/useLandingContent";
 import { LandingContent, LandingCard as LandingCardType, SectionDisplayMode } from "@/types/landing";
 import {
   Calendar, Users, Scissors, Clock, Shield, Smartphone,
   BarChart3, Globe, Star, ChevronRight, Menu, X, Zap,
-  Check, ArrowRight, Sparkles, Heart, Award,
+  Check, ArrowRight, Sparkles, Heart, Award, Loader2, Send,
   type LucideIcon,
 } from "lucide-react";
 
@@ -92,10 +95,8 @@ function LandingHeader({ content }: { content: LandingContent }) {
             <Button variant="ghost" size="sm" asChild>
               <Link to="/auth">{h.loginButtonText}</Link>
             </Button>
-            <Button size="sm" className="gap-1.5" asChild>
-              <Link to="/auth">
-                {h.ctaButtonText} <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
+            <Button size="sm" className="gap-1.5" onClick={() => scrollToSection("#teste-gratis")}>
+              {h.ctaButtonText} <ArrowRight className="w-3.5 h-3.5" />
             </Button>
           </div>
         </nav>
@@ -125,8 +126,8 @@ function LandingHeader({ content }: { content: LandingContent }) {
             <Button variant="outline" size="sm" asChild>
               <Link to="/auth">{h.loginButtonText}</Link>
             </Button>
-            <Button size="sm" asChild>
-              <Link to="/auth">{h.ctaButtonText}</Link>
+            <Button size="sm" onClick={() => { scrollToSection("#teste-gratis"); setOpen(false); }}>
+              {h.ctaButtonText}
             </Button>
           </div>
         </div>
@@ -168,10 +169,8 @@ function HeroSection({ content }: { content: LandingContent }) {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Button size="lg" className="gap-2 text-base px-8" asChild>
-                <Link to="/auth">
-                  {hero.ctaText} <ArrowRight className="w-4 h-4" />
-                </Link>
+              <Button size="lg" className="gap-2 text-base px-8" onClick={() => scrollToSection("#teste-gratis")}>
+                {hero.ctaText} <ArrowRight className="w-4 h-4" />
               </Button>
               <Button size="lg" variant="outline" className="gap-2 text-base px-8" onClick={() => scrollToSection("#demonstracao")}>
                 {hero.secondaryCtaText}
@@ -316,10 +315,8 @@ function PricingSection({ content }: { content: LandingContent }) {
                         </li>
                       ))}
                     </ul>
-                    <Button className="w-full gap-1.5" variant={p.highlighted ? "default" : "outline"} asChild>
-                      <Link to="/auth">
-                        {p.ctaText} <ChevronRight className="w-3.5 h-3.5" />
-                      </Link>
+                    <Button className="w-full gap-1.5" variant={p.highlighted ? "default" : "outline"} onClick={() => scrollToSection("#teste-gratis")}>
+                      {p.ctaText} <ChevronRight className="w-3.5 h-3.5" />
                     </Button>
                   </CardContent>
                 </Card>
@@ -402,10 +399,8 @@ function CTASection({ content }: { content: LandingContent }) {
               <h2 className="text-2xl sm:text-4xl font-bold text-foreground">{c.title}</h2>
               <p className="text-muted-foreground max-w-lg mx-auto text-sm sm:text-base">{c.description}</p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <Button size="lg" className="gap-2 text-base px-8" asChild>
-                  <Link to="/auth">
-                    {c.ctaText} <ArrowRight className="w-4 h-4" />
-                  </Link>
+                <Button size="lg" className="gap-2 text-base px-8" onClick={() => scrollToSection("#teste-gratis")}>
+                  {c.ctaText} <ArrowRight className="w-4 h-4" />
                 </Button>
               </div>
             </div>
@@ -417,6 +412,165 @@ function CTASection({ content }: { content: LandingContent }) {
             <SectionImage url={c.imageUrl!} alt={c.title} />
           </div>
         )}
+      </div>
+    </section>
+  );
+}
+
+/* ─── Formulário Teste Grátis ─── */
+const BRAZILIAN_STATES = [
+  "AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA",
+  "PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO",
+];
+
+function TrialFormSection() {
+  const { toast } = useToast();
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [form, setForm] = useState({
+    company_name: "",
+    full_name: "",
+    city: "",
+    state: "",
+    whatsapp: "",
+  });
+
+  const isValid = form.company_name.trim().length >= 2
+    && form.full_name.trim().length >= 2
+    && form.city.trim().length >= 2
+    && form.state.length > 0
+    && form.whatsapp.replace(/\D/g, "").length >= 10;
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!isValid || submitting) return;
+    setSubmitting(true);
+
+    const { error } = await supabase.from("trial_leads" as any).insert({
+      company_name: form.company_name.trim(),
+      full_name: form.full_name.trim(),
+      city: form.city.trim(),
+      state: form.state,
+      whatsapp: form.whatsapp.replace(/\D/g, ""),
+    });
+
+    setSubmitting(false);
+    if (error) {
+      toast({ title: "Erro ao enviar", description: "Tente novamente em instantes.", variant: "destructive" });
+    } else {
+      setSubmitted(true);
+      toast({ title: "Solicitação enviada!", description: "Entraremos em contato em breve." });
+    }
+  };
+
+  if (submitted) {
+    return (
+      <section id="teste-gratis" className="py-20 sm:py-28 scroll-mt-20">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 text-center space-y-6">
+          <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+            <Check className="w-10 h-10 text-primary" />
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-bold text-foreground">Recebemos sua solicitação!</h2>
+          <p className="text-muted-foreground">Nossa equipe entrará em contato pelo WhatsApp informado para liberar seu acesso ao teste gratuito.</p>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section id="teste-gratis" className="py-20 sm:py-28 scroll-mt-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="relative rounded-2xl overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-primary/10 to-secondary/10" />
+          <div className="absolute inset-0 bg-card/70 backdrop-blur-sm" />
+
+          <div className="relative z-10 py-12 px-6 sm:px-12 space-y-8">
+            <div className="text-center space-y-3 max-w-2xl mx-auto">
+              <Badge variant="outline" className="text-xs px-3 py-1">Teste Grátis</Badge>
+              <h2 className="text-2xl sm:text-4xl font-bold text-foreground">
+                Comece seu teste gratuito agora
+              </h2>
+              <p className="text-muted-foreground text-sm sm:text-base">
+                Preencha os dados abaixo e nossa equipe liberará seu acesso em até 24 horas.
+              </p>
+            </div>
+
+            <form onSubmit={handleSubmit} className="max-w-xl mx-auto space-y-5">
+              <div className="space-y-2">
+                <Label htmlFor="company_name">Nome da empresa</Label>
+                <Input
+                  id="company_name"
+                  placeholder="Ex: Studio Maria"
+                  value={form.company_name}
+                  onChange={(e) => setForm({ ...form, company_name: e.target.value })}
+                  maxLength={100}
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="full_name">Nome completo</Label>
+                <Input
+                  id="full_name"
+                  placeholder="Seu nome completo"
+                  value={form.full_name}
+                  onChange={(e) => setForm({ ...form, full_name: e.target.value })}
+                  maxLength={100}
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="city">Cidade</Label>
+                  <Input
+                    id="city"
+                    placeholder="Sua cidade"
+                    value={form.city}
+                    onChange={(e) => setForm({ ...form, city: e.target.value })}
+                    maxLength={100}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="state">Estado</Label>
+                  <select
+                    id="state"
+                    value={form.state}
+                    onChange={(e) => setForm({ ...form, state: e.target.value })}
+                    required
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  >
+                    <option value="">Selecione</option>
+                    {BRAZILIAN_STATES.map((s) => (
+                      <option key={s} value={s}>{s}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="whatsapp">WhatsApp</Label>
+                <Input
+                  id="whatsapp"
+                  placeholder="(11) 99999-9999"
+                  value={form.whatsapp}
+                  onChange={(e) => setForm({ ...form, whatsapp: e.target.value })}
+                  maxLength={15}
+                  required
+                />
+              </div>
+
+              <Button type="submit" size="lg" className="w-full gap-2 text-base" disabled={!isValid || submitting}>
+                {submitting ? (
+                  <><Loader2 className="w-4 h-4 animate-spin" /> Enviando...</>
+                ) : (
+                  <><Send className="w-4 h-4" /> Solicitar teste grátis</>
+                )}
+              </Button>
+            </form>
+          </div>
+        </div>
       </div>
     </section>
   );
@@ -477,6 +631,7 @@ export default function LandingPage() {
         <PricingSection content={content} />
         <DemoSection content={content} />
         <CTASection content={content} />
+        <TrialFormSection />
         <LandingFooter content={content} />
       </div>
     </div>
