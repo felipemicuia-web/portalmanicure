@@ -5,6 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { PlatformTenants } from "@/components/platform/PlatformTenants";
+import { PlatformLandingAdmin } from "@/components/platform/PlatformLandingAdmin";
 import { PlatformOverview } from "@/components/platform/PlatformOverview";
 import { PlatformUsers } from "@/components/platform/PlatformUsers";
 import { PlatformPlans } from "@/components/platform/PlatformPlans";
@@ -23,6 +24,7 @@ import {
   DollarSign,
   LayoutDashboard,
   Settings,
+  Globe,
   type LucideIcon,
 } from "lucide-react";
 
@@ -33,6 +35,7 @@ const MENU_ITEMS: { value: string; label: string; icon: LucideIcon }[] = [
   { value: "users", label: "Usuários", icon: Users },
   { value: "insights", label: "Valores e Insights", icon: DollarSign },
   { value: "plans", label: "Planos", icon: Crown },
+  { value: "landing", label: "Landing Page", icon: Globe },
   { value: "settings", label: "Configurações", icon: Settings },
 ];
 
@@ -169,6 +172,7 @@ export default function PlatformPage() {
             {activeTab === "users" && <PlatformUsers />}
             {activeTab === "insights" && <PlatformInsights />}
             {activeTab === "plans" && <PlatformPlans />}
+            {activeTab === "landing" && <PlatformLandingAdmin />}
             {activeTab === "settings" && <PlatformFooterSettings />}
           </main>
         </div>
