@@ -11,6 +11,9 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useLandingContent } from "@/hooks/useLandingContent";
 import { LandingContent, LandingCard as LandingCardType, SectionDisplayMode } from "@/types/landing";
+import { getPresetById, themePresets } from "@/contexts/ThemeContext";
+import { ThemedBackground } from "@/components/backgrounds/ThemedBackground";
+import { ThemeProvider, useThemeContext } from "@/contexts/ThemeContext";
 import {
   Calendar, Users, Scissors, Clock, Shield, Smartphone,
   BarChart3, Globe, Star, ChevronRight, Menu, X, Zap,
@@ -608,6 +611,51 @@ function LandingFooter({ content }: { content: LandingContent }) {
   );
 }
 
+/* ─── Apply landing theme to DOM ─── */
+function useLandingTheme(themeId: string) {
+  useEffect(() => {
+    const preset = getPresetById(themeId);
+    const root = document.documentElement;
+    root.style.setProperty("--primary", preset.colors.primary);
+    root.style.setProperty("--secondary", preset.colors.secondary);
+    root.style.setProperty("--accent", preset.colors.accent);
+    root.style.setProperty("--background", preset.colors.background);
+    root.style.setProperty("--card", preset.colors.card);
+    root.style.setProperty("--muted", preset.colors.muted);
+    root.style.setProperty("--border", preset.colors.border);
+    root.style.setProperty("--ring", preset.colors.primary);
+
+    return () => {
+      // Reset to CSS defaults on unmount
+      const props = ["--primary", "--secondary", "--accent", "--background", "--card", "--muted", "--border", "--ring"];
+      props.forEach((p) => root.style.removeProperty(p));
+    };
+  }, [themeId]);
+}
+
+/* ─── Inner page (needs ThemeContext) ─── */
+function LandingPageInner({ content }: { content: LandingContent }) {
+  const themeId = content.themeId || "galaxy";
+  useLandingTheme(themeId);
+
+  return (
+    <div className="min-h-screen bg-background text-foreground relative">
+      <ThemedBackground />
+      <div className="relative z-10">
+        <LandingHeader content={content} />
+        <HeroSection content={content} />
+        <BenefitsSection content={content} />
+        <FeaturesSection content={content} />
+        <PricingSection content={content} />
+        <DemoSection content={content} />
+        <CTASection content={content} />
+        <TrialFormSection />
+        <LandingFooter content={content} />
+      </div>
+    </div>
+  );
+}
+
 /* ─── Page ─── */
 export default function LandingPage() {
   const { content, loading } = useLandingContent();
@@ -621,19 +669,8 @@ export default function LandingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground relative">
-      <div className="galaxy-bg" />
-      <div className="relative z-10">
-        <LandingHeader content={content} />
-        <HeroSection content={content} />
-        <BenefitsSection content={content} />
-        <FeaturesSection content={content} />
-        <PricingSection content={content} />
-        <DemoSection content={content} />
-        <CTASection content={content} />
-        <TrialFormSection />
-        <LandingFooter content={content} />
-      </div>
-    </div>
+    <LandingThemeProvider themeId={content.themeId || "galaxy"}>
+      <LandingPageInner content={content} />
+    </LandingThemeProvider>
   );
 }

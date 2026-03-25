@@ -96,6 +96,7 @@ export interface LandingContent {
   demo: LandingDemo;
   cta: LandingCta;
   footer: LandingFooter;
+  themeId?: string;
 }
 
 export const DEFAULT_LANDING_CONTENT: LandingContent = {
