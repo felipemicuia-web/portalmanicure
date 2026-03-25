@@ -72,6 +72,11 @@ function LandingHeader({ content }: { content: LandingContent }) {
             </button>
           ))}
           <div className="ml-4 flex items-center gap-2">
+            {isSuperAdmin && (
+              <Button variant="ghost" size="sm" asChild>
+                <Link to="/platform">Console</Link>
+              </Button>
+            )}
             <Button variant="ghost" size="sm" asChild>
               <Link to="/auth">{h.loginButtonText}</Link>
             </Button>
