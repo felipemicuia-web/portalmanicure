@@ -24,6 +24,7 @@ import {
   DollarSign,
   LayoutDashboard,
   Settings,
+  Globe,
   type LucideIcon,
 } from "lucide-react";
 
