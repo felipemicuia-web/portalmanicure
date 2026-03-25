@@ -14,8 +14,10 @@ import {
   Star, 
   Users, 
   Instagram,
-  Calendar
+  Calendar,
+  ChevronRight
 } from "lucide-react";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { FollowButton } from "@/components/professional/FollowButton";
 import { ReviewList } from "@/components/professional/ReviewList";
 import { ReviewForm } from "@/components/professional/ReviewForm";
@@ -69,6 +71,7 @@ export default function ProfessionalProfilePage() {
   const [averageRating, setAverageRating] = useState(0);
   const [loading, setLoading] = useState(true);
   const [canReview, setCanReview] = useState(false);
+  const [showReviews, setShowReviews] = useState(false);
 
   const fetchData = useCallback(async () => {
     if (!id || !tenantId) return;
@@ -295,13 +298,17 @@ export default function ProfessionalProfilePage() {
 
                 {/* Stats */}
                 <div className="flex justify-center sm:justify-start gap-6 mb-4">
-                  <div className="text-center">
+                  <button
+                    onClick={() => setShowReviews(true)}
+                    className="text-center cursor-pointer hover:opacity-80 transition-opacity"
+                  >
                     <div className="flex items-center justify-center gap-1">
                       <Star className="w-4 h-4 fill-current text-primary" />
                       <span className="font-bold">{averageRating > 0 ? averageRating.toFixed(1) : "-"}</span>
+                      <ChevronRight className="w-3 h-3 text-muted-foreground" />
                     </div>
                     <p className="text-xs text-muted-foreground">{reviews.length} avaliações</p>
-                  </div>
+                  </button>
                   <div className="text-center">
                     <div className="flex items-center justify-center gap-1">
                       <Users className="w-4 h-4 text-primary" />
@@ -347,23 +354,34 @@ export default function ProfessionalProfilePage() {
           {/* Gallery */}
           {id && <ProfessionalGallery professionalId={id} user={user} isAdmin={isAdmin} />}
 
-          {/* Review Form */}
-          {canReview && id && (
-            <ReviewForm
-              professionalId={id}
-              userId={user!.id}
-              onSubmitted={handleReviewSubmitted}
-            />
-          )}
-
-          {/* Reviews */}
-          <ReviewList
-            reviews={reviews}
-            currentUserId={user?.id}
-            isAdmin={isAdmin}
-            onReviewDeleted={handleReviewSubmitted}
-          />
         </main>
+
+        {/* Reviews Sheet */}
+        <Sheet open={showReviews} onOpenChange={setShowReviews}>
+          <SheetContent side="bottom" className="h-[85vh] overflow-y-auto">
+            <SheetHeader>
+              <SheetTitle className="flex items-center gap-2">
+                <Star className="w-5 h-5 fill-current text-primary" />
+                Avaliações ({reviews.length})
+              </SheetTitle>
+            </SheetHeader>
+            <div className="mt-4 space-y-4">
+              {canReview && id && (
+                <ReviewForm
+                  professionalId={id}
+                  userId={user!.id}
+                  onSubmitted={handleReviewSubmitted}
+                />
+              )}
+              <ReviewList
+                reviews={reviews}
+                currentUserId={user?.id}
+                isAdmin={isAdmin}
+                onReviewDeleted={handleReviewSubmitted}
+              />
+            </div>
+          </SheetContent>
+        </Sheet>
       </div>
     </div>
   );
