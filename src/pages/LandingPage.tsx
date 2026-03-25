@@ -169,10 +169,8 @@ function HeroSection({ content }: { content: LandingContent }) {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Button size="lg" className="gap-2 text-base px-8" asChild>
-                <Link to="/auth">
-                  {hero.ctaText} <ArrowRight className="w-4 h-4" />
-                </Link>
+              <Button size="lg" className="gap-2 text-base px-8" onClick={() => scrollToSection("#teste-gratis")}>
+                {hero.ctaText} <ArrowRight className="w-4 h-4" />
               </Button>
               <Button size="lg" variant="outline" className="gap-2 text-base px-8" onClick={() => scrollToSection("#demonstracao")}>
                 {hero.secondaryCtaText}
@@ -317,10 +315,8 @@ function PricingSection({ content }: { content: LandingContent }) {
                         </li>
                       ))}
                     </ul>
-                    <Button className="w-full gap-1.5" variant={p.highlighted ? "default" : "outline"} asChild>
-                      <Link to="/auth">
-                        {p.ctaText} <ChevronRight className="w-3.5 h-3.5" />
-                      </Link>
+                    <Button className="w-full gap-1.5" variant={p.highlighted ? "default" : "outline"} onClick={() => scrollToSection("#teste-gratis")}>
+                      {p.ctaText} <ChevronRight className="w-3.5 h-3.5" />
                     </Button>
                   </CardContent>
                 </Card>
@@ -403,10 +399,8 @@ function CTASection({ content }: { content: LandingContent }) {
               <h2 className="text-2xl sm:text-4xl font-bold text-foreground">{c.title}</h2>
               <p className="text-muted-foreground max-w-lg mx-auto text-sm sm:text-base">{c.description}</p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <Button size="lg" className="gap-2 text-base px-8" asChild>
-                  <Link to="/auth">
-                    {c.ctaText} <ArrowRight className="w-4 h-4" />
-                  </Link>
+                <Button size="lg" className="gap-2 text-base px-8" onClick={() => scrollToSection("#teste-gratis")}>
+                  {c.ctaText} <ArrowRight className="w-4 h-4" />
                 </Button>
               </div>
             </div>
