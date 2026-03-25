@@ -11,9 +11,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useLandingContent } from "@/hooks/useLandingContent";
 import { LandingContent, LandingCard as LandingCardType, SectionDisplayMode } from "@/types/landing";
-import { getPresetById, themePresets } from "@/contexts/ThemeContext";
-import { ThemedBackground } from "@/components/backgrounds/ThemedBackground";
-import { ThemeProvider, useThemeContext } from "@/contexts/ThemeContext";
+import { getPresetById } from "@/contexts/ThemeContext";
 import {
   Calendar, Users, Scissors, Clock, Shield, Smartphone,
   BarChart3, Globe, Star, ChevronRight, Menu, X, Zap,
