@@ -5,6 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { PlatformTenants } from "@/components/platform/PlatformTenants";
+import { PlatformLandingAdmin } from "@/components/platform/PlatformLandingAdmin";
 import { PlatformOverview } from "@/components/platform/PlatformOverview";
 import { PlatformUsers } from "@/components/platform/PlatformUsers";
 import { PlatformPlans } from "@/components/platform/PlatformPlans";
