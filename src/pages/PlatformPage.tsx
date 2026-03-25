@@ -172,6 +172,7 @@ export default function PlatformPage() {
             {activeTab === "users" && <PlatformUsers />}
             {activeTab === "insights" && <PlatformInsights />}
             {activeTab === "plans" && <PlatformPlans />}
+            {activeTab === "landing" && <PlatformLandingAdmin />}
             {activeTab === "settings" && <PlatformFooterSettings />}
           </main>
         </div>
