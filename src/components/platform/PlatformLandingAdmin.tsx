@@ -94,7 +94,7 @@ export function PlatformLandingAdmin() {
               <Badge variant="secondary" className="text-xs">Não publicado</Badge>
             )}
             {hasUnsavedChanges && (
-              <Badge variant="outline" className="text-xs border-yellow-500 text-yellow-600">
+              <Badge variant="outline" className="text-xs border-destructive/50 text-destructive">
                 Alterações não salvas
               </Badge>
             )}
