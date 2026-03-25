@@ -202,25 +202,15 @@ function FeaturesSection({ content }: { content: LandingContent }) {
           <p className="text-muted-foreground text-sm sm:text-base">{f.subtitle}</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {f.items.map((item) => {
-            const Icon = getIcon(item.icon);
-            return (
-              <div
-                key={item.title}
-                className="flex gap-4 p-6 rounded-xl border border-border/50 bg-card/50 hover:border-primary/30 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5"
-              >
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/10 flex items-center justify-center shrink-0">
-                  <Icon className="w-6 h-6 text-primary" />
-                </div>
-                <div className="space-y-1.5">
-                  <h3 className="font-semibold text-foreground">{item.title}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{item.description}</p>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+        {f.imageUrl && (
+          <div className="flex justify-center">
+            <img
+              src={f.imageUrl}
+              alt={f.title}
+              className="w-full max-w-4xl rounded-2xl shadow-2xl shadow-primary/10 border border-border/30"
+            />
+          </div>
+        )}
       </div>
     </section>
   );
