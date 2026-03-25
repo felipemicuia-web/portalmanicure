@@ -71,6 +71,7 @@ export default function ProfessionalProfilePage() {
   const [averageRating, setAverageRating] = useState(0);
   const [loading, setLoading] = useState(true);
   const [canReview, setCanReview] = useState(false);
+  const [showReviews, setShowReviews] = useState(false);
 
   const fetchData = useCallback(async () => {
     if (!id || !tenantId) return;
