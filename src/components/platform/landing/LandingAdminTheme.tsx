@@ -1,0 +1,88 @@
+import { Check } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { themePresets, ThemePreset } from "@/contexts/ThemeContext";
+
+interface Props {
+  selectedThemeId: string;
+  onChange: (themeId: string) => void;
+}
+
+function ThemeCard({
+  preset,
+  isSelected,
+  onClick,
+}: {
+  preset: ThemePreset;
+  isSelected: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={cn(
+        "relative w-full p-4 rounded-xl border-2 transition-all duration-200 text-left",
+        "hover:scale-[1.02] hover:shadow-lg",
+        isSelected
+          ? "border-green-500 shadow-lg shadow-green-500/20"
+          : "border-transparent hover:border-white/20"
+      )}
+      style={{
+        background: `linear-gradient(135deg, hsl(${preset.colors.card}), hsl(${preset.colors.background}))`,
+      }}
+    >
+      {isSelected && (
+        <div className="absolute top-2 right-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+          <Check className="w-4 h-4 text-white" />
+        </div>
+      )}
+
+      <div className="flex gap-2 mb-3">
+        <div className="w-8 h-8 rounded-full border border-white/20" style={{ backgroundColor: `hsl(${preset.colors.primary})` }} />
+        <div className="w-8 h-8 rounded-full border border-white/20" style={{ backgroundColor: `hsl(${preset.colors.secondary})` }} />
+        <div className="w-8 h-8 rounded-full border border-white/20" style={{ backgroundColor: `hsl(${preset.colors.accent})` }} />
+      </div>
+
+      <h3 className="font-bold text-white text-lg mb-1">{preset.name}</h3>
+      <p className="text-sm text-white/70">{preset.description}</p>
+
+      <div className="mt-3 flex gap-2">
+        <div className="flex-1 h-2 rounded-full" style={{ backgroundColor: `hsl(${preset.colors.primary})` }} />
+        <div className="flex-1 h-2 rounded-full" style={{ backgroundColor: `hsl(${preset.colors.secondary})` }} />
+        <div className="w-6 h-2 rounded-full" style={{ backgroundColor: `hsl(${preset.colors.accent})` }} />
+      </div>
+    </button>
+  );
+}
+
+export function LandingAdminTheme({ selectedThemeId, onChange }: Props) {
+  return (
+    <div className="space-y-4">
+      <div>
+        <h3 className="text-lg font-semibold">Tema da Landing Page</h3>
+        <p className="text-sm text-muted-foreground">
+          Escolha o estilo visual e os efeitos animados que aparecem na página institucional.
+        </p>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {themePresets.map((preset) => (
+          <ThemeCard
+            key={preset.id}
+            preset={preset}
+            isSelected={selectedThemeId === preset.id}
+            onClick={() => onChange(preset.id)}
+          />
+        ))}
+      </div>
+
+      <div className="rounded-lg border border-border/50 bg-muted/30 p-3 text-center">
+        <p className="text-sm text-muted-foreground">
+          Tema selecionado:{" "}
+          <span className="font-semibold text-foreground">
+            {themePresets.find((p) => p.id === selectedThemeId)?.name || "Galaxy Premium"}
+          </span>
+        </p>
+      </div>
+    </div>
+  );
+}

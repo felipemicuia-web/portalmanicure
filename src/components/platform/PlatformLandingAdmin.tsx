@@ -11,6 +11,7 @@ import { LandingAdminPricing } from "./landing/LandingAdminPricing";
 import { LandingAdminDemo } from "./landing/LandingAdminDemo";
 import { LandingAdminCta } from "./landing/LandingAdminCta";
 import { LandingAdminFooter } from "./landing/LandingAdminFooter";
+import { LandingAdminTheme } from "./landing/LandingAdminTheme";
 import {
   Save,
   Upload,
@@ -25,6 +26,7 @@ import {
   Monitor,
   Megaphone,
   PanelBottom,
+  Palette,
 } from "lucide-react";
 
 const TABS = [
@@ -36,6 +38,7 @@ const TABS = [
   { id: "demo", label: "Demonstração", icon: Monitor },
   { id: "cta", label: "CTA Final", icon: Megaphone },
   { id: "footer", label: "Rodapé", icon: PanelBottom },
+  { id: "theme", label: "Tema", icon: Palette },
 ];
 
 export function PlatformLandingAdmin() {
@@ -152,6 +155,7 @@ export function PlatformLandingAdmin() {
         {activeTab === "demo" && <LandingAdminDemo content={draft.demo} onChange={(demo) => updateDraft((prev) => ({ ...prev, demo }))} />}
         {activeTab === "cta" && <LandingAdminCta content={draft.cta} onChange={(cta) => updateDraft((prev) => ({ ...prev, cta }))} />}
         {activeTab === "footer" && <LandingAdminFooter content={draft.footer} onChange={(footer) => updateDraft((prev) => ({ ...prev, footer }))} />}
+        {activeTab === "theme" && <LandingAdminTheme selectedThemeId={draft.themeId || "galaxy"} onChange={(themeId) => updateDraft((prev) => ({ ...prev, themeId }))} />}
       </div>
     </div>
   );
