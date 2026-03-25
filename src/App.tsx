@@ -33,15 +33,7 @@ const App = () => (
             <BrowserRouter>
               <Routes>
                 {/* Root routes use ThemeProvider scoped to the root TenantContext (default tenant) */}
-                <Route
-                  path="/"
-                  element={
-                    <ThemeProvider>
-                      <ThemedBackground />
-                      <BookingPage />
-                    </ThemeProvider>
-                  }
-                />
+                <Route path="/" element={<LandingPage />} />
                 <Route
                   path="/auth"
                   element={
