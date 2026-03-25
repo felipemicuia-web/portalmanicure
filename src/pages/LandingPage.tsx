@@ -1,8 +1,8 @@
 import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { useSuperAdmin } from "@/hooks/useSuperAdmin";
-import { User } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -49,13 +49,10 @@ function SectionImage({ url, alt }: { url: string; alt: string }) {
 function LandingHeader({ content }: { content: LandingContent }) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
-  const { isSuperAdmin } = useSuperAdmin(user);
+  const { user } = useAuth();
+  const { isSuperAdmin, loading: superAdminLoading } = useSuperAdmin(user);
+  const showConsole = !superAdminLoading && isSuperAdmin;
   const h = content.header;
-
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setUser(data.user ?? null));
-  }, []);
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 20);
@@ -88,7 +85,7 @@ function LandingHeader({ content }: { content: LandingContent }) {
             </button>
           ))}
           <div className="ml-4 flex items-center gap-2">
-            {isSuperAdmin && (
+            {showConsole && (
               <Button variant="ghost" size="sm" asChild>
                 <Link to="/platform">Console</Link>
               </Button>
@@ -119,7 +116,7 @@ function LandingHeader({ content }: { content: LandingContent }) {
             </button>
           ))}
           <div className="pt-2 flex flex-col gap-2">
-            {isSuperAdmin && (
+            {showConsole && (
               <Button variant="secondary" size="sm" asChild>
                 <Link to="/platform">Console da Plataforma</Link>
               </Button>
