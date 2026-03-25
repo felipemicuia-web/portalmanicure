@@ -1,5 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useSuperAdmin } from "@/hooks/useSuperAdmin";
+import { User } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -30,7 +33,13 @@ function scrollToSection(id: string) {
 function LandingHeader({ content }: { content: LandingContent }) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const { isSuperAdmin } = useSuperAdmin(user);
   const h = content.header;
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setUser(data.user ?? null));
+  }, []);
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 20);
@@ -63,6 +72,11 @@ function LandingHeader({ content }: { content: LandingContent }) {
             </button>
           ))}
           <div className="ml-4 flex items-center gap-2">
+            {isSuperAdmin && (
+              <Button variant="ghost" size="sm" asChild>
+                <Link to="/platform">Console</Link>
+              </Button>
+            )}
             <Button variant="ghost" size="sm" asChild>
               <Link to="/auth">{h.loginButtonText}</Link>
             </Button>
@@ -91,6 +105,11 @@ function LandingHeader({ content }: { content: LandingContent }) {
             </button>
           ))}
           <div className="pt-2 flex flex-col gap-2">
+            {isSuperAdmin && (
+              <Button variant="secondary" size="sm" asChild>
+                <Link to="/platform">Console da Plataforma</Link>
+              </Button>
+            )}
             <Button variant="outline" size="sm" asChild>
               <Link to="/auth">{h.loginButtonText}</Link>
             </Button>
