@@ -45,6 +45,7 @@ export interface LandingBenefits extends LandingSection {
 
 export interface LandingFeatures extends LandingSection {
   items: LandingCard[];
+  imageUrl: string;
 }
 
 export interface LandingPlanItem {
