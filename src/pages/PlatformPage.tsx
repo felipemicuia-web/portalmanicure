@@ -35,6 +35,7 @@ const MENU_ITEMS: { value: string; label: string; icon: LucideIcon }[] = [
   { value: "users", label: "Usuários", icon: Users },
   { value: "insights", label: "Valores e Insights", icon: DollarSign },
   { value: "plans", label: "Planos", icon: Crown },
+  { value: "landing", label: "Landing Page", icon: Globe },
   { value: "settings", label: "Configurações", icon: Settings },
 ];
 
