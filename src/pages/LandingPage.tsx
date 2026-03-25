@@ -85,7 +85,7 @@ function LandingHeader({ content }: { content: LandingContent }) {
             </button>
           ))}
           <div className="ml-4 flex items-center gap-2">
-            {isSuperAdmin && (
+            {showConsole && (
               <Button variant="ghost" size="sm" asChild>
                 <Link to="/platform">Console</Link>
               </Button>
@@ -116,7 +116,7 @@ function LandingHeader({ content }: { content: LandingContent }) {
             </button>
           ))}
           <div className="pt-2 flex flex-col gap-2">
-            {isSuperAdmin && (
+            {showConsole && (
               <Button variant="secondary" size="sm" asChild>
                 <Link to="/platform">Console da Plataforma</Link>
               </Button>
