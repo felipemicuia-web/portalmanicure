@@ -626,21 +626,79 @@ function useLandingTheme(themeId: string) {
     root.style.setProperty("--ring", preset.colors.primary);
 
     return () => {
-      // Reset to CSS defaults on unmount
       const props = ["--primary", "--secondary", "--accent", "--background", "--card", "--muted", "--border", "--ring"];
       props.forEach((p) => root.style.removeProperty(p));
     };
   }, [themeId]);
 }
 
-/* ─── Inner page (needs ThemeContext) ─── */
-function LandingPageInner({ content }: { content: LandingContent }) {
+/* ─── Standalone themed background for landing (no ThemeContext needed) ─── */
+function LandingThemedBackground({ themeId }: { themeId: string }) {
+  const particles = useMemo(() => {
+    const THEME_BG: Record<string, { type: string; count: number }> = {
+      galaxy: { type: "stars", count: 50 },
+      rosa: { type: "petals", count: 20 },
+      oceano: { type: "bubbles", count: 30 },
+      floresta: { type: "leaves", count: 25 },
+      pordosol: { type: "rays", count: 15 },
+      meianoite: { type: "snow", count: 40 },
+      lavanda: { type: "butterflies", count: 12 },
+    };
+    const config = THEME_BG[themeId] || THEME_BG.galaxy;
+    const els: JSX.Element[] = [];
+    for (let i = 0; i < config.count; i++) {
+      const delay = Math.random() * 10;
+      const size = 4 + Math.random() * 12;
+      const left = Math.random() * 100;
+      const duration = 8 + Math.random() * 12;
+      const style: React.CSSProperties = { left: `${left}%`, animationDelay: `${delay}s`, animationDuration: `${duration}s` };
+      switch (config.type) {
+        case "stars":
+          els.push(<div key={i} className="bg-star" style={{ ...style, top: `${Math.random() * 100}%`, width: size, height: size }} />);
+          break;
+        case "bubbles":
+          els.push(<div key={i} className="bg-bubble" style={{ ...style, width: size * 1.5, height: size * 1.5 }} />);
+          break;
+        case "petals":
+          els.push(<div key={i} className="bg-petal" style={{ ...style, width: size, height: size * 1.5 }} />);
+          break;
+        case "leaves":
+          els.push(<div key={i} className="bg-leaf" style={{ ...style, width: size * 1.2, height: size * 1.2 }} />);
+          break;
+        case "rays":
+          els.push(<div key={i} className="bg-ray" style={style} />);
+          break;
+        case "snow":
+          els.push(<div key={i} className="bg-snowflake" style={{ ...style, width: size * 0.8, height: size * 0.8 }} />);
+          break;
+        case "butterflies":
+          els.push(<div key={i} className="bg-butterfly" style={{ ...style, top: `${Math.random() * 80}%`, width: size * 1.5, height: size * 0.9 }} />);
+          break;
+      }
+    }
+    return els;
+  }, [themeId]);
+
+  return <div className="themed-bg-container">{particles}</div>;
+}
+
+/* ─── Page ─── */
+export default function LandingPage() {
+  const { content, loading } = useLandingContent();
   const themeId = content.themeId || "galaxy";
   useLandingTheme(themeId);
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background text-foreground relative">
-      <ThemedBackground />
+      <LandingThemedBackground themeId={themeId} />
       <div className="relative z-10">
         <LandingHeader content={content} />
         <HeroSection content={content} />
@@ -653,24 +711,5 @@ function LandingPageInner({ content }: { content: LandingContent }) {
         <LandingFooter content={content} />
       </div>
     </div>
-  );
-}
-
-/* ─── Page ─── */
-export default function LandingPage() {
-  const { content, loading } = useLandingContent();
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
-      </div>
-    );
-  }
-
-  return (
-    <LandingThemeProvider themeId={content.themeId || "galaxy"}>
-      <LandingPageInner content={content} />
-    </LandingThemeProvider>
   );
 }
