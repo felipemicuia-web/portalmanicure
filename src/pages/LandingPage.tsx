@@ -49,7 +49,7 @@ function SectionImage({ url, alt }: { url: string; alt: string }) {
 function LandingHeader({ content }: { content: LandingContent }) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const { isSuperAdmin, loading: superAdminLoading } = useSuperAdmin(user);
   const showConsole = !superAdminLoading && isSuperAdmin;
   const h = content.header;
