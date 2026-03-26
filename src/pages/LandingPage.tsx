@@ -332,7 +332,7 @@ function PricingSection({ content }: { content: LandingContent }) {
                         </li>
                       ))}
                     </ul>
-                    <Button className="w-full gap-1.5" variant={p.highlighted ? "default" : "outline"} onClick={() => scrollToSection("#teste-gratis")}>
+                    <Button className="w-full gap-1.5" onClick={() => scrollToSection("#teste-gratis")}>
                       {p.ctaText} <ChevronRight className="w-3.5 h-3.5" />
                     </Button>
                   </CardContent>
