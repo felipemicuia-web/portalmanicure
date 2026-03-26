@@ -12,6 +12,7 @@ import { PlatformPlans } from "@/components/platform/PlatformPlans";
 import { PlatformInsights } from "@/components/platform/PlatformInsights";
 import { PlatformTenantDashboards } from "@/components/platform/PlatformTenantDashboards";
 import { PlatformFooterSettings } from "@/components/platform/PlatformFooterSettings";
+import { PlatformLeads } from "@/components/platform/PlatformLeads";
 import {
   Shield,
   LogOut,
