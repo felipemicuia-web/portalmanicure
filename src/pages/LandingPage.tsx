@@ -90,9 +90,15 @@ function LandingHeader({ content }: { content: LandingContent }) {
                 <Link to="/platform">Console</Link>
               </Button>
             )}
-            <Button variant="ghost" size="sm" asChild>
-              <Link to="/auth">{h.loginButtonText}</Link>
-            </Button>
+            {user ? (
+              <span className="text-sm text-muted-foreground px-3 py-1.5">
+                Olá, <span className="font-semibold text-foreground">{user.user_metadata?.name || user.email?.split("@")[0]}</span>
+              </span>
+            ) : (
+              <Button variant="ghost" size="sm" asChild>
+                <Link to="/auth">{h.loginButtonText}</Link>
+              </Button>
+            )}
             <Button size="sm" className="gap-1.5" onClick={() => scrollToSection("#teste-gratis")}>
               {h.ctaButtonText} <ArrowRight className="w-3.5 h-3.5" />
             </Button>
@@ -128,9 +134,15 @@ function LandingHeader({ content }: { content: LandingContent }) {
                 <Link to="/platform">Console da Plataforma</Link>
               </Button>
             )}
-            <Button variant="outline" size="sm" asChild>
-              <Link to="/auth">{h.loginButtonText}</Link>
-            </Button>
+            {user ? (
+              <p className="text-sm text-muted-foreground px-2 py-1">
+                Olá, <span className="font-semibold text-foreground">{user.user_metadata?.name || user.email?.split("@")[0]}</span>
+              </p>
+            ) : (
+              <Button variant="outline" size="sm" asChild>
+                <Link to="/auth">{h.loginButtonText}</Link>
+              </Button>
+            )}
             <Button size="sm" onClick={() => { scrollToSection("#teste-gratis"); setOpen(false); }}>
               {h.ctaButtonText}
             </Button>
