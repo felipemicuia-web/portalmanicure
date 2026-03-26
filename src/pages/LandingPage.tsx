@@ -4,25 +4,26 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSuperAdmin } from "@/hooks/useSuperAdmin";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useLandingContent } from "@/hooks/useLandingContent";
-import { LandingContent, SectionDisplayMode } from "@/types/landing";
+import { LandingContent, LandingCard as LandingCardType, SectionDisplayMode } from "@/types/landing";
 import { getPresetById } from "@/contexts/ThemeContext";
 import {
   Calendar, Users, Scissors, Clock, Shield, Smartphone,
   BarChart3, Globe, Star, ChevronRight, Menu, X, Zap,
   Check, ArrowRight, Sparkles, Heart, Award, Loader2, Send,
-  Play, TrendingUp, type LucideIcon,
+  type LucideIcon,
 } from "lucide-react";
 
-/* ─── Icon map ─── */
 const ICON_MAP: Record<string, LucideIcon> = {
   Calendar, Users, Scissors, Clock, Shield, Smartphone,
-  BarChart3, Globe, Star, Zap, Sparkles, Heart, Award, TrendingUp,
+  BarChart3, Globe, Star, Zap, Sparkles, Heart, Award,
 };
+
 function getIcon(name: string): LucideIcon {
   return ICON_MAP[name] || Star;
 }
@@ -38,15 +39,13 @@ function SectionImage({ url, alt }: { url: string; alt: string }) {
       <img
         src={url}
         alt={alt}
-        className="w-full max-w-4xl rounded-2xl border border-emerald-500/10 shadow-2xl shadow-emerald-500/5"
+        className="w-full max-w-4xl rounded-2xl shadow-2xl shadow-primary/10 border border-border/30"
       />
     </div>
   );
 }
 
-/* ═══════════════════════════════════════════════════════════
-   HEADER — Premium dark navbar
-   ═══════════════════════════════════════════════════════════ */
+/* ─── Header ─── */
 function LandingHeader({ content }: { content: LandingContent }) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -63,70 +62,63 @@ function LandingHeader({ content }: { content: LandingContent }) {
 
   return (
     <header
-      className={`fixed top-0 inset-x-0 z-50 transition-all duration-500 ${
+      className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${
         scrolled
-          ? "bg-[#0a0f0a]/90 backdrop-blur-2xl border-b border-emerald-500/10 shadow-lg shadow-black/20"
+          ? "bg-background/80 backdrop-blur-xl border-b border-border/50 shadow-lg"
           : "bg-transparent"
       }`}
     >
-      <div className="max-w-7xl mx-auto flex items-center justify-between px-5 sm:px-8 h-[72px]">
-        {/* Brand */}
-        <span className="text-xl font-bold tracking-tight text-white flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center">
-            <Calendar className="w-4.5 h-4.5 text-white" />
-          </div>
+      <div className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 h-16">
+        <span className="text-lg font-bold tracking-tight text-foreground flex items-center gap-2">
+          <Sparkles className="w-5 h-5 text-primary" />
           {h.brandName}
         </span>
 
-        {/* Desktop nav */}
-        <nav className="hidden md:flex items-center gap-0.5">
+        <nav className="hidden md:flex items-center gap-1">
           {h.menuItems.map((i) => (
             <button
               key={i.href}
               onClick={() => scrollToSection(i.href)}
-              className="px-4 py-2 text-sm text-zinc-400 hover:text-white transition-colors duration-200 rounded-lg hover:bg-white/5"
+              className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-muted/40"
             >
               {i.label}
             </button>
           ))}
-          <div className="ml-6 flex items-center gap-3">
+          <div className="ml-4 flex items-center gap-2">
             {showConsole && (
-              <Button variant="ghost" size="sm" className="text-zinc-400 hover:text-white hover:bg-white/5" asChild>
+              <Button variant="ghost" size="sm" asChild>
                 <Link to="/platform">Console</Link>
               </Button>
             )}
             {user ? (
-              <span className="text-sm text-zinc-400 px-3 py-1.5">
-                Olá, <span className="font-semibold text-white">{user.user_metadata?.name || user.email?.split("@")[0]}</span>
+              <span className="text-sm text-muted-foreground px-3 py-1.5">
+                Olá, <span className="font-semibold text-foreground">{user.user_metadata?.name || user.email?.split("@")[0]}</span>
               </span>
             ) : (
-              <Button variant="ghost" size="sm" className="text-zinc-400 hover:text-white hover:bg-white/5" asChild>
+              <Button variant="ghost" size="sm" asChild>
                 <Link to="/auth">{h.loginButtonText}</Link>
               </Button>
             )}
-            <button
-              onClick={() => scrollToSection("#teste-gratis")}
-              className="h-9 px-5 text-sm font-semibold rounded-full bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:from-emerald-400 hover:to-emerald-500 transition-all duration-300 shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:-translate-y-0.5"
-            >
-              {h.ctaButtonText}
-            </button>
+            <Button size="sm" className="gap-1.5" onClick={() => scrollToSection("#teste-gratis")}>
+              {h.ctaButtonText} <ArrowRight className="w-3.5 h-3.5" />
+            </Button>
           </div>
         </nav>
 
-        {/* Mobile hamburger */}
-        <button className="md:hidden text-zinc-300 p-2 hover:bg-white/5 rounded-lg transition-colors" onClick={() => setOpen(!open)}>
+        {/* Mobile: hamburger only for login/console/cta */}
+        <button className="md:hidden text-foreground" onClick={() => setOpen(!open)}>
           {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
       </div>
 
-      {/* Mobile menu items — horizontal scroll */}
-      <div className="md:hidden overflow-x-auto scrollbar-hide">
-        <div className="flex items-center gap-1 px-4 py-2 min-w-max">
+      {/* Mobile: menu items always visible as horizontal scroll */}
+      <div className="md:hidden overflow-x-auto scrollbar-hide border-b border-border/30">
+        <div className="flex items-center gap-1 px-4 py-1.5 min-w-max">
           {h.menuItems.map((i) => (
             <button
               key={i.href}
               onClick={() => scrollToSection(i.href)}
-              className="px-3 py-1.5 text-xs font-medium text-zinc-400 hover:text-white transition-colors rounded-full hover:bg-white/5 whitespace-nowrap"
+              className="px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors rounded-full hover:bg-muted/40 whitespace-nowrap"
             >
               {i.label}
             </button>
@@ -134,30 +126,26 @@ function LandingHeader({ content }: { content: LandingContent }) {
         </div>
       </div>
 
-      {/* Mobile drawer */}
       {open && (
-        <div className="md:hidden bg-[#0a0f0a]/98 backdrop-blur-2xl border-t border-emerald-500/10 px-5 pb-5 space-y-3">
-          <div className="pt-3 flex flex-col gap-2.5">
+        <div className="md:hidden bg-background/95 backdrop-blur-xl border-b border-border/50 px-4 pb-4 space-y-1">
+          <div className="pt-2 flex flex-col gap-2">
             {showConsole && (
-              <Button variant="outline" size="sm" className="border-emerald-500/20 text-zinc-300 hover:bg-emerald-500/10" asChild>
+              <Button variant="secondary" size="sm" asChild>
                 <Link to="/platform">Console da Plataforma</Link>
               </Button>
             )}
             {user ? (
-              <p className="text-sm text-zinc-400 px-1 py-1">
-                Olá, <span className="font-semibold text-white">{user.user_metadata?.name || user.email?.split("@")[0]}</span>
+              <p className="text-sm text-muted-foreground px-2 py-1">
+                Olá, <span className="font-semibold text-foreground">{user.user_metadata?.name || user.email?.split("@")[0]}</span>
               </p>
             ) : (
-              <Button variant="outline" size="sm" className="border-zinc-700 text-zinc-300 hover:bg-white/5" asChild>
+              <Button variant="outline" size="sm" asChild>
                 <Link to="/auth">{h.loginButtonText}</Link>
               </Button>
             )}
-            <button
-              onClick={() => { scrollToSection("#teste-gratis"); setOpen(false); }}
-              className="h-10 px-6 text-sm font-semibold rounded-full bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-lg shadow-emerald-500/25"
-            >
+            <Button size="sm" onClick={() => { scrollToSection("#teste-gratis"); setOpen(false); }}>
               {h.ctaButtonText}
-            </button>
+            </Button>
           </div>
         </div>
       )}
@@ -165,9 +153,7 @@ function LandingHeader({ content }: { content: LandingContent }) {
   );
 }
 
-/* ═══════════════════════════════════════════════════════════
-   HERO — High-impact first fold
-   ═══════════════════════════════════════════════════════════ */
+/* ─── Hero ─── */
 function HeroSection({ content }: { content: LandingContent }) {
   const hero = content.hero;
   const mode: SectionDisplayMode = hero.displayMode || "text";
@@ -176,87 +162,56 @@ function HeroSection({ content }: { content: LandingContent }) {
   const showImage = (mode === "image" || mode === "both") && hasImage;
 
   return (
-    <section className="relative pt-32 pb-20 sm:pt-44 sm:pb-32 overflow-hidden">
-      {/* Background effects */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[600px] bg-emerald-500/8 rounded-full blur-[150px]" />
-        <div className="absolute top-1/4 right-0 w-[400px] h-[400px] bg-emerald-400/5 rounded-full blur-[120px]" />
-        <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-emerald-600/5 rounded-full blur-[100px]" />
-        {/* Grid pattern */}
-        <div className="absolute inset-0 opacity-[0.03]" style={{
-          backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
-          backgroundSize: '60px 60px',
-        }} />
-      </div>
+    <section className="relative pt-28 pb-20 sm:pt-36 sm:pb-28 overflow-hidden">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/15 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-1/3 right-0 w-[300px] h-[300px] bg-secondary/10 rounded-full blur-[80px] pointer-events-none" />
 
-      <div className="relative z-10 max-w-7xl mx-auto px-5 sm:px-8">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 text-center space-y-8">
         {showText && (
-          <div className="text-center space-y-8 sm:space-y-10">
-            {/* Badge */}
-            <div className="flex justify-center">
-              <div className="inline-flex items-center gap-2 text-xs font-medium px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                {hero.badgeText}
-              </div>
-            </div>
+          <>
+            <Badge variant="secondary" className="gap-1.5 text-xs px-4 py-1.5 mx-auto">
+              <Zap className="w-3.5 h-3.5" />
+              {hero.badgeText}
+            </Badge>
 
-            {/* Headline */}
-            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-[1.1] max-w-5xl mx-auto">
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground leading-tight max-w-4xl mx-auto">
               {hero.title}{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-emerald-300 to-emerald-500">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">
                 {hero.highlight}
               </span>
             </h1>
 
-            {/* Subtitle */}
-            <p className="text-base sm:text-xl text-zinc-400 max-w-2xl mx-auto leading-relaxed font-light">
+            <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
               {hero.description}
             </p>
 
-            {/* CTAs */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-2">
-              <button
-                onClick={() => scrollToSection("#teste-gratis")}
-                className="group h-14 px-10 text-base font-semibold rounded-full bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:from-emerald-400 hover:to-emerald-500 transition-all duration-300 shadow-xl shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:-translate-y-0.5 flex items-center justify-center gap-2.5"
-              >
-                {hero.ctaText}
-                <ArrowRight className="w-4.5 h-4.5 group-hover:translate-x-0.5 transition-transform" />
-              </button>
-              <button
-                onClick={() => scrollToSection("#demonstracao")}
-                className="h-14 px-10 text-base font-semibold rounded-full border border-zinc-700 text-zinc-300 hover:border-zinc-500 hover:text-white hover:bg-white/5 transition-all duration-300 flex items-center justify-center gap-2.5"
-              >
-                <Play className="w-4 h-4" />
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Button size="lg" className="gap-2 text-base px-8" onClick={() => scrollToSection("#teste-gratis")}>
+                {hero.ctaText} <ArrowRight className="w-4 h-4" />
+              </Button>
+              <Button size="lg" variant="outline" className="gap-2 text-base px-8" onClick={() => scrollToSection("#demonstracao")}>
                 {hero.secondaryCtaText}
-              </button>
+              </Button>
             </div>
 
-            {/* Stats */}
-            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center pt-8 sm:pt-12">
+            <div className="flex flex-wrap gap-6 sm:gap-10 justify-center pt-6 text-sm text-muted-foreground">
               {hero.stats.map((s) => (
-                <div
-                  key={s.label}
-                  className="flex items-center gap-4 px-6 py-4 rounded-2xl bg-white/[0.03] border border-white/[0.06] backdrop-blur-sm"
-                >
-                  <div className="text-left">
-                    <p className="text-2xl sm:text-3xl font-bold text-white">{s.value}</p>
-                    <p className="text-xs text-zinc-500 mt-0.5 font-medium">{s.label}</p>
-                  </div>
+                <div key={s.label} className="text-center">
+                  <p className="text-2xl sm:text-3xl font-bold text-foreground">{s.value}</p>
+                  <p className="text-xs mt-0.5">{s.label}</p>
                 </div>
               ))}
             </div>
-          </div>
+          </>
         )}
 
-        {showImage && <div className="mt-12"><SectionImage url={hero.imageUrl!} alt="Hero" /></div>}
+        {showImage && <SectionImage url={hero.imageUrl!} alt="Hero" />}
       </div>
     </section>
   );
 }
 
-/* ═══════════════════════════════════════════════════════════
-   BENEFITS — Premium cards grid
-   ═══════════════════════════════════════════════════════════ */
+/* ─── Benefícios ─── */
 function BenefitsSection({ content }: { content: LandingContent }) {
   const b = content.benefits;
   if (!b.enabled) return null;
@@ -266,52 +221,42 @@ function BenefitsSection({ content }: { content: LandingContent }) {
   const showImage = (mode === "image" || mode === "both") && hasImage;
 
   return (
-    <section id="beneficios" className="py-24 sm:py-32 scroll-mt-20 relative">
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/2 left-0 w-[500px] h-[500px] bg-emerald-500/5 rounded-full blur-[150px]" />
-      </div>
-      <div className="relative z-10 max-w-7xl mx-auto px-5 sm:px-8 space-y-16">
+    <section id="beneficios" className="py-20 sm:py-28 scroll-mt-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-12">
         {showText && (
           <>
-            <div className="text-center space-y-4 max-w-3xl mx-auto">
-              <div className="inline-flex items-center gap-2 text-xs font-medium px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
-                {b.badgeText}
-              </div>
-              <h2 className="text-3xl sm:text-5xl font-bold text-white tracking-tight">{b.title}</h2>
-              <p className="text-zinc-400 text-base sm:text-lg max-w-2xl mx-auto">{b.subtitle}</p>
+            <div className="text-center space-y-3 max-w-2xl mx-auto">
+              <Badge variant="outline" className="text-xs px-3 py-1">{b.badgeText}</Badge>
+              <h2 className="text-2xl sm:text-4xl font-bold text-foreground">{b.title}</h2>
+              <p className="text-muted-foreground text-sm sm:text-base">{b.subtitle}</p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {b.cards.map((card) => {
                 const Icon = getIcon(card.icon);
                 return (
-                  <div
-                    key={card.title}
-                    className="group relative p-6 sm:p-7 rounded-2xl bg-white/[0.02] border border-white/[0.06] hover:border-emerald-500/20 transition-all duration-500 hover:bg-white/[0.04]"
-                  >
-                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                    <div className="relative z-10 space-y-4">
-                      <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center group-hover:bg-emerald-500/15 transition-colors duration-300">
-                        <Icon className="w-5 h-5 text-emerald-400" />
+                  <Card key={card.title} className="group hover:border-primary/30 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5">
+                    <CardContent className="p-6 space-y-3">
+                      <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                        <Icon className="w-5 h-5 text-primary" />
                       </div>
-                      <h3 className="text-lg font-semibold text-white">{card.title}</h3>
-                      <p className="text-sm text-zinc-400 leading-relaxed">{card.description}</p>
-                    </div>
-                  </div>
+                      <h3 className="font-semibold text-foreground">{card.title}</h3>
+                      <p className="text-sm text-muted-foreground leading-relaxed">{card.description}</p>
+                    </CardContent>
+                  </Card>
                 );
               })}
             </div>
           </>
         )}
+
         {showImage && <SectionImage url={b.imageUrl!} alt={b.title} />}
       </div>
     </section>
   );
 }
 
-/* ═══════════════════════════════════════════════════════════
-   FEATURES — Functions section
-   ═══════════════════════════════════════════════════════════ */
+/* ─── Funções ─── */
 function FeaturesSection({ content }: { content: LandingContent }) {
   const f = content.features;
   if (!f.enabled) return null;
@@ -321,29 +266,23 @@ function FeaturesSection({ content }: { content: LandingContent }) {
   const showImage = (mode === "image" || mode === "both") && hasImage;
 
   return (
-    <section id="funcoes" className="py-24 sm:py-32 scroll-mt-20 relative">
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-emerald-500/5 rounded-full blur-[150px]" />
-      </div>
-      <div className="relative z-10 max-w-7xl mx-auto px-5 sm:px-8 space-y-16">
+    <section id="funcoes" className="py-20 sm:py-28 scroll-mt-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-12">
         {showText && (
-          <div className="text-center space-y-4 max-w-3xl mx-auto">
-            <div className="inline-flex items-center gap-2 text-xs font-medium px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
-              {f.badgeText}
-            </div>
-            <h2 className="text-3xl sm:text-5xl font-bold text-white tracking-tight">{f.title}</h2>
-            <p className="text-zinc-400 text-base sm:text-lg max-w-2xl mx-auto">{f.subtitle}</p>
+          <div className="text-center space-y-3 max-w-2xl mx-auto">
+            <Badge variant="outline" className="text-xs px-3 py-1">{f.badgeText}</Badge>
+            <h2 className="text-2xl sm:text-4xl font-bold text-foreground">{f.title}</h2>
+            <p className="text-muted-foreground text-sm sm:text-base">{f.subtitle}</p>
           </div>
         )}
+
         {showImage && <SectionImage url={f.imageUrl!} alt={f.title} />}
       </div>
     </section>
   );
 }
 
-/* ═══════════════════════════════════════════════════════════
-   PRICING — Premium plan cards
-   ═══════════════════════════════════════════════════════════ */
+/* ─── Preços ─── */
 function PricingSection({ content }: { content: LandingContent }) {
   const pr = content.pricing;
   if (!pr.enabled) return null;
@@ -353,83 +292,63 @@ function PricingSection({ content }: { content: LandingContent }) {
   const showImage = (mode === "image" || mode === "both") && hasImage;
 
   return (
-    <section id="precos" className="py-24 sm:py-32 scroll-mt-20 relative">
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-emerald-500/5 rounded-full blur-[150px]" />
-      </div>
-      <div className="relative z-10 max-w-7xl mx-auto px-5 sm:px-8 space-y-16">
+    <section id="precos" className="py-20 sm:py-28 scroll-mt-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-12">
         {showText && (
           <>
-            <div className="text-center space-y-4 max-w-3xl mx-auto">
-              <div className="inline-flex items-center gap-2 text-xs font-medium px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
-                {pr.badgeText}
-              </div>
-              <h2 className="text-3xl sm:text-5xl font-bold text-white tracking-tight">{pr.title}</h2>
-              <p className="text-zinc-400 text-base sm:text-lg max-w-2xl mx-auto">{pr.subtitle}</p>
+            <div className="text-center space-y-3 max-w-2xl mx-auto">
+              <Badge variant="outline" className="text-xs px-3 py-1">{pr.badgeText}</Badge>
+              <h2 className="text-2xl sm:text-4xl font-bold text-foreground">{pr.title}</h2>
+              <p className="text-muted-foreground text-sm sm:text-base">{pr.subtitle}</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {pr.plans.map((p) => (
-                <div
+                <Card
                   key={p.name}
-                  className={`relative group rounded-2xl transition-all duration-500 ${
+                  className={`relative overflow-hidden transition-all duration-300 hover:shadow-xl ${
                     p.highlighted
-                      ? "bg-gradient-to-b from-emerald-500/10 to-transparent border-emerald-500/30 border-2 shadow-xl shadow-emerald-500/10 scale-[1.02]"
-                      : "bg-white/[0.02] border border-white/[0.06] hover:border-emerald-500/15"
+                      ? "border-primary shadow-lg shadow-primary/10 scale-[1.02]"
+                      : "hover:border-primary/30"
                   }`}
                 >
                   {p.highlighted && (
-                    <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-                      <span className="px-4 py-1 text-xs font-semibold rounded-full bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-lg shadow-emerald-500/30">
-                        Mais popular
-                      </span>
-                    </div>
+                    <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-primary to-secondary" />
                   )}
-                  <div className="p-7 sm:p-8 space-y-6">
+                  <CardContent className="p-6 space-y-5">
                     <div>
-                      <h3 className="font-bold text-white text-xl">{p.name}</h3>
-                      <p className="text-sm text-zinc-500 mt-1">{p.description}</p>
+                      <h3 className="font-semibold text-foreground text-lg">{p.name}</h3>
+                      <p className="text-xs text-muted-foreground mt-0.5">{p.description}</p>
                     </div>
-                    <div className="flex items-baseline gap-1.5">
-                      <span className="text-4xl font-extrabold text-white">{p.price}</span>
-                      <span className="text-sm text-zinc-500">{p.period}</span>
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-3xl font-extrabold text-foreground">{p.price}</span>
+                      <span className="text-sm text-muted-foreground">{p.period}</span>
                     </div>
-                    <div className="h-px bg-white/[0.06]" />
-                    <ul className="space-y-3">
+                    <ul className="space-y-2.5">
                       {p.features.map((f) => (
-                        <li key={f} className="flex items-start gap-3 text-sm text-zinc-400">
-                          <div className="w-5 h-5 rounded-full bg-emerald-500/10 flex items-center justify-center shrink-0 mt-0.5">
-                            <Check className="w-3 h-3 text-emerald-400" />
-                          </div>
+                        <li key={f} className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <Check className="w-4 h-4 text-primary shrink-0" />
                           {f}
                         </li>
                       ))}
                     </ul>
-                    <button
-                      onClick={() => scrollToSection("#teste-gratis")}
-                      className={`w-full h-12 text-sm font-semibold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 ${
-                        p.highlighted
-                          ? "bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:-translate-y-0.5"
-                          : "bg-white/[0.05] border border-white/[0.1] text-zinc-300 hover:bg-white/[0.08] hover:border-emerald-500/20 hover:text-white"
-                      }`}
-                    >
-                      {p.ctaText} <ChevronRight className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
+                    <Button className="w-full gap-1.5" onClick={() => scrollToSection("#teste-gratis")}>
+                      {p.ctaText} <ChevronRight className="w-3.5 h-3.5" />
+                    </Button>
+                  </CardContent>
+                </Card>
               ))}
             </div>
           </>
         )}
+
         {showImage && <SectionImage url={pr.imageUrl!} alt={pr.title} />}
       </div>
     </section>
   );
 }
 
-/* ═══════════════════════════════════════════════════════════
-   DEMO — Product demonstration
-   ═══════════════════════════════════════════════════════════ */
+/* ─── Demonstração ─── */
 function DemoSection({ content }: { content: LandingContent }) {
   const d = content.demo;
   if (!d.enabled) return null;
@@ -439,37 +358,28 @@ function DemoSection({ content }: { content: LandingContent }) {
   const showImage = (mode === "image" || mode === "both") && hasImage;
 
   return (
-    <section id="demonstracao" className="py-24 sm:py-32 scroll-mt-20 relative">
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] bg-emerald-500/5 rounded-full blur-[150px]" />
-      </div>
-      <div className="relative z-10 max-w-7xl mx-auto px-5 sm:px-8 space-y-16">
+    <section id="demonstracao" className="py-20 sm:py-28 scroll-mt-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-12">
         {showText && (
           <>
-            <div className="text-center space-y-4 max-w-3xl mx-auto">
-              <div className="inline-flex items-center gap-2 text-xs font-medium px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
-                {d.badgeText}
-              </div>
-              <h2 className="text-3xl sm:text-5xl font-bold text-white tracking-tight">{d.title}</h2>
-              <p className="text-zinc-400 text-base sm:text-lg max-w-2xl mx-auto">{d.subtitle}</p>
+            <div className="text-center space-y-3 max-w-2xl mx-auto">
+              <Badge variant="outline" className="text-xs px-3 py-1">{d.badgeText}</Badge>
+              <h2 className="text-2xl sm:text-4xl font-bold text-foreground">{d.title}</h2>
+              <p className="text-muted-foreground text-sm sm:text-base">{d.subtitle}</p>
             </div>
 
             <div className="relative max-w-4xl mx-auto">
-              <div className="absolute -inset-1 bg-gradient-to-br from-emerald-500/20 via-emerald-500/5 to-transparent rounded-3xl blur-xl" />
-              <div className="relative rounded-2xl border border-white/[0.08] bg-[#0d1210]/80 backdrop-blur-xl overflow-hidden p-8 sm:p-12 text-center space-y-8">
-                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center mx-auto shadow-xl shadow-emerald-500/20">
-                  <Calendar className="w-10 h-10 text-white" />
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary/10 rounded-2xl blur-2xl -z-10" />
+              <div className="rounded-2xl border border-border/50 bg-card/80 backdrop-blur-sm overflow-hidden p-6 sm:p-10 text-center space-y-6">
+                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center mx-auto">
+                  <Calendar className="w-10 h-10 text-primary-foreground" />
                 </div>
-                <div className="space-y-3">
-                  <h3 className="text-2xl font-bold text-white">Experimente agora</h3>
-                  <p className="text-zinc-400 max-w-md mx-auto">{d.description}</p>
+                <div className="space-y-2">
+                  <h3 className="text-xl font-bold text-foreground">Experimente agora</h3>
+                  <p className="text-sm text-muted-foreground max-w-md mx-auto">{d.description}</p>
                 </div>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Button
-                    size="lg"
-                    className="gap-2 h-12 px-8 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white border-0 shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40"
-                    asChild
-                  >
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <Button size="lg" className="gap-2" asChild>
                     <Link to={d.demoUrl}>
                       {d.ctaText} <ArrowRight className="w-4 h-4" />
                     </Link>
@@ -479,15 +389,14 @@ function DemoSection({ content }: { content: LandingContent }) {
             </div>
           </>
         )}
+
         {showImage && <SectionImage url={d.imageUrl!} alt={d.title} />}
       </div>
     </section>
   );
 }
 
-/* ═══════════════════════════════════════════════════════════
-   CTA FINAL — Conversion block
-   ═══════════════════════════════════════════════════════════ */
+/* ─── CTA Final ─── */
 function CTASection({ content }: { content: LandingContent }) {
   const c = content.cta;
   if (!c.enabled) return null;
@@ -497,27 +406,24 @@ function CTASection({ content }: { content: LandingContent }) {
   const showImage = (mode === "image" || mode === "both") && hasImage;
 
   return (
-    <section className="py-24 sm:py-32">
-      <div className="max-w-7xl mx-auto px-5 sm:px-8">
+    <section className="py-20 sm:py-28">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
         {showText && (
-          <div className="relative rounded-3xl overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-emerald-600/20 via-emerald-500/10 to-transparent" />
-            <div className="absolute inset-0 bg-[#0d1210]/60 backdrop-blur-sm" />
-            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-emerald-500/30 to-transparent" />
-            <div className="relative z-10 text-center py-20 px-6 sm:px-16 space-y-8">
-              <h2 className="text-3xl sm:text-5xl font-bold text-white tracking-tight">{c.title}</h2>
-              <p className="text-zinc-400 max-w-lg mx-auto text-base sm:text-lg">{c.description}</p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <button
-                  onClick={() => scrollToSection("#teste-gratis")}
-                  className="h-14 px-10 text-base font-semibold rounded-full bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-xl shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center gap-2.5"
-                >
-                  {c.ctaText} <ArrowRight className="w-4.5 h-4.5" />
-                </button>
+          <div className="relative rounded-2xl overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-primary/20 to-secondary/15" />
+            <div className="absolute inset-0 bg-card/60 backdrop-blur-sm" />
+            <div className="relative z-10 text-center py-16 px-6 sm:px-12 space-y-6">
+              <h2 className="text-2xl sm:text-4xl font-bold text-foreground">{c.title}</h2>
+              <p className="text-muted-foreground max-w-lg mx-auto text-sm sm:text-base">{c.description}</p>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <Button size="lg" className="gap-2 text-base px-8" onClick={() => scrollToSection("#teste-gratis")}>
+                  {c.ctaText} <ArrowRight className="w-4 h-4" />
+                </Button>
               </div>
             </div>
           </div>
         )}
+
         {showImage && (
           <div className={showText ? "mt-12" : ""}>
             <SectionImage url={c.imageUrl!} alt={c.title} />
@@ -528,9 +434,7 @@ function CTASection({ content }: { content: LandingContent }) {
   );
 }
 
-/* ═══════════════════════════════════════════════════════════
-   TRIAL FORM — Lead capture
-   ═══════════════════════════════════════════════════════════ */
+/* ─── Formulário Teste Grátis ─── */
 const BRAZILIAN_STATES = [
   "AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA",
   "PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO",
@@ -578,45 +482,39 @@ function TrialFormSection() {
 
   if (submitted) {
     return (
-      <section id="teste-gratis" className="py-24 sm:py-32 scroll-mt-20">
-        <div className="max-w-2xl mx-auto px-5 sm:px-8 text-center space-y-6">
-          <div className="w-20 h-20 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mx-auto">
-            <Check className="w-10 h-10 text-emerald-400" />
+      <section id="teste-gratis" className="py-20 sm:py-28 scroll-mt-20">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 text-center space-y-6">
+          <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+            <Check className="w-10 h-10 text-primary" />
           </div>
-          <h2 className="text-2xl sm:text-4xl font-bold text-white">Recebemos sua solicitação!</h2>
-          <p className="text-zinc-400">Nossa equipe entrará em contato pelo WhatsApp informado para liberar seu acesso ao teste gratuito.</p>
+          <h2 className="text-2xl sm:text-3xl font-bold text-foreground">Recebemos sua solicitação!</h2>
+          <p className="text-muted-foreground">Nossa equipe entrará em contato pelo WhatsApp informado para liberar seu acesso ao teste gratuito.</p>
         </div>
       </section>
     );
   }
 
   return (
-    <section id="teste-gratis" className="py-24 sm:py-32 scroll-mt-20 relative">
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-emerald-500/5 rounded-full blur-[150px]" />
-      </div>
-      <div className="relative z-10 max-w-7xl mx-auto px-5 sm:px-8">
-        <div className="relative rounded-3xl overflow-hidden max-w-2xl mx-auto">
-          <div className="absolute inset-0 bg-gradient-to-b from-emerald-500/10 to-transparent" />
-          <div className="absolute inset-0 bg-[#0d1210]/70 backdrop-blur-xl" />
-          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-emerald-500/30 to-transparent" />
+    <section id="teste-gratis" className="py-20 sm:py-28 scroll-mt-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="relative rounded-2xl overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-primary/10 to-secondary/10" />
+          <div className="absolute inset-0 bg-card/70 backdrop-blur-sm" />
 
-          <div className="relative z-10 py-12 px-6 sm:px-10 space-y-8">
-            <div className="text-center space-y-3">
-              <div className="inline-flex items-center gap-2 text-xs font-medium px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
-                Teste Grátis
-              </div>
-              <h2 className="text-2xl sm:text-4xl font-bold text-white">
-                Comece seu teste gratuito
+          <div className="relative z-10 py-12 px-6 sm:px-12 space-y-8">
+            <div className="text-center space-y-3 max-w-2xl mx-auto">
+              <Badge variant="outline" className="text-xs px-3 py-1">Teste Grátis</Badge>
+              <h2 className="text-2xl sm:text-4xl font-bold text-foreground">
+                Comece seu teste gratuito agora
               </h2>
-              <p className="text-zinc-400 text-sm sm:text-base max-w-md mx-auto">
-                Preencha os dados e nossa equipe libera seu acesso em até 24 horas.
+              <p className="text-muted-foreground text-sm sm:text-base">
+                Preencha os dados abaixo e nossa equipe liberará seu acesso em até 24 horas.
               </p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={handleSubmit} className="max-w-xl mx-auto space-y-5">
               <div className="space-y-2">
-                <Label htmlFor="company_name" className="text-zinc-300 text-sm">Nome da empresa</Label>
+                <Label htmlFor="company_name">Nome da empresa</Label>
                 <Input
                   id="company_name"
                   placeholder="Ex: Studio Maria"
@@ -624,12 +522,11 @@ function TrialFormSection() {
                   onChange={(e) => setForm({ ...form, company_name: e.target.value })}
                   maxLength={100}
                   required
-                  className="h-12 bg-white/[0.04] border-white/[0.08] text-white placeholder:text-zinc-600 focus:border-emerald-500/50 rounded-xl"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="full_name" className="text-zinc-300 text-sm">Nome completo</Label>
+                <Label htmlFor="full_name">Nome completo</Label>
                 <Input
                   id="full_name"
                   placeholder="Seu nome completo"
@@ -637,13 +534,12 @@ function TrialFormSection() {
                   onChange={(e) => setForm({ ...form, full_name: e.target.value })}
                   maxLength={100}
                   required
-                  className="h-12 bg-white/[0.04] border-white/[0.08] text-white placeholder:text-zinc-600 focus:border-emerald-500/50 rounded-xl"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="city" className="text-zinc-300 text-sm">Cidade</Label>
+                  <Label htmlFor="city">Cidade</Label>
                   <Input
                     id="city"
                     placeholder="Sua cidade"
@@ -651,28 +547,27 @@ function TrialFormSection() {
                     onChange={(e) => setForm({ ...form, city: e.target.value })}
                     maxLength={100}
                     required
-                    className="h-12 bg-white/[0.04] border-white/[0.08] text-white placeholder:text-zinc-600 focus:border-emerald-500/50 rounded-xl"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="state" className="text-zinc-300 text-sm">Estado</Label>
+                  <Label htmlFor="state">Estado</Label>
                   <select
                     id="state"
                     value={form.state}
                     onChange={(e) => setForm({ ...form, state: e.target.value })}
                     required
-                    className="flex h-12 w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-sm text-white focus:border-emerald-500/50 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                   >
-                    <option value="" className="bg-[#0d1210]">Selecione</option>
+                    <option value="">Selecione</option>
                     {BRAZILIAN_STATES.map((s) => (
-                      <option key={s} value={s} className="bg-[#0d1210]">{s}</option>
+                      <option key={s} value={s}>{s}</option>
                     ))}
                   </select>
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="whatsapp" className="text-zinc-300 text-sm">WhatsApp</Label>
+                <Label htmlFor="whatsapp">WhatsApp</Label>
                 <Input
                   id="whatsapp"
                   placeholder="(11) 99999-9999"
@@ -680,21 +575,16 @@ function TrialFormSection() {
                   onChange={(e) => setForm({ ...form, whatsapp: e.target.value })}
                   maxLength={15}
                   required
-                  className="h-12 bg-white/[0.04] border-white/[0.08] text-white placeholder:text-zinc-600 focus:border-emerald-500/50 rounded-xl"
                 />
               </div>
 
-              <button
-                type="submit"
-                disabled={!isValid || submitting}
-                className="w-full h-14 text-base font-semibold rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-xl shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-40 disabled:hover:translate-y-0 disabled:hover:shadow-emerald-500/25 flex items-center justify-center gap-2.5"
-              >
+              <Button type="submit" size="lg" className="w-full gap-2 text-base" disabled={!isValid || submitting}>
                 {submitting ? (
-                  <><Loader2 className="w-5 h-5 animate-spin" /> Enviando...</>
+                  <><Loader2 className="w-4 h-4 animate-spin" /> Enviando...</>
                 ) : (
                   <><Send className="w-4 h-4" /> Solicitar teste grátis</>
                 )}
-              </button>
+              </Button>
             </form>
           </div>
         </div>
@@ -703,34 +593,30 @@ function TrialFormSection() {
   );
 }
 
-/* ═══════════════════════════════════════════════════════════
-   FOOTER — Clean premium footer
-   ═══════════════════════════════════════════════════════════ */
+/* ─── Footer ─── */
 function LandingFooter({ content }: { content: LandingContent }) {
   const ft = content.footer;
   const h = content.header;
   return (
-    <footer className="border-t border-white/[0.06] py-12">
-      <div className="max-w-7xl mx-auto px-5 sm:px-8">
-        <div className="flex flex-col gap-8 sm:flex-row sm:items-center sm:justify-between">
-          <span className="flex items-center gap-2.5 font-bold text-white text-lg">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center">
-              <Calendar className="w-3.5 h-3.5 text-white" />
-            </div>
+    <footer className="border-t border-border/50 py-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
+          <span className="flex items-center gap-2 font-semibold text-foreground">
+            <Sparkles className="w-4 h-4 text-primary" />
             {ft.brandName}
           </span>
-          <div className="flex flex-wrap gap-6">
+          <div className="flex gap-6">
             {h.menuItems.map((i) => (
               <button
                 key={i.href}
                 onClick={() => scrollToSection(i.href)}
-                className="text-sm text-zinc-500 hover:text-zinc-300 transition-colors"
+                className="hover:text-foreground transition-colors"
               >
                 {i.label}
               </button>
             ))}
           </div>
-          <p className="text-xs text-zinc-600">
+          <p className="text-xs text-muted-foreground">
             © {new Date().getFullYear()} {ft.brandName}. {ft.copyrightText}
           </p>
         </div>
@@ -739,7 +625,7 @@ function LandingFooter({ content }: { content: LandingContent }) {
   );
 }
 
-/* ─── Apply landing theme ─── */
+/* ─── Apply landing theme to DOM ─── */
 function useLandingTheme(themeId: string) {
   useEffect(() => {
     const preset = getPresetById(themeId);
@@ -760,29 +646,57 @@ function useLandingTheme(themeId: string) {
   }, [themeId]);
 }
 
-/* ─── Landing background ─── */
-function LandingBackground() {
-  return (
-    <div className="fixed inset-0 pointer-events-none z-0">
-      {/* Base */}
-      <div className="absolute inset-0 bg-[#060b06]" />
-      {/* Ambient glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1200px] h-[800px] bg-emerald-900/15 rounded-full blur-[200px]" />
-      <div className="absolute bottom-0 right-0 w-[600px] h-[400px] bg-emerald-800/10 rounded-full blur-[150px]" />
-      {/* Subtle grid */}
-      <div className="absolute inset-0 opacity-[0.015]" style={{
-        backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
-        backgroundSize: '80px 80px',
-      }} />
-      {/* Top shine line */}
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-emerald-500/20 to-transparent" />
-    </div>
-  );
+/* ─── Standalone themed background for landing (no ThemeContext needed) ─── */
+function LandingThemedBackground({ themeId }: { themeId: string }) {
+  const particles = useMemo(() => {
+    const THEME_BG: Record<string, { type: string; count: number }> = {
+      galaxy: { type: "stars", count: 50 },
+      rosa: { type: "petals", count: 20 },
+      oceano: { type: "bubbles", count: 30 },
+      floresta: { type: "leaves", count: 25 },
+      pordosol: { type: "rays", count: 15 },
+      meianoite: { type: "snow", count: 40 },
+      lavanda: { type: "butterflies", count: 12 },
+    };
+    const config = THEME_BG[themeId] || THEME_BG.galaxy;
+    const els: JSX.Element[] = [];
+    for (let i = 0; i < config.count; i++) {
+      const delay = Math.random() * 10;
+      const size = 4 + Math.random() * 12;
+      const left = Math.random() * 100;
+      const duration = 8 + Math.random() * 12;
+      const style: React.CSSProperties = { left: `${left}%`, animationDelay: `${delay}s`, animationDuration: `${duration}s` };
+      switch (config.type) {
+        case "stars":
+          els.push(<div key={i} className="bg-star" style={{ ...style, top: `${Math.random() * 100}%`, width: size, height: size }} />);
+          break;
+        case "bubbles":
+          els.push(<div key={i} className="bg-bubble" style={{ ...style, width: size * 1.5, height: size * 1.5 }} />);
+          break;
+        case "petals":
+          els.push(<div key={i} className="bg-petal" style={{ ...style, width: size, height: size * 1.5 }} />);
+          break;
+        case "leaves":
+          els.push(<div key={i} className="bg-leaf" style={{ ...style, width: size * 1.2, height: size * 1.2 }} />);
+          break;
+        case "rays":
+          els.push(<div key={i} className="bg-ray" style={style} />);
+          break;
+        case "snow":
+          els.push(<div key={i} className="bg-snowflake" style={{ ...style, width: size * 0.8, height: size * 0.8 }} />);
+          break;
+        case "butterflies":
+          els.push(<div key={i} className="bg-butterfly" style={{ ...style, top: `${Math.random() * 80}%`, width: size * 1.5, height: size * 0.9 }} />);
+          break;
+      }
+    }
+    return els;
+  }, [themeId]);
+
+  return <div className="themed-bg-container">{particles}</div>;
 }
 
-/* ═══════════════════════════════════════════════════════════
-   PAGE — Main entry
-   ═══════════════════════════════════════════════════════════ */
+/* ─── Page ─── */
 export default function LandingPage() {
   const { content, loading } = useLandingContent();
   const themeId = content.themeId || "galaxy";
@@ -790,15 +704,15 @@ export default function LandingPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#060b06] flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#060b06] text-white relative">
-      <LandingBackground />
+    <div className="min-h-screen bg-background text-foreground relative">
+      <LandingThemedBackground themeId={themeId} />
       <div className="relative z-10">
         <LandingHeader content={content} />
         <HeroSection content={content} />
