@@ -26,6 +26,7 @@ import {
   LayoutDashboard,
   Settings,
   Globe,
+  ClipboardList,
   type LucideIcon,
 } from "lucide-react";
 
@@ -37,6 +38,7 @@ const MENU_ITEMS: { value: string; label: string; icon: LucideIcon }[] = [
   { value: "insights", label: "Valores e Insights", icon: DollarSign },
   { value: "plans", label: "Planos", icon: Crown },
   { value: "landing", label: "Landing Page", icon: Globe },
+  { value: "leads", label: "Solicitações", icon: ClipboardList },
   { value: "settings", label: "Configurações", icon: Settings },
 ];
 
@@ -174,6 +176,7 @@ export default function PlatformPage() {
             {activeTab === "insights" && <PlatformInsights />}
             {activeTab === "plans" && <PlatformPlans />}
             {activeTab === "landing" && <PlatformLandingAdmin />}
+            {activeTab === "leads" && <PlatformLeads />}
             {activeTab === "settings" && <PlatformFooterSettings />}
           </main>
         </div>
