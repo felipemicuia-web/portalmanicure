@@ -99,22 +99,29 @@ function LandingHeader({ content }: { content: LandingContent }) {
           </div>
         </nav>
 
+        {/* Mobile: hamburger only for login/console/cta */}
         <button className="md:hidden text-foreground" onClick={() => setOpen(!open)}>
           {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
       </div>
 
-      {open && (
-        <div className="md:hidden bg-background/95 backdrop-blur-xl border-b border-border/50 px-4 pb-4 space-y-1">
+      {/* Mobile: menu items always visible as horizontal scroll */}
+      <div className="md:hidden overflow-x-auto scrollbar-hide border-b border-border/30">
+        <div className="flex items-center gap-1 px-4 py-1.5 min-w-max">
           {h.menuItems.map((i) => (
             <button
               key={i.href}
-              onClick={() => { scrollToSection(i.href); setOpen(false); }}
-              className="block w-full text-left px-3 py-2.5 text-sm text-muted-foreground hover:text-foreground rounded-md hover:bg-muted/40"
+              onClick={() => scrollToSection(i.href)}
+              className="px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors rounded-full hover:bg-muted/40 whitespace-nowrap"
             >
               {i.label}
             </button>
           ))}
+        </div>
+      </div>
+
+      {open && (
+        <div className="md:hidden bg-background/95 backdrop-blur-xl border-b border-border/50 px-4 pb-4 space-y-1">
           <div className="pt-2 flex flex-col gap-2">
             {showConsole && (
               <Button variant="secondary" size="sm" asChild>
