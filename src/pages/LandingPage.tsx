@@ -134,9 +134,15 @@ function LandingHeader({ content }: { content: LandingContent }) {
                 <Link to="/platform">Console da Plataforma</Link>
               </Button>
             )}
-            <Button variant="outline" size="sm" asChild>
-              <Link to="/auth">{h.loginButtonText}</Link>
-            </Button>
+            {user ? (
+              <p className="text-sm text-muted-foreground px-2 py-1">
+                Olá, <span className="font-semibold text-foreground">{user.user_metadata?.name || user.email?.split("@")[0]}</span>
+              </p>
+            ) : (
+              <Button variant="outline" size="sm" asChild>
+                <Link to="/auth">{h.loginButtonText}</Link>
+              </Button>
+            )}
             <Button size="sm" onClick={() => { scrollToSection("#teste-gratis"); setOpen(false); }}>
               {h.ctaButtonText}
             </Button>
