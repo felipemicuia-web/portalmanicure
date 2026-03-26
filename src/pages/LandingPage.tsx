@@ -117,8 +117,8 @@ function LandingHeader({ content }: { content: LandingContent }) {
       </div>
 
       {/* Mobile: menu items always visible as horizontal scroll */}
-      <div className="md:hidden overflow-x-auto scrollbar-hide border-b border-border/30 -mt-1">
-        <div className="flex items-center gap-0.5 px-4 py-1 min-w-max">
+      <div className="md:hidden overflow-x-auto scrollbar-hide border-b border-border/30 -mt-2.5">
+        <div className="flex items-center gap-0.5 px-4 py-0.5 min-w-max">
           {h.menuItems.map((i) => (
             <button
               key={i.href}
