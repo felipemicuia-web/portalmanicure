@@ -155,7 +155,25 @@ export function PlatformLandingAdmin() {
         {activeTab === "demo" && <LandingAdminDemo content={draft.demo} onChange={(demo) => updateDraft((prev) => ({ ...prev, demo }))} />}
         {activeTab === "cta" && <LandingAdminCta content={draft.cta} onChange={(cta) => updateDraft((prev) => ({ ...prev, cta }))} />}
         {activeTab === "footer" && <LandingAdminFooter content={draft.footer} onChange={(footer) => updateDraft((prev) => ({ ...prev, footer }))} />}
-        {activeTab === "theme" && <LandingAdminTheme selectedThemeId={draft.themeId || "galaxy"} onChange={(themeId) => updateDraft((prev) => ({ ...prev, themeId }))} />}
+        {activeTab === "theme" && <LandingAdminTheme selectedThemeId={draft.themeId || "galaxy"} onChange={async (themeId) => {
+          updateDraft((prev) => ({ ...prev, themeId }));
+          // Auto-publish theme change immediately
+          const updatedContent = { ...draft, themeId };
+          const value = JSON.stringify(updatedContent);
+          const { data: pubExists } = await supabase.from("platform_settings").select("id").eq("key", "landing_page_published").maybeSingle();
+          if (pubExists) {
+            await supabase.from("platform_settings").update({ value, updated_at: new Date().toISOString() }).eq("key", "landing_page_published");
+          } else {
+            await supabase.from("platform_settings").insert({ key: "landing_page_published", value });
+          }
+          const { data: draftExists } = await supabase.from("platform_settings").select("id").eq("key", "landing_page_draft").maybeSingle();
+          if (draftExists) {
+            await supabase.from("platform_settings").update({ value, updated_at: new Date().toISOString() }).eq("key", "landing_page_draft");
+          } else {
+            await supabase.from("platform_settings").insert({ key: "landing_page_draft", value });
+          }
+          toast({ title: "Tema aplicado!", description: "O tema da landing page foi atualizado." });
+        }} />
       </div>
     </div>
   );
