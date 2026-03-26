@@ -91,9 +91,14 @@ function LandingHeader({ content }: { content: LandingContent }) {
               </Button>
             )}
             {user ? (
-              <span className="text-sm text-muted-foreground px-3 py-1.5">
-                Olá, <span className="font-semibold text-foreground">{user.user_metadata?.name || user.email?.split("@")[0]}</span>
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground px-2 py-1.5">
+                  Olá, <span className="font-semibold text-foreground">{user.user_metadata?.name || user.email?.split("@")[0]}</span>
+                </span>
+                <Button variant="ghost" size="sm" onClick={() => signOut()}>
+                  Sair
+                </Button>
+              </div>
             ) : (
               <Button variant="ghost" size="sm" asChild>
                 <Link to="/auth">{h.loginButtonText}</Link>
@@ -135,9 +140,14 @@ function LandingHeader({ content }: { content: LandingContent }) {
               </Button>
             )}
             {user ? (
-              <p className="text-sm text-muted-foreground px-2 py-1">
-                Olá, <span className="font-semibold text-foreground">{user.user_metadata?.name || user.email?.split("@")[0]}</span>
-              </p>
+              <div className="flex flex-col gap-2">
+                <p className="text-sm text-muted-foreground px-2 py-1">
+                  Olá, <span className="font-semibold text-foreground">{user.user_metadata?.name || user.email?.split("@")[0]}</span>
+                </p>
+                <Button variant="outline" size="sm" onClick={() => { signOut(); setOpen(false); }}>
+                  Sair da conta
+                </Button>
+              </div>
             ) : (
               <Button variant="outline" size="sm" asChild>
                 <Link to="/auth">{h.loginButtonText}</Link>
