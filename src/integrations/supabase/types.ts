@@ -445,6 +445,242 @@ export type Database = {
           },
         ]
       }
+      integration_logs: {
+        Row: {
+          booking_id: string | null
+          duration_ms: number | null
+          error_message: string | null
+          event_code: string | null
+          executed_at: string
+          id: string
+          mode_used: string
+          provider_id: string
+          request_summary: Json | null
+          response_summary: Json | null
+          status: string
+          tenant_id: string
+          tenant_integration_id: string | null
+        }
+        Insert: {
+          booking_id?: string | null
+          duration_ms?: number | null
+          error_message?: string | null
+          event_code?: string | null
+          executed_at?: string
+          id?: string
+          mode_used: string
+          provider_id: string
+          request_summary?: Json | null
+          response_summary?: Json | null
+          status?: string
+          tenant_id: string
+          tenant_integration_id?: string | null
+        }
+        Update: {
+          booking_id?: string | null
+          duration_ms?: number | null
+          error_message?: string | null
+          event_code?: string | null
+          executed_at?: string
+          id?: string
+          mode_used?: string
+          provider_id?: string
+          request_summary?: Json | null
+          response_summary?: Json | null
+          status?: string
+          tenant_id?: string
+          tenant_integration_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "integration_logs_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "integration_providers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "integration_logs_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "integration_logs_tenant_integration_id_fkey"
+            columns: ["tenant_integration_id"]
+            isOneToOne: false
+            referencedRelation: "tenant_integrations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      integration_processed_events: {
+        Row: {
+          booking_id: string
+          event_code: string
+          id: string
+          processed_at: string
+          tenant_integration_id: string
+        }
+        Insert: {
+          booking_id: string
+          event_code: string
+          id?: string
+          processed_at?: string
+          tenant_integration_id: string
+        }
+        Update: {
+          booking_id?: string
+          event_code?: string
+          id?: string
+          processed_at?: string
+          tenant_integration_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "integration_processed_events_tenant_integration_id_fkey"
+            columns: ["tenant_integration_id"]
+            isOneToOne: false
+            referencedRelation: "tenant_integrations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      integration_provider_admin: {
+        Row: {
+          created_at: string
+          default_sandbox_url: string | null
+          id: string
+          internal_notes: string | null
+          is_active_global: boolean
+          max_retries: number
+          provider_id: string
+          rate_limit_per_minute: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          default_sandbox_url?: string | null
+          id?: string
+          internal_notes?: string | null
+          is_active_global?: boolean
+          max_retries?: number
+          provider_id: string
+          rate_limit_per_minute?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          default_sandbox_url?: string | null
+          id?: string
+          internal_notes?: string | null
+          is_active_global?: boolean
+          max_retries?: number
+          provider_id?: string
+          rate_limit_per_minute?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "integration_provider_admin_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: true
+            referencedRelation: "integration_providers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      integration_providers: {
+        Row: {
+          category: string
+          code: string
+          config_schema_json: Json
+          created_at: string
+          description: string | null
+          icon_name: string
+          id: string
+          integration_type: string
+          name: string
+          requires_secret: boolean
+          supports_test_mode: boolean
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          code: string
+          config_schema_json?: Json
+          created_at?: string
+          description?: string | null
+          icon_name?: string
+          id?: string
+          integration_type?: string
+          name: string
+          requires_secret?: boolean
+          supports_test_mode?: boolean
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          code?: string
+          config_schema_json?: Json
+          created_at?: string
+          description?: string | null
+          icon_name?: string
+          id?: string
+          integration_type?: string
+          name?: string
+          requires_secret?: boolean
+          supports_test_mode?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      integration_secrets: {
+        Row: {
+          created_at: string
+          encrypted_value: string
+          id: string
+          secret_key: string
+          tenant_id: string
+          tenant_integration_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          encrypted_value: string
+          id?: string
+          secret_key: string
+          tenant_id: string
+          tenant_integration_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          encrypted_value?: string
+          id?: string
+          secret_key?: string
+          tenant_id?: string
+          tenant_integration_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "integration_secrets_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "integration_secrets_tenant_integration_id_fkey"
+            columns: ["tenant_integration_id"]
+            isOneToOne: false
+            referencedRelation: "tenant_integrations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       logo_history: {
         Row: {
           created_at: string
@@ -1008,6 +1244,105 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "services_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tenant_integration_events: {
+        Row: {
+          created_at: string
+          event_code: string
+          id: string
+          is_enabled: boolean
+          schedule_config_json: Json
+          tenant_id: string
+          tenant_integration_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          event_code: string
+          id?: string
+          is_enabled?: boolean
+          schedule_config_json?: Json
+          tenant_id: string
+          tenant_integration_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          event_code?: string
+          id?: string
+          is_enabled?: boolean
+          schedule_config_json?: Json
+          tenant_id?: string
+          tenant_integration_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tenant_integration_events_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tenant_integration_events_tenant_integration_id_fkey"
+            columns: ["tenant_integration_id"]
+            isOneToOne: false
+            referencedRelation: "tenant_integrations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tenant_integrations: {
+        Row: {
+          config_json: Json
+          created_at: string
+          id: string
+          last_success_at: string | null
+          last_test_at: string | null
+          provider_id: string
+          status: string
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          config_json?: Json
+          created_at?: string
+          id?: string
+          last_success_at?: string | null
+          last_test_at?: string | null
+          provider_id: string
+          status?: string
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          config_json?: Json
+          created_at?: string
+          id?: string
+          last_success_at?: string | null
+          last_test_at?: string | null
+          provider_id?: string
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tenant_integrations_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "integration_providers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tenant_integrations_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
