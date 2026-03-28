@@ -13,6 +13,7 @@ import { PlatformInsights } from "@/components/platform/PlatformInsights";
 import { PlatformTenantDashboards } from "@/components/platform/PlatformTenantDashboards";
 import { PlatformFooterSettings } from "@/components/platform/PlatformFooterSettings";
 import { PlatformLeads } from "@/components/platform/PlatformLeads";
+import { PlatformIntegrations } from "@/components/platform/PlatformIntegrations";
 import {
   Shield,
   LogOut,
@@ -27,6 +28,7 @@ import {
   Settings,
   Globe,
   ClipboardList,
+  Plug,
   type LucideIcon,
 } from "lucide-react";
 
@@ -39,6 +41,7 @@ const MENU_ITEMS: { value: string; label: string; icon: LucideIcon }[] = [
   { value: "plans", label: "Planos", icon: Crown },
   { value: "landing", label: "Landing Page", icon: Globe },
   { value: "leads", label: "Solicitações", icon: ClipboardList },
+  { value: "integrations", label: "Integrações", icon: Plug },
   { value: "settings", label: "Configurações", icon: Settings },
 ];
 
