@@ -180,6 +180,7 @@ export default function PlatformPage() {
             {activeTab === "plans" && <PlatformPlans />}
             {activeTab === "landing" && <PlatformLandingAdmin />}
             {activeTab === "leads" && <PlatformLeads />}
+            {activeTab === "integrations" && <PlatformIntegrations />}
             {activeTab === "settings" && <PlatformFooterSettings />}
           </main>
         </div>
