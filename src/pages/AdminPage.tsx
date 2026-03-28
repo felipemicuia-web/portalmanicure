@@ -20,6 +20,7 @@ import { AdminDashboard } from "@/components/admin/AdminDashboard";
 import { AdminPayment } from "@/components/admin/AdminPayment";
 import { AdminPopups } from "@/components/admin/AdminPopups";
 import { AdminLocation } from "@/components/admin/AdminLocation";
+import { AdminIntegrations } from "@/components/admin/AdminIntegrations";
 
 import { AdminUsers } from "@/components/admin/AdminUsers";
 import { AdminCoupons } from "@/components/admin/AdminCoupons";
@@ -43,6 +44,7 @@ import {
   CreditCard,
   Megaphone,
   MapPin,
+  Plug,
   type LucideIcon,
 } from "lucide-react";
 
@@ -61,6 +63,7 @@ const MENU_ITEMS: { value: string; label: string; icon: LucideIcon }[] = [
   { value: "popups", label: "Pop-ups", icon: Megaphone },
   { value: "location", label: "Localização", icon: MapPin },
   { value: "users", label: "Clientes", icon: UsersRound },
+  { value: "integrations", label: "Integrações", icon: Plug },
   { value: "dashboard", label: "Dashboard", icon: BarChart3 },
 ];
 
@@ -80,6 +83,7 @@ const TAB_CONTENT: Record<string, React.ReactNode> = {
   popups: <AdminPopups />,
   location: <AdminLocation />,
   users: <AdminUsers />,
+  integrations: <AdminIntegrations />,
 };
 
 export default function AdminPage() {
