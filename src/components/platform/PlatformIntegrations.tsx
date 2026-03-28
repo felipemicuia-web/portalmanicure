@@ -177,9 +177,9 @@ export function PlatformIntegrations() {
                 </div>
                 <div className="flex items-center gap-3">
                   {admin.is_active_global ? (
-                    <Badge className="bg-green-500/20 text-green-400"><Power className="w-3 h-3 mr-1" />Ativo</Badge>
+                    <Badge className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"><Power className="w-3 h-3 mr-1" />Ativo</Badge>
                   ) : (
-                    <Badge variant="secondary"><PowerOff className="w-3 h-3 mr-1" />Inativo</Badge>
+                    <Badge className="bg-red-500/20 text-red-400 border border-red-500/30"><PowerOff className="w-3 h-3 mr-1" />Inativo</Badge>
                   )}
                   <Switch checked={admin.is_active_global} onCheckedChange={() => toggleGlobal(admin)} />
                 </div>
@@ -223,9 +223,9 @@ export function PlatformIntegrations() {
                   </div>
                   <div className="flex items-center gap-2">
                     {admin.is_active_global ? (
-                      <Badge className="bg-green-500/20 text-green-400">Global Ativo</Badge>
+                      <Badge className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Global Ativo</Badge>
                     ) : (
-                      <Badge variant="secondary">Global Inativo</Badge>
+                      <Badge className="bg-red-500/20 text-red-400 border border-red-500/30">Global Inativo</Badge>
                     )}
                   </div>
                 </CardContent>
