@@ -52,9 +52,14 @@ export async function updateProvider(
   id: string,
   updates: Partial<IntegrationProvider>
 ): Promise<void> {
+  const { config_schema_json, ...rest } = updates;
+  const payload: Record<string, unknown> = { ...rest };
+  if (config_schema_json !== undefined) {
+    payload.config_schema_json = config_schema_json as unknown;
+  }
   const { error } = await supabase
     .from("integration_providers")
-    .update(updates)
+    .update(payload as any)
     .eq("id", id);
   if (error) throw error;
 }
@@ -96,7 +101,7 @@ export async function updateTenantIntegration(
 ): Promise<void> {
   const { error } = await supabase
     .from("tenant_integrations")
-    .update(updates)
+    .update(updates as any)
     .eq("id", id);
   if (error) throw error;
 }
@@ -130,8 +135,8 @@ export async function upsertIntegrationEvent(
         tenant_id: tenantId,
         event_code: eventCode,
         is_enabled: isEnabled,
-        schedule_config_json: scheduleConfig || {},
-      },
+        schedule_config_json: (scheduleConfig || {}) as any,
+      } as any,
       { onConflict: "tenant_integration_id,event_code" }
     );
   if (error) throw error;
