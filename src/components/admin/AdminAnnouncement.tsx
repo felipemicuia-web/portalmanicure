@@ -11,12 +11,20 @@ import { MessageSquareText } from "lucide-react";
 
 const COLOR_PRESETS = [
   { label: "Branco", value: "#FFFFFF" },
+  { label: "Preto", value: "#000000" },
+  { label: "Cinza", value: "#9CA3AF" },
+  { label: "Dourado", value: "#D4A017" },
   { label: "Amarelo", value: "#FACC15" },
   { label: "Verde", value: "#4ADE80" },
   { label: "Vermelho", value: "#F87171" },
   { label: "Azul", value: "#60A5FA" },
   { label: "Rosa", value: "#F472B6" },
   { label: "Laranja", value: "#FB923C" },
+  { label: "Roxo", value: "#A78BFA" },
+  { label: "Ciano", value: "#22D3EE" },
+  { label: "Lima", value: "#A3E635" },
+  { label: "Coral", value: "#FF6B6B" },
+  { label: "Turquesa", value: "#2DD4BF" },
 ];
 
 export function AdminAnnouncement() {
