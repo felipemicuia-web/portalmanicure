@@ -1,0 +1,1 @@
+ALTER TABLE public.work_settings ADD COLUMN announcement_color text DEFAULT '#FFFFFF';

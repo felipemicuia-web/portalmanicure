@@ -6,12 +6,24 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Input } from "@/components/ui/input";
 import { MessageSquareText } from "lucide-react";
+
+const COLOR_PRESETS = [
+  { label: "Branco", value: "#FFFFFF" },
+  { label: "Amarelo", value: "#FACC15" },
+  { label: "Verde", value: "#4ADE80" },
+  { label: "Vermelho", value: "#F87171" },
+  { label: "Azul", value: "#60A5FA" },
+  { label: "Rosa", value: "#F472B6" },
+  { label: "Laranja", value: "#FB923C" },
+];
 
 export function AdminAnnouncement() {
   const { tenantId } = useTenant();
   const { toast } = useToast();
   const [announcement, setAnnouncement] = useState("");
+  const [color, setColor] = useState("#FFFFFF");
   const [enabled, setEnabled] = useState(false);
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -20,14 +32,16 @@ export function AdminAnnouncement() {
     if (!tenantId) return;
     supabase
       .from("work_settings")
-      .select("booking_announcement")
+      .select("booking_announcement, announcement_color")
       .eq("tenant_id", tenantId)
       .maybeSingle()
       .then(({ data }) => {
         if (data) {
-          const text = (data as any).booking_announcement || "";
+          const d = data as any;
+          const text = d.booking_announcement || "";
           setAnnouncement(text);
           setEnabled(!!text);
+          setColor(d.announcement_color || "#FFFFFF");
         }
         setLoading(false);
       });
@@ -39,7 +53,7 @@ export function AdminAnnouncement() {
     const value = enabled ? announcement.trim() || null : null;
     const { error } = await supabase
       .from("work_settings")
-      .update({ booking_announcement: value } as any)
+      .update({ booking_announcement: value, announcement_color: color } as any)
       .eq("tenant_id", tenantId);
 
     if (error) {
@@ -77,23 +91,57 @@ export function AdminAnnouncement() {
       </div>
 
       {enabled && (
-        <div className="space-y-2">
-          <Label htmlFor="announcement-text">Texto do aviso</Label>
-          <Textarea
-            id="announcement-text"
-            value={announcement}
-            onChange={(e) => setAnnouncement(e.target.value)}
-            placeholder="Ex: AS SEGUNDAS E TERÇAS POR ORDEM DE CHEGADA"
-            className="min-h-[100px] resize-y"
-            maxLength={500}
-          />
-          <p className="text-xs text-muted-foreground text-right">{announcement.length}/500</p>
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="announcement-text">Texto do aviso</Label>
+            <Textarea
+              id="announcement-text"
+              value={announcement}
+              onChange={(e) => setAnnouncement(e.target.value)}
+              placeholder="Ex: AS SEGUNDAS E TERÇAS POR ORDEM DE CHEGADA"
+              className="min-h-[100px] resize-y"
+              maxLength={500}
+            />
+            <p className="text-xs text-muted-foreground text-right">{announcement.length}/500</p>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Cor do texto</Label>
+            <div className="flex flex-wrap gap-2 items-center">
+              {COLOR_PRESETS.map((preset) => (
+                <button
+                  key={preset.value}
+                  type="button"
+                  onClick={() => setColor(preset.value)}
+                  className={`w-8 h-8 rounded-full border-2 transition-all ${
+                    color === preset.value ? "border-primary scale-110 ring-2 ring-primary/40" : "border-border/50 hover:border-border"
+                  }`}
+                  style={{ backgroundColor: preset.value }}
+                  title={preset.label}
+                />
+              ))}
+              <div className="flex items-center gap-2 ml-2">
+                <input
+                  type="color"
+                  value={color}
+                  onChange={(e) => setColor(e.target.value)}
+                  className="w-8 h-8 rounded cursor-pointer border border-border/50"
+                />
+                <Input
+                  value={color}
+                  onChange={(e) => setColor(e.target.value)}
+                  className="w-24 h-8 text-xs font-mono"
+                  placeholder="#FFFFFF"
+                />
+              </div>
+            </div>
+          </div>
 
           {announcement.trim() && (
-            <div className="mt-3">
+            <div>
               <Label className="text-xs text-muted-foreground mb-2 block">Pré-visualização:</Label>
               <div className="p-3 sm:p-4 rounded-xl border-2 border-primary/30 bg-primary/10 text-center">
-                <p className="text-sm sm:text-base font-semibold text-primary whitespace-pre-line">
+                <p className="text-sm sm:text-base font-semibold whitespace-pre-line" style={{ color }}>
                   {announcement}
                 </p>
               </div>
