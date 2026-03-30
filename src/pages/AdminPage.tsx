@@ -63,7 +63,7 @@ const MENU_ITEMS: { value: string; label: string; icon: LucideIcon }[] = [
   { value: "coupons", label: "Cupons", icon: Ticket },
   { value: "payment", label: "Pagamento", icon: CreditCard },
   { value: "popups", label: "Pop-ups", icon: Megaphone },
-  { value: "announcement", label: "Avisos", icon: MessageSquareText },
+  { value: "announcement", label: "Avisos página inicial", icon: MessageSquareText },
   { value: "location", label: "Localização", icon: MapPin },
   { value: "users", label: "Clientes", icon: UsersRound },
   { value: "integrations", label: "Integrações", icon: Plug },
