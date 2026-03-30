@@ -1,0 +1,1 @@
+ALTER TABLE public.work_settings ADD COLUMN booking_announcement text DEFAULT null;

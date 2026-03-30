@@ -556,6 +556,13 @@ export default function BookingPage() {
               <div className="mt-3 sm:mt-4">
                 {currentStep === 1 && (
                   <>
+                    {branding.bookingAnnouncement && (
+                      <div className="mb-3 sm:mb-4 p-3 sm:p-4 rounded-xl border-2 border-primary/30 bg-primary/10 text-center">
+                        <p className="text-sm sm:text-base font-semibold text-primary whitespace-pre-line">
+                          {branding.bookingAnnouncement}
+                        </p>
+                      </div>
+                    )}
                     <ProfessionalSelect
                     professionals={professionals}
                     selectedId={professionalId}

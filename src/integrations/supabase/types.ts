@@ -1710,6 +1710,7 @@ export type Database = {
       }
       work_settings: {
         Row: {
+          booking_announcement: string | null
           day_schedules: Json
           end_time: string
           hero_background_url: string | null
@@ -1737,6 +1738,7 @@ export type Database = {
           working_days: number[]
         }
         Insert: {
+          booking_announcement?: string | null
           day_schedules?: Json
           end_time?: string
           hero_background_url?: string | null
@@ -1764,6 +1766,7 @@ export type Database = {
           working_days?: number[]
         }
         Update: {
+          booking_announcement?: string | null
           day_schedules?: Json
           end_time?: string
           hero_background_url?: string | null
