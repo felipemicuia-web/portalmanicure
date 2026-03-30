@@ -247,17 +247,44 @@ export function getPresetById(id: string): ThemePreset {
   return themePresets.find((p) => p.id === id) || themePresets[0];
 }
 
+// Default animation for each theme
+const THEME_DEFAULT_ANIMATION: Record<string, string> = {
+  galaxy: "stars",
+  rosa: "petals",
+  oceano: "bubbles",
+  floresta: "leaves",
+  pordosol: "rays",
+  meianoite: "snow",
+  lavanda: "butterflies",
+  preto: "sparkles",
+  branco: "none",
+  vermelho: "fireflies",
+  dourado: "sparkles",
+  neon: "sparkles",
+  terracota: "fireflies",
+};
+
+export function getDefaultAnimationForTheme(themeId: string): string {
+  return THEME_DEFAULT_ANIMATION[themeId] || "stars";
+}
+
 interface ThemeContextType {
   currentThemeId: string;
+  animationId: string;
+  resolvedAnimationId: string;
   loading: boolean;
   setTheme: (themeId: string) => Promise<void>;
+  setAnimation: (animationId: string) => Promise<void>;
   canEditTheme: boolean;
 }
 
 const ThemeContext = createContext<ThemeContextType>({
   currentThemeId: "galaxy",
+  animationId: "auto",
+  resolvedAnimationId: "stars",
   loading: true,
   setTheme: async () => {},
+  setAnimation: async () => {},
   canEditTheme: false,
 });
 
@@ -267,10 +294,15 @@ export function useThemeContext() {
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [currentThemeId, setCurrentThemeId] = useState("galaxy");
+  const [animationId, setAnimationId] = useState("auto");
   const [loading, setLoading] = useState(true);
   const { tenantId, isSuperAdmin, loading: tenantLoading } = useTenant();
   const canEditTheme = !!tenantId && !isSuperAdmin;
   const currentThemeIdRef = useRef(currentThemeId);
+
+  const resolvedAnimationId = animationId === "auto"
+    ? getDefaultAnimationForTheme(currentThemeId)
+    : animationId;
 
   // Keep ref in sync
   useEffect(() => {
@@ -286,6 +318,121 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     if (scopeKey) {
       localStorage.setItem(`site-theme-id-${scopeKey}`, preset.id);
     }
+  }, [tenantId]);
+
+  // Load initial theme from DB
+  useEffect(() => {
+    if (tenantLoading) return;
+
+    if (!tenantId) {
+      const fallbackPreset = getPresetById("galaxy");
+      setCurrentThemeId(fallbackPreset.id);
+      applyThemeToDOM(fallbackPreset.colors);
+      setLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+    setLoading(true);
+
+    async function loadTheme() {
+      const cached = localStorage.getItem(`site-theme-id-${tenantId}`);
+      const cachedPreset = getPresetById(cached || "galaxy");
+
+      setCurrentThemeId(cachedPreset.id);
+      applyThemeToDOM(cachedPreset.colors);
+
+      const { data } = await supabase
+        .from("work_settings")
+        .select("theme_id, animation_id")
+        .eq("tenant_id", tenantId!)
+        .limit(1)
+        .maybeSingle();
+
+      if (cancelled) return;
+
+      if (data?.theme_id) {
+        applyById(data.theme_id, tenantId);
+      } else {
+        applyById("galaxy", tenantId);
+      }
+
+      setAnimationId((data as any)?.animation_id || "auto");
+      setLoading(false);
+    }
+
+    loadTheme();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [tenantId, tenantLoading, applyById]);
+
+  // Subscribe to realtime changes
+  useEffect(() => {
+    if (tenantLoading || !tenantId) return;
+
+    const channel = supabase
+      .channel(`theme-${tenantId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "work_settings",
+          filter: `tenant_id=eq.${tenantId}`,
+        },
+        (payload) => {
+          const p = payload.new as any;
+          if (p?.theme_id && p.theme_id !== currentThemeIdRef.current) {
+            applyById(p.theme_id, tenantId);
+          }
+          if (p?.animation_id !== undefined) {
+            setAnimationId(p.animation_id || "auto");
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [tenantId, tenantLoading, applyById]);
+
+  // Save theme to DB
+  const setTheme = useCallback(
+    async (themeId: string) => {
+      if (!tenantId || isSuperAdmin) return;
+      applyById(themeId, tenantId);
+
+      await supabase
+        .from("work_settings")
+        .update({ theme_id: themeId })
+        .eq("tenant_id", tenantId);
+    },
+    [tenantId, isSuperAdmin, applyById]
+  );
+
+  // Save animation to DB
+  const setAnimation = useCallback(
+    async (newAnimationId: string) => {
+      if (!tenantId || isSuperAdmin) return;
+      setAnimationId(newAnimationId);
+
+      await supabase
+        .from("work_settings")
+        .update({ animation_id: newAnimationId })
+        .eq("tenant_id", tenantId);
+    },
+    [tenantId, isSuperAdmin]
+  );
+
+  return (
+    <ThemeContext.Provider value={{ currentThemeId, animationId, resolvedAnimationId, loading, setTheme, setAnimation, canEditTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
+}
   }, [tenantId]);
 
   // Load initial theme from DB
