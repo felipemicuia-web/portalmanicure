@@ -1710,6 +1710,7 @@ export type Database = {
       }
       work_settings: {
         Row: {
+          animation_id: string
           announcement_color: string | null
           booking_announcement: string | null
           day_schedules: Json
@@ -1739,6 +1740,7 @@ export type Database = {
           working_days: number[]
         }
         Insert: {
+          animation_id?: string
           announcement_color?: string | null
           booking_announcement?: string | null
           day_schedules?: Json
@@ -1768,6 +1770,7 @@ export type Database = {
           working_days?: number[]
         }
         Update: {
+          animation_id?: string
           announcement_color?: string | null
           booking_announcement?: string | null
           day_schedules?: Json

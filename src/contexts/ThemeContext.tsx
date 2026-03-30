@@ -20,6 +20,28 @@ export interface ThemePreset {
   colors: ThemeColors;
 }
 
+export interface AnimationPreset {
+  id: string;
+  name: string;
+  description: string;
+}
+
+export const animationPresets: AnimationPreset[] = [
+  { id: "auto", name: "🎨 Automática", description: "Animação padrão do tema" },
+  { id: "none", name: "⛔ Sem Animação", description: "Fundo limpo sem partículas" },
+  { id: "stars", name: "✨ Estrelas", description: "Estrelas brilhando no céu" },
+  { id: "bubbles", name: "🫧 Bolhas", description: "Bolhas subindo suavemente" },
+  { id: "petals", name: "🌸 Pétalas", description: "Pétalas de flor caindo" },
+  { id: "leaves", name: "🍃 Folhas", description: "Folhas caindo suavemente" },
+  { id: "rays", name: "☀️ Raios de Luz", description: "Feixes de luz quentes" },
+  { id: "snow", name: "❄️ Neve", description: "Flocos de neve descendo" },
+  { id: "butterflies", name: "🦋 Borboletas", description: "Borboletas flutuando" },
+  { id: "sparkles", name: "💫 Brilhos", description: "Partículas cintilantes" },
+  { id: "fireflies", name: "🔥 Vagalumes", description: "Luzes flutuando na escuridão" },
+  { id: "hearts", name: "💖 Corações", description: "Corações subindo suavemente" },
+  { id: "confetti", name: "🎉 Confete", description: "Confetes coloridos caindo" },
+];
+
 export const themePresets: ThemePreset[] = [
   {
     id: "galaxy",
@@ -119,6 +141,90 @@ export const themePresets: ThemePreset[] = [
       border: "280 8% 22%",
     },
   },
+  {
+    id: "preto",
+    name: "🖤 Preto Absoluto",
+    description: "Elegância total em preto",
+    colors: {
+      primary: "0 0% 75%",
+      secondary: "0 0% 50%",
+      accent: "0 0% 90%",
+      background: "0 0% 3%",
+      card: "0 0% 7%",
+      muted: "0 0% 15%",
+      border: "0 0% 15%",
+    },
+  },
+  {
+    id: "branco",
+    name: "🤍 Branco Clean",
+    description: "Minimalista e luminoso",
+    colors: {
+      primary: "220 60% 50%",
+      secondary: "200 50% 60%",
+      accent: "45 90% 50%",
+      background: "220 20% 95%",
+      card: "220 15% 98%",
+      muted: "220 10% 90%",
+      border: "220 10% 85%",
+    },
+  },
+  {
+    id: "vermelho",
+    name: "❤️ Vermelho Intenso",
+    description: "Paixão e energia vibrante",
+    colors: {
+      primary: "0 75% 50%",
+      secondary: "350 60% 55%",
+      accent: "35 90% 55%",
+      background: "0 20% 6%",
+      card: "0 15% 10%",
+      muted: "0 10% 18%",
+      border: "0 8% 20%",
+    },
+  },
+  {
+    id: "dourado",
+    name: "👑 Dourado Royal",
+    description: "Luxo e sofisticação",
+    colors: {
+      primary: "42 80% 50%",
+      secondary: "30 60% 45%",
+      accent: "50 90% 60%",
+      background: "35 15% 6%",
+      card: "35 12% 10%",
+      muted: "35 8% 18%",
+      border: "35 8% 20%",
+    },
+  },
+  {
+    id: "neon",
+    name: "💚 Neon Cyber",
+    description: "Estilo cyberpunk futurista",
+    colors: {
+      primary: "150 100% 50%",
+      secondary: "280 100% 60%",
+      accent: "50 100% 55%",
+      background: "240 20% 4%",
+      card: "240 15% 7%",
+      muted: "240 10% 15%",
+      border: "240 8% 18%",
+    },
+  },
+  {
+    id: "terracota",
+    name: "🏺 Terracota",
+    description: "Tons terrosos e acolhedores",
+    colors: {
+      primary: "15 55% 50%",
+      secondary: "30 40% 55%",
+      accent: "45 60% 55%",
+      background: "20 15% 7%",
+      card: "20 12% 11%",
+      muted: "20 8% 20%",
+      border: "20 6% 22%",
+    },
+  },
 ];
 
 function applyThemeToDOM(colors: ThemeColors) {
@@ -141,17 +247,44 @@ export function getPresetById(id: string): ThemePreset {
   return themePresets.find((p) => p.id === id) || themePresets[0];
 }
 
+// Default animation for each theme
+const THEME_DEFAULT_ANIMATION: Record<string, string> = {
+  galaxy: "stars",
+  rosa: "petals",
+  oceano: "bubbles",
+  floresta: "leaves",
+  pordosol: "rays",
+  meianoite: "snow",
+  lavanda: "butterflies",
+  preto: "sparkles",
+  branco: "none",
+  vermelho: "fireflies",
+  dourado: "sparkles",
+  neon: "sparkles",
+  terracota: "fireflies",
+};
+
+export function getDefaultAnimationForTheme(themeId: string): string {
+  return THEME_DEFAULT_ANIMATION[themeId] || "stars";
+}
+
 interface ThemeContextType {
   currentThemeId: string;
+  animationId: string;
+  resolvedAnimationId: string;
   loading: boolean;
   setTheme: (themeId: string) => Promise<void>;
+  setAnimation: (animationId: string) => Promise<void>;
   canEditTheme: boolean;
 }
 
 const ThemeContext = createContext<ThemeContextType>({
   currentThemeId: "galaxy",
+  animationId: "auto",
+  resolvedAnimationId: "stars",
   loading: true,
   setTheme: async () => {},
+  setAnimation: async () => {},
   canEditTheme: false,
 });
 
@@ -161,10 +294,15 @@ export function useThemeContext() {
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [currentThemeId, setCurrentThemeId] = useState("galaxy");
+  const [animationId, setAnimationId] = useState("auto");
   const [loading, setLoading] = useState(true);
   const { tenantId, isSuperAdmin, loading: tenantLoading } = useTenant();
   const canEditTheme = !!tenantId && !isSuperAdmin;
   const currentThemeIdRef = useRef(currentThemeId);
+
+  const resolvedAnimationId = animationId === "auto"
+    ? getDefaultAnimationForTheme(currentThemeId)
+    : animationId;
 
   // Keep ref in sync
   useEffect(() => {
@@ -206,7 +344,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
       const { data } = await supabase
         .from("work_settings")
-        .select("theme_id")
+        .select("theme_id, animation_id")
         .eq("tenant_id", tenantId!)
         .limit(1)
         .maybeSingle();
@@ -219,6 +357,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         applyById("galaxy", tenantId);
       }
 
+      setAnimationId((data as any)?.animation_id || "auto");
       setLoading(false);
     }
 
@@ -229,7 +368,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     };
   }, [tenantId, tenantLoading, applyById]);
 
-  // Subscribe to realtime changes — stable deps, use ref for currentThemeId
+  // Subscribe to realtime changes
   useEffect(() => {
     if (tenantLoading || !tenantId) return;
 
@@ -244,9 +383,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
           filter: `tenant_id=eq.${tenantId}`,
         },
         (payload) => {
-          const newThemeId = (payload.new as any)?.theme_id;
-          if (newThemeId && newThemeId !== currentThemeIdRef.current) {
-            applyById(newThemeId, tenantId);
+          const p = payload.new as any;
+          if (p?.theme_id && p.theme_id !== currentThemeIdRef.current) {
+            applyById(p.theme_id, tenantId);
+          }
+          if (p?.animation_id !== undefined) {
+            setAnimationId(p.animation_id || "auto");
           }
         }
       )
@@ -257,7 +399,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     };
   }, [tenantId, tenantLoading, applyById]);
 
-  // Save theme to DB (admin action)
+  // Save theme to DB
   const setTheme = useCallback(
     async (themeId: string) => {
       if (!tenantId || isSuperAdmin) return;
@@ -271,8 +413,22 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     [tenantId, isSuperAdmin, applyById]
   );
 
+  // Save animation to DB
+  const setAnimation = useCallback(
+    async (newAnimationId: string) => {
+      if (!tenantId || isSuperAdmin) return;
+      setAnimationId(newAnimationId);
+
+      await supabase
+        .from("work_settings")
+        .update({ animation_id: newAnimationId })
+        .eq("tenant_id", tenantId);
+    },
+    [tenantId, isSuperAdmin]
+  );
+
   return (
-    <ThemeContext.Provider value={{ currentThemeId, loading, setTheme, canEditTheme }}>
+    <ThemeContext.Provider value={{ currentThemeId, animationId, resolvedAnimationId, loading, setTheme, setAnimation, canEditTheme }}>
       {children}
     </ThemeContext.Provider>
   );

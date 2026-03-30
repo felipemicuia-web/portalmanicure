@@ -1,22 +1,7 @@
-import { useEffect, useState, useMemo } from "react";
+import { useMemo } from "react";
 import { useThemeContext } from "@/contexts/ThemeContext";
 
-type BackgroundType = "stars" | "bubbles" | "petals" | "leaves" | "rays" | "snow" | "butterflies";
-
-interface ThemeBackground {
-  type: BackgroundType;
-  particleCount: number;
-}
-
-const THEME_BACKGROUNDS: Record<string, ThemeBackground> = {
-  "galaxy": { type: "stars", particleCount: 50 },
-  "rosa": { type: "petals", particleCount: 20 },
-  "oceano": { type: "bubbles", particleCount: 30 },
-  "floresta": { type: "leaves", particleCount: 25 },
-  "pordosol": { type: "rays", particleCount: 15 },
-  "meianoite": { type: "snow", particleCount: 40 },
-  "lavanda": { type: "butterflies", particleCount: 12 },
-};
+type BackgroundType = "stars" | "bubbles" | "petals" | "leaves" | "rays" | "snow" | "butterflies" | "sparkles" | "fireflies" | "hearts" | "confetti" | "none";
 
 function Star({ delay, size, left, duration }: { delay: number; size: number; left: number; duration: number }) {
   return (
@@ -60,21 +45,64 @@ function Butterfly({ delay, size, left, duration }: { delay: number; size: numbe
   );
 }
 
+function Sparkle({ delay, size, left, duration }: { delay: number; size: number; left: number; duration: number }) {
+  return (
+    <div className="bg-sparkle" style={{ left: `${left}%`, top: `${Math.random() * 100}%`, width: size, height: size, animationDelay: `${delay}s`, animationDuration: `${duration}s` }} />
+  );
+}
+
+function Firefly({ delay, size, left, duration }: { delay: number; size: number; left: number; duration: number }) {
+  return (
+    <div className="bg-firefly" style={{ left: `${left}%`, top: `${Math.random() * 100}%`, width: size, height: size, animationDelay: `${delay}s`, animationDuration: `${duration}s` }} />
+  );
+}
+
+function Heart({ delay, size, left, duration }: { delay: number; size: number; left: number; duration: number }) {
+  return (
+    <div className="bg-heart" style={{ left: `${left}%`, width: size, height: size, animationDelay: `${delay}s`, animationDuration: `${duration}s` }} />
+  );
+}
+
+function Confetti({ delay, size, left, duration }: { delay: number; size: number; left: number; duration: number }) {
+  const colors = ['hsl(var(--primary))', 'hsl(var(--secondary))', 'hsl(var(--accent))'];
+  const color = colors[Math.floor(Math.random() * colors.length)];
+  return (
+    <div className="bg-confetti" style={{ left: `${left}%`, width: size * 0.4, height: size, backgroundColor: color, animationDelay: `${delay}s`, animationDuration: `${duration}s` }} />
+  );
+}
+
+const PARTICLE_COUNTS: Record<BackgroundType, number> = {
+  stars: 50,
+  bubbles: 30,
+  petals: 20,
+  leaves: 25,
+  rays: 15,
+  snow: 40,
+  butterflies: 12,
+  sparkles: 35,
+  fireflies: 20,
+  hearts: 18,
+  confetti: 40,
+  none: 0,
+};
+
 export function ThemedBackground() {
-  // Use ThemeContext directly instead of polling localStorage
-  const { currentThemeId } = useThemeContext();
+  const { resolvedAnimationId } = useThemeContext();
 
   const particles = useMemo(() => {
-    const config = THEME_BACKGROUNDS[currentThemeId] || THEME_BACKGROUNDS["galaxy"];
+    const type = resolvedAnimationId as BackgroundType;
+    if (type === "none") return [];
+
+    const count = PARTICLE_COUNTS[type] || 30;
     const result: JSX.Element[] = [];
 
-    for (let i = 0; i < config.particleCount; i++) {
+    for (let i = 0; i < count; i++) {
       const delay = Math.random() * 10;
       const size = 4 + Math.random() * 12;
       const left = Math.random() * 100;
       const duration = 8 + Math.random() * 12;
 
-      switch (config.type) {
+      switch (type) {
         case "stars":
           result.push(<Star key={i} delay={delay} size={size} left={left} duration={duration} />);
           break;
@@ -96,10 +124,24 @@ export function ThemedBackground() {
         case "butterflies":
           result.push(<Butterfly key={i} delay={delay} size={size * 1.5} left={left} duration={duration * 1.5} />);
           break;
+        case "sparkles":
+          result.push(<Sparkle key={i} delay={delay} size={size * 0.6} left={left} duration={duration * 0.6} />);
+          break;
+        case "fireflies":
+          result.push(<Firefly key={i} delay={delay} size={size * 0.5} left={left} duration={duration * 1.2} />);
+          break;
+        case "hearts":
+          result.push(<Heart key={i} delay={delay} size={size} left={left} duration={duration} />);
+          break;
+        case "confetti":
+          result.push(<Confetti key={i} delay={delay} size={size} left={left} duration={duration * 0.8} />);
+          break;
       }
     }
     return result;
-  }, [currentThemeId]);
+  }, [resolvedAnimationId]);
+
+  if (resolvedAnimationId === "none") return null;
 
   return (
     <div className="themed-bg-container">
