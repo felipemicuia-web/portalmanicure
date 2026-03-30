@@ -20,6 +20,28 @@ export interface ThemePreset {
   colors: ThemeColors;
 }
 
+export interface AnimationPreset {
+  id: string;
+  name: string;
+  description: string;
+}
+
+export const animationPresets: AnimationPreset[] = [
+  { id: "auto", name: "🎨 Automática", description: "Animação padrão do tema" },
+  { id: "none", name: "⛔ Sem Animação", description: "Fundo limpo sem partículas" },
+  { id: "stars", name: "✨ Estrelas", description: "Estrelas brilhando no céu" },
+  { id: "bubbles", name: "🫧 Bolhas", description: "Bolhas subindo suavemente" },
+  { id: "petals", name: "🌸 Pétalas", description: "Pétalas de flor caindo" },
+  { id: "leaves", name: "🍃 Folhas", description: "Folhas caindo suavemente" },
+  { id: "rays", name: "☀️ Raios de Luz", description: "Feixes de luz quentes" },
+  { id: "snow", name: "❄️ Neve", description: "Flocos de neve descendo" },
+  { id: "butterflies", name: "🦋 Borboletas", description: "Borboletas flutuando" },
+  { id: "sparkles", name: "💫 Brilhos", description: "Partículas cintilantes" },
+  { id: "fireflies", name: "🔥 Vagalumes", description: "Luzes flutuando na escuridão" },
+  { id: "hearts", name: "💖 Corações", description: "Corações subindo suavemente" },
+  { id: "confetti", name: "🎉 Confete", description: "Confetes coloridos caindo" },
+];
+
 export const themePresets: ThemePreset[] = [
   {
     id: "galaxy",
@@ -117,6 +139,90 @@ export const themePresets: ThemePreset[] = [
       card: "280 15% 11%",
       muted: "280 10% 20%",
       border: "280 8% 22%",
+    },
+  },
+  {
+    id: "preto",
+    name: "🖤 Preto Absoluto",
+    description: "Elegância total em preto",
+    colors: {
+      primary: "0 0% 75%",
+      secondary: "0 0% 50%",
+      accent: "0 0% 90%",
+      background: "0 0% 3%",
+      card: "0 0% 7%",
+      muted: "0 0% 15%",
+      border: "0 0% 15%",
+    },
+  },
+  {
+    id: "branco",
+    name: "🤍 Branco Clean",
+    description: "Minimalista e luminoso",
+    colors: {
+      primary: "220 60% 50%",
+      secondary: "200 50% 60%",
+      accent: "45 90% 50%",
+      background: "220 20% 95%",
+      card: "220 15% 98%",
+      muted: "220 10% 90%",
+      border: "220 10% 85%",
+    },
+  },
+  {
+    id: "vermelho",
+    name: "❤️ Vermelho Intenso",
+    description: "Paixão e energia vibrante",
+    colors: {
+      primary: "0 75% 50%",
+      secondary: "350 60% 55%",
+      accent: "35 90% 55%",
+      background: "0 20% 6%",
+      card: "0 15% 10%",
+      muted: "0 10% 18%",
+      border: "0 8% 20%",
+    },
+  },
+  {
+    id: "dourado",
+    name: "👑 Dourado Royal",
+    description: "Luxo e sofisticação",
+    colors: {
+      primary: "42 80% 50%",
+      secondary: "30 60% 45%",
+      accent: "50 90% 60%",
+      background: "35 15% 6%",
+      card: "35 12% 10%",
+      muted: "35 8% 18%",
+      border: "35 8% 20%",
+    },
+  },
+  {
+    id: "neon",
+    name: "💚 Neon Cyber",
+    description: "Estilo cyberpunk futurista",
+    colors: {
+      primary: "150 100% 50%",
+      secondary: "280 100% 60%",
+      accent: "50 100% 55%",
+      background: "240 20% 4%",
+      card: "240 15% 7%",
+      muted: "240 10% 15%",
+      border: "240 8% 18%",
+    },
+  },
+  {
+    id: "terracota",
+    name: "🏺 Terracota",
+    description: "Tons terrosos e acolhedores",
+    colors: {
+      primary: "15 55% 50%",
+      secondary: "30 40% 55%",
+      accent: "45 60% 55%",
+      background: "20 15% 7%",
+      card: "20 12% 11%",
+      muted: "20 8% 20%",
+      border: "20 6% 22%",
     },
   },
 ];
