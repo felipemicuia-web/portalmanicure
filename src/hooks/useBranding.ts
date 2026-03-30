@@ -29,6 +29,7 @@ export interface Branding {
   heroBackgroundUrl: string | null;
   showProfessionalFilter: boolean;
   bookingAnnouncement: string | null;
+  announcementColor: string;
 }
 
 const DEFAULT_BRANDING: Branding = {
@@ -45,6 +46,7 @@ const DEFAULT_BRANDING: Branding = {
   heroBackgroundUrl: null,
   showProfessionalFilter: false,
   bookingAnnouncement: null,
+  announcementColor: "#FFFFFF",
 };
 
 function loadFont(fontName: string) {
@@ -78,7 +80,7 @@ export function useBranding() {
 
       const { data } = await supabase
         .from("work_settings")
-        .select("site_name, site_subtitle, logo_url, logo_display_mode, site_font, show_brand_name, logo_size, hero_title, hero_subtitle, hero_font, hero_background_url, show_professional_filter, booking_announcement")
+        .select("site_name, site_subtitle, logo_url, logo_display_mode, site_font, show_brand_name, logo_size, hero_title, hero_subtitle, hero_font, hero_background_url, show_professional_filter, booking_announcement, announcement_color")
         .eq("tenant_id", tenantId)
         .limit(1)
         .single();
@@ -100,6 +102,7 @@ export function useBranding() {
           heroBackgroundUrl: d.hero_background_url || null,
           showProfessionalFilter: d.show_professional_filter ?? false,
           bookingAnnouncement: d.booking_announcement || null,
+          announcementColor: d.announcement_color || "#FFFFFF",
         });
         applyFont(font);
       }

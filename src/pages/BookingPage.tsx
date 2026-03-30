@@ -558,7 +558,7 @@ export default function BookingPage() {
                   <>
                     {branding.bookingAnnouncement && (
                       <div className="mb-3 sm:mb-4 p-3 sm:p-4 rounded-xl border-2 border-primary/30 bg-primary/10 text-center">
-                        <p className="text-sm sm:text-base font-semibold text-primary whitespace-pre-line">
+                        <p className="text-sm sm:text-base font-semibold whitespace-pre-line" style={{ color: branding.announcementColor }}>
                           {branding.bookingAnnouncement}
                         </p>
                       </div>
