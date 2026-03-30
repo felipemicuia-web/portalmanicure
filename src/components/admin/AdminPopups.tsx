@@ -169,12 +169,6 @@ export function AdminPopups() {
   const validate = (): boolean => {
     const errs: Record<string, string> = {};
 
-    if (form.enabled) {
-      if (!form.trigger_image_url.trim()) {
-        errs.trigger_image_url = "Imagem do gatilho é obrigatória quando ativo.";
-      }
-    }
-
     if (form.button_url.trim() && !isValidUrl(form.button_url.trim())) {
       errs.button_url = "URL inválida. Use http:// ou https://";
     }
@@ -213,7 +207,7 @@ export function AdminPopups() {
         <div>
           <Label className="text-sm font-medium">Ativar pop-up</Label>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Quando ativo, uma imagem clicável aparece na página de agendamento.
+            Quando ativo, o pop-up aparece automaticamente ao abrir a página de agendamento.
           </p>
         </div>
         <Switch
@@ -234,16 +228,6 @@ export function AdminPopups() {
             className="mt-1"
           />
         </div>
-
-        {/* Trigger Image */}
-        <ImageUploadField
-          label="Imagem pequena (gatilho)"
-          value={form.trigger_image_url}
-          onChange={(url) => updateField("trigger_image_url", url)}
-          error={errors.trigger_image_url}
-          tenantId={tenantId}
-          fieldKey="trigger"
-        />
 
         {/* Modal Image */}
         <ImageUploadField

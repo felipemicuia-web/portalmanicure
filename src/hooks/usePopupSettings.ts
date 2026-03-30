@@ -147,23 +147,18 @@ export function usePublicPopupSettings() {
 
       if (!error && data) {
         const d = data as any;
-        const triggerUrl = (d.trigger_image_url || "").trim();
-        if (triggerUrl && isValidUrl(triggerUrl)) {
-          setPopup({
-            id: d.id,
-            enabled: true,
-            title: d.title || "",
-            trigger_image_url: triggerUrl,
-            modal_image_url: d.modal_image_url || "",
-            description: d.description || "",
-            button_text: d.button_text || "",
-            button_url: d.button_url || "",
-            open_button_in_new_tab: d.open_button_in_new_tab ?? true,
-            position: d.position || "bottom",
-          });
-        } else {
-          setPopup(null);
-        }
+        setPopup({
+          id: d.id,
+          enabled: true,
+          title: d.title || "",
+          trigger_image_url: d.trigger_image_url || "",
+          modal_image_url: d.modal_image_url || "",
+          description: d.description || "",
+          button_text: d.button_text || "",
+          button_url: d.button_url || "",
+          open_button_in_new_tab: d.open_button_in_new_tab ?? true,
+          position: d.position || "bottom",
+        });
       } else {
         setPopup(null);
       }
