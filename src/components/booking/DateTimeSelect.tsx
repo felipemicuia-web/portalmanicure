@@ -173,17 +173,17 @@ export function DateTimeSelect({
                   disabled={cell.isDisabled && !cell.isBlocked}
                   onClick={() => {
                     if (cell.isBlocked) {
-                      // Allow selecting blocked date to show reason
-                      onDateChange(cell.iso);
+                      setClickedBlockedDate(cell.iso);
                     } else if (!cell.isDisabled) {
+                      setClickedBlockedDate(null);
                       onDateChange(cell.iso);
                     }
                   }}
                   className={cn(
-                    "cal-day text-xs sm:text-sm font-medium py-2 sm:py-2.5",
+                    "cal-day text-xs sm:text-sm font-medium py-2 sm:py-2.5 relative",
                     cell.isDisabled && !cell.isBlocked && "cal-disabled",
-                    cell.isBlocked && "cal-disabled text-destructive/60 line-through",
-                    cell.isToday && "cal-today",
+                    cell.isBlocked && "bg-destructive/20 text-destructive line-through cursor-pointer rounded-lg hover:bg-destructive/30",
+                    cell.isToday && !cell.isBlocked && "cal-today",
                     cell.isSelected && !cell.isBlocked && "cal-selected"
                   )}
                 >
