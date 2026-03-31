@@ -48,6 +48,7 @@ export function DateTimeSelect({
   onPrev,
   onNext,
 }: DateTimeSelectProps) {
+  const [clickedBlockedDate, setClickedBlockedDate] = useState<string | null>(null);
   const today = new Date();
   const todayMid = new Date(today.getFullYear(), today.getMonth(), today.getDate());
   
