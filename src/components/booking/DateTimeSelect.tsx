@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, ChevronLeft, ChevronRight, Clock } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, Clock, Ban } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatDateBR } from "@/lib/dateFormat";
 import { useWorkSettings } from "@/hooks/useWorkSettings";
@@ -72,7 +72,7 @@ export function DateTimeSelect({
   const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
   const prevMonthDays = new Date(viewYear, viewMonth, 0).getDate();
 
-  const cells: (null | { date: Date; iso: string; isDisabled: boolean; isToday: boolean; isSelected: boolean })[] = [];
+  const cells: (null | { date: Date; iso: string; isDisabled: boolean; isToday: boolean; isSelected: boolean; isBlocked: boolean })[] = [];
   for (let i = 0; i < startDow; i++) {
     cells.push(null);
   }
@@ -88,8 +88,13 @@ export function DateTimeSelect({
     const isToday = dMid.getTime() === todayMid.getTime();
     const isSelected = selectedDate === iso;
 
-    cells.push({ date: d, iso, isDisabled, isToday, isSelected });
+    cells.push({ date: d, iso, isDisabled, isToday, isSelected, isBlocked: isBlockedDate });
   }
+
+  // Find reason for selected blocked date
+  const selectedBlockedInfo = selectedDate
+    ? professionalSchedule.blockedDateInfos.find((b) => b.date === selectedDate)
+    : null;
 
   const goToPrevMonth = () => {
     setViewDate(new Date(viewYear, viewMonth - 1, 1));
@@ -164,13 +169,21 @@ export function DateTimeSelect({
                 <button
                   key={idx}
                   type="button"
-                  disabled={cell.isDisabled}
-                  onClick={() => !cell.isDisabled && onDateChange(cell.iso)}
+                  disabled={cell.isDisabled && !cell.isBlocked}
+                  onClick={() => {
+                    if (cell.isBlocked) {
+                      // Allow selecting blocked date to show reason
+                      onDateChange(cell.iso);
+                    } else if (!cell.isDisabled) {
+                      onDateChange(cell.iso);
+                    }
+                  }}
                   className={cn(
                     "cal-day text-xs sm:text-sm font-medium py-2 sm:py-2.5",
-                    cell.isDisabled && "cal-disabled",
+                    cell.isDisabled && !cell.isBlocked && "cal-disabled",
+                    cell.isBlocked && "cal-disabled text-destructive/60 line-through",
                     cell.isToday && "cal-today",
-                    cell.isSelected && "cal-selected"
+                    cell.isSelected && !cell.isBlocked && "cal-selected"
                   )}
                 >
                   {cell.date.getDate()}
@@ -178,6 +191,23 @@ export function DateTimeSelect({
               )
             ))}
           </div>
+
+          {/* Blocked date reason banner */}
+          {selectedBlockedInfo && (
+            <div className="mt-3 p-3 rounded-lg bg-destructive/10 border border-destructive/20 flex items-start gap-2">
+              <Ban className="w-4 h-4 text-destructive flex-shrink-0 mt-0.5" />
+              <div className="text-sm">
+                <p className="font-medium text-destructive">
+                  Folga em {formatDateBR(selectedBlockedInfo.date)}
+                </p>
+                {selectedBlockedInfo.reason && (
+                  <p className="text-muted-foreground mt-0.5">
+                    Motivo: {selectedBlockedInfo.reason}
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
