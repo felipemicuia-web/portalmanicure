@@ -169,13 +169,21 @@ export function DateTimeSelect({
                 <button
                   key={idx}
                   type="button"
-                  disabled={cell.isDisabled}
-                  onClick={() => !cell.isDisabled && onDateChange(cell.iso)}
+                  disabled={cell.isDisabled && !cell.isBlocked}
+                  onClick={() => {
+                    if (cell.isBlocked) {
+                      // Allow selecting blocked date to show reason
+                      onDateChange(cell.iso);
+                    } else if (!cell.isDisabled) {
+                      onDateChange(cell.iso);
+                    }
+                  }}
                   className={cn(
                     "cal-day text-xs sm:text-sm font-medium py-2 sm:py-2.5",
-                    cell.isDisabled && "cal-disabled",
+                    cell.isDisabled && !cell.isBlocked && "cal-disabled",
+                    cell.isBlocked && "cal-disabled text-destructive/60 line-through",
                     cell.isToday && "cal-today",
-                    cell.isSelected && "cal-selected"
+                    cell.isSelected && !cell.isBlocked && "cal-selected"
                   )}
                 >
                   {cell.date.getDate()}
@@ -183,6 +191,23 @@ export function DateTimeSelect({
               )
             ))}
           </div>
+
+          {/* Blocked date reason banner */}
+          {selectedBlockedInfo && (
+            <div className="mt-3 p-3 rounded-lg bg-destructive/10 border border-destructive/20 flex items-start gap-2">
+              <Ban className="w-4 h-4 text-destructive flex-shrink-0 mt-0.5" />
+              <div className="text-sm">
+                <p className="font-medium text-destructive">
+                  Folga em {formatDateBR(selectedBlockedInfo.date)}
+                </p>
+                {selectedBlockedInfo.reason && (
+                  <p className="text-muted-foreground mt-0.5">
+                    Motivo: {selectedBlockedInfo.reason}
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
