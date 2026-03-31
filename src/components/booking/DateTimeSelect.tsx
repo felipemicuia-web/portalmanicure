@@ -48,6 +48,7 @@ export function DateTimeSelect({
   onPrev,
   onNext,
 }: DateTimeSelectProps) {
+  const [clickedBlockedDate, setClickedBlockedDate] = useState<string | null>(null);
   const today = new Date();
   const todayMid = new Date(today.getFullYear(), today.getMonth(), today.getDate());
   
@@ -91,9 +92,9 @@ export function DateTimeSelect({
     cells.push({ date: d, iso, isDisabled, isToday, isSelected, isBlocked: isBlockedDate });
   }
 
-  // Find reason for selected blocked date
-  const selectedBlockedInfo = selectedDate
-    ? professionalSchedule.blockedDateInfos.find((b) => b.date === selectedDate)
+  // Find reason for clicked blocked date
+  const clickedBlockedInfo = clickedBlockedDate
+    ? professionalSchedule.blockedDateInfos.find((b) => b.date === clickedBlockedDate)
     : null;
 
   const goToPrevMonth = () => {
@@ -172,17 +173,17 @@ export function DateTimeSelect({
                   disabled={cell.isDisabled && !cell.isBlocked}
                   onClick={() => {
                     if (cell.isBlocked) {
-                      // Allow selecting blocked date to show reason
-                      onDateChange(cell.iso);
+                      setClickedBlockedDate(cell.iso);
                     } else if (!cell.isDisabled) {
+                      setClickedBlockedDate(null);
                       onDateChange(cell.iso);
                     }
                   }}
                   className={cn(
-                    "cal-day text-xs sm:text-sm font-medium py-2 sm:py-2.5",
+                    "cal-day text-xs sm:text-sm font-medium py-2 sm:py-2.5 relative",
                     cell.isDisabled && !cell.isBlocked && "cal-disabled",
-                    cell.isBlocked && "cal-disabled text-destructive/60 line-through",
-                    cell.isToday && "cal-today",
+                    cell.isBlocked && "bg-destructive/20 text-destructive line-through cursor-pointer rounded-lg hover:bg-destructive/30",
+                    cell.isToday && !cell.isBlocked && "cal-today",
                     cell.isSelected && !cell.isBlocked && "cal-selected"
                   )}
                 >
@@ -193,16 +194,21 @@ export function DateTimeSelect({
           </div>
 
           {/* Blocked date reason banner */}
-          {selectedBlockedInfo && (
+          {clickedBlockedInfo && (
             <div className="mt-3 p-3 rounded-lg bg-destructive/10 border border-destructive/20 flex items-start gap-2">
               <Ban className="w-4 h-4 text-destructive flex-shrink-0 mt-0.5" />
               <div className="text-sm">
                 <p className="font-medium text-destructive">
-                  Folga em {formatDateBR(selectedBlockedInfo.date)}
+                  Folga em {formatDateBR(clickedBlockedInfo.date)}
                 </p>
-                {selectedBlockedInfo.reason && (
+                {clickedBlockedInfo.reason && (
                   <p className="text-muted-foreground mt-0.5">
-                    Motivo: {selectedBlockedInfo.reason}
+                    Motivo: {clickedBlockedInfo.reason}
+                  </p>
+                )}
+                {!clickedBlockedInfo.reason && (
+                  <p className="text-muted-foreground mt-0.5">
+                    Profissional não disponível nesta data.
                   </p>
                 )}
               </div>
