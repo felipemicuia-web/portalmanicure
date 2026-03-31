@@ -92,9 +92,9 @@ export function DateTimeSelect({
     cells.push({ date: d, iso, isDisabled, isToday, isSelected, isBlocked: isBlockedDate });
   }
 
-  // Find reason for selected blocked date
-  const selectedBlockedInfo = selectedDate
-    ? professionalSchedule.blockedDateInfos.find((b) => b.date === selectedDate)
+  // Find reason for clicked blocked date
+  const clickedBlockedInfo = clickedBlockedDate
+    ? professionalSchedule.blockedDateInfos.find((b) => b.date === clickedBlockedDate)
     : null;
 
   const goToPrevMonth = () => {
