@@ -72,7 +72,7 @@ export function DateTimeSelect({
   const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
   const prevMonthDays = new Date(viewYear, viewMonth, 0).getDate();
 
-  const cells: (null | { date: Date; iso: string; isDisabled: boolean; isToday: boolean; isSelected: boolean })[] = [];
+  const cells: (null | { date: Date; iso: string; isDisabled: boolean; isToday: boolean; isSelected: boolean; isBlocked: boolean })[] = [];
   for (let i = 0; i < startDow; i++) {
     cells.push(null);
   }
@@ -88,8 +88,13 @@ export function DateTimeSelect({
     const isToday = dMid.getTime() === todayMid.getTime();
     const isSelected = selectedDate === iso;
 
-    cells.push({ date: d, iso, isDisabled, isToday, isSelected });
+    cells.push({ date: d, iso, isDisabled, isToday, isSelected, isBlocked: isBlockedDate });
   }
+
+  // Find reason for selected blocked date
+  const selectedBlockedInfo = selectedDate
+    ? professionalSchedule.blockedDateInfos.find((b) => b.date === selectedDate)
+    : null;
 
   const goToPrevMonth = () => {
     setViewDate(new Date(viewYear, viewMonth - 1, 1));
