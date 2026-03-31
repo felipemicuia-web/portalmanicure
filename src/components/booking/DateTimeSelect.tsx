@@ -194,16 +194,21 @@ export function DateTimeSelect({
           </div>
 
           {/* Blocked date reason banner */}
-          {selectedBlockedInfo && (
+          {clickedBlockedInfo && (
             <div className="mt-3 p-3 rounded-lg bg-destructive/10 border border-destructive/20 flex items-start gap-2">
               <Ban className="w-4 h-4 text-destructive flex-shrink-0 mt-0.5" />
               <div className="text-sm">
                 <p className="font-medium text-destructive">
-                  Folga em {formatDateBR(selectedBlockedInfo.date)}
+                  Folga em {formatDateBR(clickedBlockedInfo.date)}
                 </p>
-                {selectedBlockedInfo.reason && (
+                {clickedBlockedInfo.reason && (
                   <p className="text-muted-foreground mt-0.5">
-                    Motivo: {selectedBlockedInfo.reason}
+                    Motivo: {clickedBlockedInfo.reason}
+                  </p>
+                )}
+                {!clickedBlockedInfo.reason && (
+                  <p className="text-muted-foreground mt-0.5">
+                    Profissional não disponível nesta data.
                   </p>
                 )}
               </div>
