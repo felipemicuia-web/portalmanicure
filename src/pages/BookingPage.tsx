@@ -657,7 +657,7 @@ export default function BookingPage() {
                     couponError={couponError}
                     selectedPaymentMethod={selectedPaymentMethod}
                     onPaymentMethodChange={setSelectedPaymentMethod}
-                    
+                    advancePaymentMessage={advancePaymentMessage}
                   />
                 )}
               </div>
