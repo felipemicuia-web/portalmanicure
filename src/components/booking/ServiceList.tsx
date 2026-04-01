@@ -28,6 +28,7 @@ export function ServiceList({
   onToggle,
   onPrev,
   onNext,
+  creditsMap = {},
 }: ServiceListProps) {
   return (
     <div className="glass-panel p-4 sm:p-6 space-y-4 sm:space-y-5">
