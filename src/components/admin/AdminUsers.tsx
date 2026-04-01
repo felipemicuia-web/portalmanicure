@@ -310,7 +310,12 @@ export function AdminUsers() {
                   <Phone className="w-3 h-3" />
                   {user.phone || "—"}
                 </p>
-              </div>
+                {user.email && (
+                  <p className="text-xs text-muted-foreground flex items-center gap-1">
+                    <Mail className="w-3 h-3" />
+                    {user.email}
+                  </p>
+                )}
               <div className="flex items-center gap-2 shrink-0">
                 {user.advance_payment_required && (
                   <Badge variant="outline" className="text-[10px] border-primary/50 text-primary">
