@@ -1909,6 +1909,13 @@ export type Database = {
       }
       get_tenant_detail_stats: { Args: { p_tenant_id: string }; Returns: Json }
       get_tenant_stats: { Args: { p_tenant_id: string }; Returns: Json }
+      get_user_emails_for_tenant: {
+        Args: { p_tenant_id: string }
+        Returns: {
+          email: string
+          user_id: string
+        }[]
+      }
       get_user_role_in_tenant: {
         Args: { _tenant_id: string; _user_id: string }
         Returns: string
