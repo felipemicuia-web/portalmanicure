@@ -25,6 +25,7 @@ import { AdminAnnouncement } from "@/components/admin/AdminAnnouncement";
 
 import { AdminUsers } from "@/components/admin/AdminUsers";
 import { AdminCoupons } from "@/components/admin/AdminCoupons";
+import { AdminPackages } from "@/components/admin/AdminPackages";
 import {
   Users,
   Sparkles,
@@ -47,6 +48,7 @@ import {
   MapPin,
   Plug,
   MessageSquareText,
+  Package,
   type LucideIcon,
 } from "lucide-react";
 
@@ -58,6 +60,7 @@ const MENU_ITEMS: { value: string; label: string; icon: LucideIcon }[] = [
   { value: "schedules", label: "Folgas", icon: UserCog },
   { value: "professionals", label: "Profissionais", icon: Users },
   { value: "services", label: "Serviços", icon: Sparkles },
+  { value: "packages", label: "Pacotes", icon: Package },
   { value: "hero", label: "Logotipo", icon: Image },
   { value: "theme", label: "Cores", icon: Palette },
   { value: "coupons", label: "Cupons", icon: Ticket },
@@ -79,6 +82,7 @@ const TAB_CONTENT: Record<string, React.ReactNode> = {
   schedules: <AdminProfessionalSchedule />,
   professionals: <AdminProfessionals />,
   services: <AdminServices />,
+  packages: <AdminPackages />,
   hero: <AdminHeroHeader />,
   theme: <AdminTheme />,
   coupons: <AdminCoupons />,

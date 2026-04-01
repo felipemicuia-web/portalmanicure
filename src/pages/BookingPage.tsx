@@ -23,6 +23,7 @@ import { PopupTrigger } from "@/components/booking/PopupTrigger";
 import { LocationSection } from "@/components/booking/LocationSection";
 import { usePlatformSettings } from "@/hooks/usePlatformSettings";
 import { usePublicPaymentMethods } from "@/hooks/usePaymentMethods";
+import { useClientCredits } from "@/hooks/usePackages";
 
 function getTodayISO(): string {
   const d = new Date();
@@ -64,6 +65,7 @@ export default function BookingPage() {
   const [draftRestored, setDraftRestored] = useState(false);
   const { methods: paymentMethods } = usePublicPaymentMethods();
   const [professionalServiceIds, setProfessionalServiceIds] = useState<string[]>([]);
+  const { getCreditsForService, getBestCreditForService, fetchCredits: refreshCredits } = useClientCredits(user?.id);
 
   // Fetch services linked to selected professional — scoped to tenant
   useEffect(() => {
@@ -487,6 +489,19 @@ export default function BookingPage() {
 
       if (servicesError) throw servicesError;
 
+      // Consume package credits if available
+      for (const serviceId of selectedServiceIds) {
+        const bestCredit = getBestCreditForService(serviceId);
+        if (bestCredit) {
+          await supabase.rpc("consume_package_credit", {
+            p_purchase_id: bestCredit.purchase_id,
+            p_service_id: serviceId,
+            p_booking_id: booking.id,
+            p_tenant_id: tenantId,
+          });
+        }
+      }
+
       // Update profile name and phone only (not notes - those are booking-specific)
       await supabase
         .from("profiles")
@@ -616,6 +631,9 @@ export default function BookingPage() {
                     onToggle={toggleService}
                     onPrev={() => goToStep(1)}
                     onNext={() => goToStep(3)}
+                    creditsMap={Object.fromEntries(
+                      filteredServices.map(s => [s.id, getCreditsForService(s.id)])
+                    )}
                   />
                 )}
 

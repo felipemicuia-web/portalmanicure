@@ -1,7 +1,7 @@
 import { Service } from "@/types/booking";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { ArrowLeft, Check } from "lucide-react";
+import { ArrowLeft, Check, Package } from "lucide-react";
 
 interface ServiceListProps {
   services: Service[];
@@ -9,6 +9,7 @@ interface ServiceListProps {
   onToggle: (id: string) => void;
   onPrev: () => void;
   onNext: () => void;
+  creditsMap?: Record<string, number>; // serviceId -> remaining credits
 }
 
 function formatPrice(value: number): string {
@@ -27,6 +28,7 @@ export function ServiceList({
   onToggle,
   onPrev,
   onNext,
+  creditsMap = {},
 }: ServiceListProps) {
   return (
     <div className="glass-panel p-4 sm:p-6 space-y-4 sm:space-y-5">
@@ -48,6 +50,7 @@ export function ServiceList({
       <div className="flex flex-col gap-3 mt-2 sm:mt-3">
         {services.map((service) => {
           const isSelected = selectedIds.includes(service.id);
+          const remainingCredits = creditsMap[service.id] || 0;
           return (
             <article
               key={service.id}
@@ -83,6 +86,14 @@ export function ServiceList({
                   <p className="text-muted-foreground text-xs sm:text-sm line-clamp-2">
                     {service.description || "Serviço de beleza profissional"}
                   </p>
+                  {remainingCredits > 0 && (
+                    <div className="flex items-center gap-1.5 mt-1">
+                      <Package className="w-3.5 h-3.5 text-primary" />
+                      <span className="text-xs font-medium text-primary">
+                        Você tem {remainingCredits} {remainingCredits === 1 ? "crédito" : "créditos"} disponíve{remainingCredits === 1 ? "l" : "is"}
+                      </span>
+                    </div>
+                  )}
                 </div>
                 
                 {/* Price and duration row */}

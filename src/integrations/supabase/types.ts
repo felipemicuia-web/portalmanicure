@@ -125,6 +125,7 @@ export type Database = {
           duration_minutes: number
           id: string
           notes: string | null
+          package_purchase_id: string | null
           payment_method: string | null
           payment_status: string
           professional_id: string
@@ -149,6 +150,7 @@ export type Database = {
           duration_minutes: number
           id?: string
           notes?: string | null
+          package_purchase_id?: string | null
           payment_method?: string | null
           payment_status?: string
           professional_id: string
@@ -173,6 +175,7 @@ export type Database = {
           duration_minutes?: number
           id?: string
           notes?: string | null
+          package_purchase_id?: string | null
           payment_method?: string | null
           payment_status?: string
           professional_id?: string
@@ -190,6 +193,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "bookings_package_purchase_id_fkey"
+            columns: ["package_purchase_id"]
+            isOneToOne: false
+            referencedRelation: "client_package_purchases"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "bookings_professional_id_fkey"
             columns: ["professional_id"]
             isOneToOne: false
@@ -198,6 +208,121 @@ export type Database = {
           },
           {
             foreignKeyName: "bookings_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      client_package_credits: {
+        Row: {
+          created_at: string
+          credits_remaining: number
+          credits_total: number
+          credits_used: number
+          id: string
+          purchase_id: string
+          service_id: string
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          credits_remaining?: number
+          credits_total?: number
+          credits_used?: number
+          id?: string
+          purchase_id: string
+          service_id: string
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          credits_remaining?: number
+          credits_total?: number
+          credits_used?: number
+          id?: string
+          purchase_id?: string
+          service_id?: string
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_package_credits_purchase_id_fkey"
+            columns: ["purchase_id"]
+            isOneToOne: false
+            referencedRelation: "client_package_purchases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_package_credits_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_package_credits_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      client_package_purchases: {
+        Row: {
+          activated_at: string | null
+          activated_by: string | null
+          client_id: string
+          created_at: string
+          expires_at: string | null
+          id: string
+          package_id: string
+          purchase_date: string
+          status: string
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          activated_at?: string | null
+          activated_by?: string | null
+          client_id: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          package_id: string
+          purchase_date?: string
+          status?: string
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          activated_at?: string | null
+          activated_by?: string | null
+          client_id?: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          package_id?: string
+          purchase_date?: string
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_package_purchases_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "service_packages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_package_purchases_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
@@ -719,6 +844,74 @@ export type Database = {
           },
         ]
       }
+      package_credit_movements: {
+        Row: {
+          booking_id: string | null
+          created_at: string
+          credit_id: string
+          id: string
+          movement_type: string
+          notes: string | null
+          performed_by: string | null
+          purchase_id: string
+          quantity: number
+          tenant_id: string
+        }
+        Insert: {
+          booking_id?: string | null
+          created_at?: string
+          credit_id: string
+          id?: string
+          movement_type: string
+          notes?: string | null
+          performed_by?: string | null
+          purchase_id: string
+          quantity: number
+          tenant_id: string
+        }
+        Update: {
+          booking_id?: string | null
+          created_at?: string
+          credit_id?: string
+          id?: string
+          movement_type?: string
+          notes?: string | null
+          performed_by?: string | null
+          purchase_id?: string
+          quantity?: number
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "package_credit_movements_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "package_credit_movements_credit_id_fkey"
+            columns: ["credit_id"]
+            isOneToOne: false
+            referencedRelation: "client_package_credits"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "package_credit_movements_purchase_id_fkey"
+            columns: ["purchase_id"]
+            isOneToOne: false
+            referencedRelation: "client_package_purchases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "package_credit_movements_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       photo_comments: {
         Row: {
           content: string
@@ -1215,6 +1408,99 @@ export type Database = {
           },
           {
             foreignKeyName: "reviews_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      service_package_items: {
+        Row: {
+          created_at: string
+          credits_quantity: number
+          id: string
+          package_id: string
+          service_id: string
+          tenant_id: string
+        }
+        Insert: {
+          created_at?: string
+          credits_quantity?: number
+          id?: string
+          package_id: string
+          service_id: string
+          tenant_id: string
+        }
+        Update: {
+          created_at?: string
+          credits_quantity?: number
+          id?: string
+          package_id?: string
+          service_id?: string
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_package_items_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "service_packages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_package_items_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_package_items_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      service_packages: {
+        Row: {
+          active: boolean
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          price: number
+          tenant_id: string
+          updated_at: string
+          validity_days: number | null
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          price?: number
+          tenant_id: string
+          updated_at?: string
+          validity_days?: number | null
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          price?: number
+          tenant_id?: string
+          updated_at?: string
+          validity_days?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_packages_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
@@ -1867,12 +2153,25 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      activate_package_purchase: {
+        Args: { p_purchase_id: string; p_tenant_id: string }
+        Returns: undefined
+      }
       add_user_to_tenant: {
         Args: { p_role?: string; p_tenant_id: string; p_user_id: string }
         Returns: undefined
       }
       change_tenant_role: {
         Args: { p_new_role: string; p_tenant_id: string; p_user_id: string }
+        Returns: undefined
+      }
+      consume_package_credit: {
+        Args: {
+          p_booking_id: string
+          p_purchase_id: string
+          p_service_id: string
+          p_tenant_id: string
+        }
         Returns: undefined
       }
       get_average_rating:
