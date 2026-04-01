@@ -52,6 +52,7 @@ export default function BookingPage() {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
   const [advancePaymentMessage, setAdvancePaymentMessage] = useState<string | null>(null);
   const [advancePaymentRequired, setAdvancePaymentRequired] = useState(false);
+  const [advancePaymentPercentage, setAdvancePaymentPercentage] = useState(0);
   
   const navigate = useNavigate();
   const { toast } = useToast();
