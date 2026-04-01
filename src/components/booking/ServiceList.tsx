@@ -55,7 +55,7 @@ export function ServiceList({
             <article
               key={service.id}
               className={cn(
-                "flex gap-3 sm:gap-4 items-start p-3 sm:p-4 rounded-xl sm:rounded-2xl border transition-all duration-300 cursor-pointer",
+                "relative flex gap-3 sm:gap-4 items-start p-3 sm:p-4 rounded-xl sm:rounded-2xl border transition-all duration-300 cursor-pointer",
                 isSelected 
                   ? "service-selected" 
                   : "border-border/40 bg-card/40 hover:border-border/60 hover:bg-card/60 active:scale-[0.99]"
