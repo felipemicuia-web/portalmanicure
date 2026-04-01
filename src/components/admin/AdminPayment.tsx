@@ -174,6 +174,79 @@ export function AdminPayment() {
         </div>
       </div>
 
+      {/* Payment Methods Section */}
+      <div className="border-t border-border/30 pt-6 space-y-4">
+        <div className="flex items-center gap-3">
+          <CreditCard className="w-4 h-4 text-primary" />
+          <div>
+            <h3 className="text-sm font-bold">Formas de Pagamento</h3>
+            <p className="text-xs text-muted-foreground">
+              Adicione as opções de pagamento que o cliente poderá escolher ao confirmar o agendamento.
+            </p>
+          </div>
+        </div>
+
+        {/* Add new method */}
+        <div className="flex gap-2">
+          <Input
+            value={newMethodName}
+            onChange={(e) => setNewMethodName(e.target.value)}
+            placeholder="Ex: Pix, Cartão, Dinheiro..."
+            maxLength={50}
+            className="flex-1"
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && newMethodName.trim()) {
+                addMethod(newMethodName.trim());
+                setNewMethodName("");
+              }
+            }}
+          />
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={methodsSaving || !newMethodName.trim()}
+            onClick={() => {
+              addMethod(newMethodName.trim());
+              setNewMethodName("");
+            }}
+            className="gap-1 h-10"
+          >
+            <Plus className="w-4 h-4" />
+            Adicionar
+          </Button>
+        </div>
+
+        {/* Methods list */}
+        {methods.length === 0 ? (
+          <p className="text-xs text-muted-foreground italic">Nenhuma forma de pagamento cadastrada.</p>
+        ) : (
+          <div className="space-y-2">
+            {methods.map((m) => (
+              <div
+                key={m.id}
+                className="flex items-center justify-between gap-3 border border-border/40 rounded-lg px-3 py-2.5 bg-card/50"
+              >
+                <span className="text-sm font-medium flex-1">{m.name}</span>
+                <div className="flex items-center gap-2">
+                  <Switch
+                    checked={m.enabled}
+                    onCheckedChange={(v) => toggleMethod(m.id, v)}
+                  />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-destructive hover:text-destructive"
+                    onClick={() => removeMethod(m.id)}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
       <div className="flex justify-end pt-2">
         <Button onClick={handleSave} disabled={saving} className="gap-2">
           {saving && <Loader2 className="w-4 h-4 animate-spin" />}
