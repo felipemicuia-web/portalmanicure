@@ -344,6 +344,11 @@ export default function BookingPage() {
       return;
     }
 
+    if (paymentMethods.length > 0 && !selectedPaymentMethod) {
+      setGlobalMessage({ text: "Selecione uma forma de pagamento.", type: "bad" });
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
