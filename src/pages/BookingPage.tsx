@@ -22,6 +22,7 @@ import { useTenantPath } from "@/contexts/TenantScopeProvider";
 import { PopupTrigger } from "@/components/booking/PopupTrigger";
 import { LocationSection } from "@/components/booking/LocationSection";
 import { usePlatformSettings } from "@/hooks/usePlatformSettings";
+import { usePublicPaymentMethods } from "@/hooks/usePaymentMethods";
 
 function getTodayISO(): string {
   const d = new Date();
