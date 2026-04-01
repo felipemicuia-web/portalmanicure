@@ -193,12 +193,6 @@ export function ProfessionalAgenda({ professionalId }: Props) {
           </div>
         )}
 
-        {booking.payment_method && (
-          <div className="flex items-center gap-2 text-sm text-muted-foreground pt-1">
-            <CreditCard className="w-3.5 h-3.5 shrink-0" />
-            <span>{booking.payment_method}</span>
-          </div>
-        )}
       </div>
     );
   };
