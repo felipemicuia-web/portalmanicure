@@ -22,6 +22,7 @@ import { useTenantPath } from "@/contexts/TenantScopeProvider";
 import { PopupTrigger } from "@/components/booking/PopupTrigger";
 import { LocationSection } from "@/components/booking/LocationSection";
 import { usePlatformSettings } from "@/hooks/usePlatformSettings";
+import { usePublicPaymentMethods } from "@/hooks/usePaymentMethods";
 
 function getTodayISO(): string {
   const d = new Date();
@@ -58,6 +59,7 @@ export default function BookingPage() {
   const { branding } = useBranding();
   const { settings: platformSettings } = usePlatformSettings();
   const [draftRestored, setDraftRestored] = useState(false);
+  const { methods: paymentMethods } = usePublicPaymentMethods();
   const [professionalServiceIds, setProfessionalServiceIds] = useState<string[]>([]);
 
   // Fetch services linked to selected professional — scoped to tenant
@@ -339,6 +341,11 @@ export default function BookingPage() {
 
     if (!isValidBrazilianPhone(phoneDigits)) {
       setGlobalMessage({ text: "WhatsApp inválido. Use formato: (11) 98765-4321", type: "bad" });
+      return;
+    }
+
+    if (paymentMethods.length > 0 && !selectedPaymentMethod) {
+      setGlobalMessage({ text: "Selecione uma forma de pagamento.", type: "bad" });
       return;
     }
 
