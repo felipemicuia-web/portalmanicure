@@ -1,7 +1,7 @@
 import { Service } from "@/types/booking";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { ArrowLeft, Check } from "lucide-react";
+import { ArrowLeft, Check, Package } from "lucide-react";
 
 interface ServiceListProps {
   services: Service[];
@@ -9,6 +9,7 @@ interface ServiceListProps {
   onToggle: (id: string) => void;
   onPrev: () => void;
   onNext: () => void;
+  creditsMap?: Record<string, number>; // serviceId -> remaining credits
 }
 
 function formatPrice(value: number): string {
