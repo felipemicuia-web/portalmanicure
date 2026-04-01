@@ -17,6 +17,7 @@ import {
   X,
   FileText,
   DollarSign,
+  CreditCard,
 } from "lucide-react";
 
 interface Booking {
