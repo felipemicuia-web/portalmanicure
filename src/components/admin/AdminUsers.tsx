@@ -27,7 +27,7 @@ import {
 import { Label } from "@/components/ui/label";
 import {
   Search, Trash2, ShieldBan, ShieldCheck, User, Phone, Calendar, Mail,
-  Eye, StickyNote, Clock, CalendarDays, CreditCard, Sparkles, Save, DollarSign,
+  Eye, StickyNote, Clock, CalendarDays, CreditCard, Sparkles, Save,
 } from "lucide-react";
 
 interface ProfileUser {
