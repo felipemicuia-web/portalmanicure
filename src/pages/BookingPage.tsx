@@ -633,6 +633,8 @@ export default function BookingPage() {
                     onRemoveCoupon={handleRemoveCoupon}
                     couponLoading={couponLoading}
                     couponError={couponError}
+                    selectedPaymentMethod={selectedPaymentMethod}
+                    onPaymentMethodChange={setSelectedPaymentMethod}
                   />
                 )}
               </div>
