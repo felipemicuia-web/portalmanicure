@@ -173,8 +173,8 @@ export default function BookingPage() {
         if (data.notes && !notes) setNotes(data.notes);
 
         // Check advance payment requirement
-        if (data.advance_payment_required && data.advance_payment_message) {
-          setAdvancePaymentMessage(data.advance_payment_message);
+        if (data.advance_payment_required) {
+          setAdvancePaymentMessage(data.advance_payment_message || `É necessário realizar o pagamento antecipado de ${data.advance_payment_percentage || 50}% do valor total antes de confirmar o agendamento.`);
           setAdvancePaymentRequired(true);
           setAdvancePaymentPercentage(data.advance_payment_percentage || 50);
         } else {
