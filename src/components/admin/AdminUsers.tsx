@@ -76,7 +76,7 @@ export function AdminUsers() {
     setLoading(true);
     const { data, error } = await supabase
       .from("profiles")
-      .select("id, user_id, name, phone, avatar_url, blocked, created_at, updated_at, notes, advance_payment_required, advance_payment_percentage, advance_payment_message")
+      .select("id, user_id, name, phone, avatar_url, blocked, created_at, updated_at, notes")
       .eq("tenant_id", tenantId)
       .order("created_at", { ascending: false });
 
