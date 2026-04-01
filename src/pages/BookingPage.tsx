@@ -59,6 +59,7 @@ export default function BookingPage() {
   const { branding } = useBranding();
   const { settings: platformSettings } = usePlatformSettings();
   const [draftRestored, setDraftRestored] = useState(false);
+  const { methods: paymentMethods } = usePublicPaymentMethods();
   const [professionalServiceIds, setProfessionalServiceIds] = useState<string[]>([]);
 
   // Fetch services linked to selected professional — scoped to tenant
