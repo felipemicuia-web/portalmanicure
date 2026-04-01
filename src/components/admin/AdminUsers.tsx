@@ -45,6 +45,7 @@ interface ProfileUser {
   advance_payment_required: boolean;
   advance_payment_percentage: number;
   advance_payment_message: string | null;
+  email?: string | null;
 }
 
 interface UserBooking {
