@@ -72,6 +72,10 @@ export function AdminUsers() {
   const [loadingBookings, setLoadingBookings] = useState(false);
   const [editNotes, setEditNotes] = useState("");
   const [savingNotes, setSavingNotes] = useState(false);
+  const [advancePayment, setAdvancePayment] = useState(false);
+  const [advancePercentage, setAdvancePercentage] = useState(50);
+  const [advanceMessage, setAdvanceMessage] = useState("");
+  const [savingAdvance, setSavingAdvance] = useState(false);
   const { toast } = useToast();
   const { tenantId } = useTenant();
 
