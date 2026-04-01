@@ -43,7 +43,6 @@ interface BookingConfirmProps {
   couponError: string | null;
   selectedPaymentMethod: string;
   onPaymentMethodChange: (value: string) => void;
-  advancePaymentMessage?: string | null;
 }
 
 function formatPrice(value: number): string {
