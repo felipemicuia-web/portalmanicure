@@ -5,7 +5,7 @@ import { useTenant } from "@/contexts/TenantContext";
 import { formatPhone } from "@/lib/validation";
 import { formatDateBR } from "@/lib/dateFormat";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Calendar, Clock, User, Phone, CalendarDays, Pencil, Trash2, MessageCircle, RotateCcw, Archive, AlertTriangle, CheckCircle, Filter, X } from "lucide-react";
+import { Calendar, Clock, User, Phone, CalendarDays, Pencil, Trash2, MessageCircle, RotateCcw, Archive, AlertTriangle, CheckCircle, Filter, X, DollarSign } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -47,6 +47,7 @@ interface Booking {
   deleted_at: string | null;
   deleted_by: string | null;
   payment_method: string | null;
+  payment_status: string;
 }
 
 interface Professional {
@@ -188,6 +189,33 @@ export function AdminBookings() {
       default:
         return <Badge variant="secondary" className="text-xs">{status}</Badge>;
     }
+  };
+
+  const getPaymentStatusBadge = (paymentStatus: string) => {
+    switch (paymentStatus) {
+      case "pendente":
+        return <Badge className="bg-amber-500/20 text-amber-400 border-amber-500/30 text-xs">Pgto Pendente</Badge>;
+      case "pago":
+        return <Badge className="bg-green-500/20 text-green-400 border-green-500/30 text-xs">Pgto Pago</Badge>;
+      default:
+        return null;
+    }
+  };
+
+  const togglePaymentStatus = async (booking: Booking) => {
+    const newStatus = booking.payment_status === "pendente" ? "pago" : "pendente";
+    const { error } = await supabase
+      .from("bookings")
+      .update({ payment_status: newStatus })
+      .eq("id", booking.id);
+    if (error) {
+      toast.error("Erro ao atualizar status de pagamento");
+      return;
+    }
+    toast.success(newStatus === "pago" ? "Pagamento confirmado!" : "Status alterado para pendente");
+    setBookings((prev) =>
+      prev.map((b) => b.id === booking.id ? { ...b, payment_status: newStatus } : b)
+    );
   };
 
   const applyFilters = (list: Booking[]) => {
@@ -417,6 +445,20 @@ export function AdminBookings() {
               💳 {booking.payment_method}
             </div>
           )}
+          {booking.payment_status !== "na" && (
+            <div className="flex items-center gap-2 mt-1">
+              {getPaymentStatusBadge(booking.payment_status)}
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 px-2 text-xs"
+                onClick={(e) => { e.stopPropagation(); togglePaymentStatus(booking); }}
+              >
+                <DollarSign className="w-3 h-3 mr-1" />
+                {booking.payment_status === "pendente" ? "Confirmar pgto" : "Marcar pendente"}
+              </Button>
+            </div>
+          )}
           {isTrash && booking.deleted_at && (
             <div className="text-xs text-muted-foreground mt-1">
               Deletado em: {formatDateBR(booking.deleted_at.split("T")[0])}
@@ -511,6 +553,24 @@ export function AdminBookings() {
       <TableCell>{getProfessionalName(booking.professional_id)}</TableCell>
       <TableCell className="text-right">{formatPrice(booking.total_price)}</TableCell>
       <TableCell className="text-center">{getStatusBadge(booking.status)}</TableCell>
+      <TableCell className="text-center">
+        {booking.payment_status !== "na" ? (
+          <div className="flex items-center justify-center gap-1">
+            {getPaymentStatusBadge(booking.payment_status)}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7"
+              onClick={() => togglePaymentStatus(booking)}
+              title={booking.payment_status === "pendente" ? "Confirmar pagamento" : "Marcar pendente"}
+            >
+              <DollarSign className="w-3.5 h-3.5" />
+            </Button>
+          </div>
+        ) : (
+          <span className="text-xs text-muted-foreground">—</span>
+        )}
+      </TableCell>
       <TableCell>
         <div className="flex items-center justify-center gap-1">
           {booking.status === "confirmed" && (
@@ -670,6 +730,7 @@ export function AdminBookings() {
                     <TableHead>Profissional</TableHead>
                     <TableHead className="text-right">Valor</TableHead>
                     <TableHead className="text-center">Status</TableHead>
+                    <TableHead className="text-center">Pgto</TableHead>
                     <TableHead className="text-center">Ações</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -708,6 +769,7 @@ export function AdminBookings() {
                     <TableHead>Profissional</TableHead>
                     <TableHead className="text-right">Valor</TableHead>
                     <TableHead className="text-center">Status</TableHead>
+                    <TableHead className="text-center">Pgto</TableHead>
                     <TableHead className="text-center">Ações</TableHead>
                   </TableRow>
                 </TableHeader>

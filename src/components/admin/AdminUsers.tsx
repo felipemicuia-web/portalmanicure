@@ -25,9 +25,11 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Slider } from "@/components/ui/slider";
 import {
   Search, Trash2, ShieldBan, ShieldCheck, User, Phone, Calendar, Mail,
-  Eye, StickyNote, Clock, CalendarDays, CreditCard, Sparkles, Save,
+  Eye, StickyNote, Clock, CalendarDays, CreditCard, Sparkles, Save, DollarSign,
 } from "lucide-react";
 
 interface ProfileUser {
@@ -40,6 +42,9 @@ interface ProfileUser {
   created_at: string;
   updated_at: string;
   notes: string | null;
+  advance_payment_required: boolean;
+  advance_payment_percentage: number;
+  advance_payment_message: string | null;
   email?: string | null;
 }
 
@@ -66,6 +71,10 @@ export function AdminUsers() {
   const [loadingBookings, setLoadingBookings] = useState(false);
   const [editNotes, setEditNotes] = useState("");
   const [savingNotes, setSavingNotes] = useState(false);
+  const [advancePayment, setAdvancePayment] = useState(false);
+  const [advancePercentage, setAdvancePercentage] = useState(50);
+  const [advanceMessage, setAdvanceMessage] = useState("");
+  const [savingAdvance, setSavingAdvance] = useState(false);
   const { toast } = useToast();
   const { tenantId } = useTenant();
 
@@ -74,7 +83,7 @@ export function AdminUsers() {
     setLoading(true);
     const { data, error } = await supabase
       .from("profiles")
-      .select("id, user_id, name, phone, avatar_url, blocked, created_at, updated_at, notes")
+      .select("id, user_id, name, phone, avatar_url, blocked, created_at, updated_at, notes, advance_payment_required, advance_payment_percentage, advance_payment_message")
       .eq("tenant_id", tenantId)
       .order("created_at", { ascending: false });
 
@@ -141,6 +150,9 @@ export function AdminUsers() {
   const openUserDetail = (user: ProfileUser) => {
     setSelectedUser(user);
     setEditNotes(user.notes || "");
+    setAdvancePayment(user.advance_payment_required);
+    setAdvancePercentage(user.advance_payment_percentage);
+    setAdvanceMessage(user.advance_payment_message || "");
     fetchUserBookings(user.user_id);
   };
 
@@ -162,6 +174,35 @@ export function AdminUsers() {
     }
     setSavingNotes(false);
   };
+
+  const saveAdvancePayment = async () => {
+    if (!selectedUser || !tenantId) return;
+    setSavingAdvance(true);
+    const { error } = await supabase
+      .from("profiles")
+      .update({
+        advance_payment_required: advancePayment,
+        advance_payment_percentage: advancePercentage,
+        advance_payment_message: advanceMessage.trim() || null,
+      })
+      .eq("id", selectedUser.id)
+      .eq("tenant_id", tenantId);
+
+    if (error) {
+      toast({ title: "Erro", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Configuração de pagamento antecipado salva" });
+      setSelectedUser({
+        ...selectedUser,
+        advance_payment_required: advancePayment,
+        advance_payment_percentage: advancePercentage,
+        advance_payment_message: advanceMessage.trim() || null,
+      });
+      fetchUsers();
+    }
+    setSavingAdvance(false);
+  };
+
 
 
   const toggleBlock = async (profile: ProfileUser) => {
@@ -280,6 +321,12 @@ export function AdminUsers() {
                 )}
               </div>
               <div className="flex items-center gap-2 shrink-0">
+                {user.advance_payment_required && (
+                  <Badge variant="outline" className="text-[10px] border-primary/50 text-primary">
+                    <DollarSign className="w-2.5 h-2.5 mr-0.5" />
+                    Antecipado
+                  </Badge>
+                )}
                 {user.blocked ? (
                   <Badge variant="destructive" className="text-xs">Bloqueado</Badge>
                 ) : (
@@ -417,6 +464,55 @@ export function AdminUsers() {
                       ))}
                     </div>
                   )}
+                </div>
+
+                {/* Advance Payment */}
+                <div className="space-y-3 border border-border/60 rounded-lg p-3 bg-muted/30">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <DollarSign className="w-4 h-4 text-muted-foreground" />
+                      <p className="text-sm font-medium">Pagamento antecipado</p>
+                    </div>
+                    <Switch
+                      checked={advancePayment}
+                      onCheckedChange={setAdvancePayment}
+                    />
+                  </div>
+
+                  {advancePayment && (
+                    <div className="space-y-3">
+                      <div>
+                        <Label className="text-xs text-muted-foreground">
+                          Porcentagem exigida: {advancePercentage}%
+                        </Label>
+                        <Slider
+                          value={[advancePercentage]}
+                          onValueChange={(v) => setAdvancePercentage(v[0])}
+                          min={10}
+                          max={100}
+                          step={5}
+                          className="mt-2"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-xs text-muted-foreground">
+                          Mensagem para o cliente
+                        </Label>
+                        <Textarea
+                          placeholder="Ex: Devido ao histórico, solicitamos pagamento antecipado de 50% via Pix antes da confirmação."
+                          value={advanceMessage}
+                          onChange={(e) => setAdvanceMessage(e.target.value)}
+                          rows={3}
+                          className="mt-1"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  <Button size="sm" onClick={saveAdvancePayment} disabled={savingAdvance} className="gap-1">
+                    <Save className="w-3.5 h-3.5" />
+                    {savingAdvance ? "Salvando..." : "Salvar pagamento antecipado"}
+                  </Button>
                 </div>
 
                 {/* Actions */}

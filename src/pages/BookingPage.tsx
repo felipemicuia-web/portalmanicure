@@ -50,6 +50,8 @@ export default function BookingPage() {
   const [couponLoading, setCouponLoading] = useState(false);
   const [couponError, setCouponError] = useState<string | null>(null);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
+  const [advancePaymentMessage, setAdvancePaymentMessage] = useState<string | null>(null);
+  const [advancePaymentRequired, setAdvancePaymentRequired] = useState(false);
   
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -169,6 +171,14 @@ export default function BookingPage() {
         }
         if (data.notes && !notes) setNotes(data.notes);
 
+        // Check advance payment requirement
+        if (data.advance_payment_required && data.advance_payment_message) {
+          setAdvancePaymentMessage(data.advance_payment_message);
+          setAdvancePaymentRequired(true);
+        } else {
+          setAdvancePaymentMessage(null);
+          setAdvancePaymentRequired(false);
+        }
       }
     }
 
@@ -430,6 +440,7 @@ export default function BookingPage() {
           discount_type: couponData?.discount_type || null,
           discount_value: couponData?.discount_value || 0,
           discount_amount: couponData?.discount_amount || 0,
+          payment_status: advancePaymentRequired ? 'pendente' : 'na',
         })
         .select()
         .single();
@@ -646,7 +657,7 @@ export default function BookingPage() {
                     couponError={couponError}
                     selectedPaymentMethod={selectedPaymentMethod}
                     onPaymentMethodChange={setSelectedPaymentMethod}
-                    
+                    advancePaymentMessage={advancePaymentMessage}
                   />
                 )}
               </div>
