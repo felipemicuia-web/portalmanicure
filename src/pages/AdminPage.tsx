@@ -60,6 +60,7 @@ const MENU_ITEMS: { value: string; label: string; icon: LucideIcon }[] = [
   { value: "schedules", label: "Folgas", icon: UserCog },
   { value: "professionals", label: "Profissionais", icon: Users },
   { value: "services", label: "Serviços", icon: Sparkles },
+  { value: "packages", label: "Pacotes", icon: Package },
   { value: "hero", label: "Logotipo", icon: Image },
   { value: "theme", label: "Cores", icon: Palette },
   { value: "coupons", label: "Cupons", icon: Ticket },
