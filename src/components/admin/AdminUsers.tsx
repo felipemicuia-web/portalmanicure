@@ -175,6 +175,35 @@ export function AdminUsers() {
     setSavingNotes(false);
   };
 
+  const saveAdvancePayment = async () => {
+    if (!selectedUser || !tenantId) return;
+    setSavingAdvance(true);
+    const { error } = await supabase
+      .from("profiles")
+      .update({
+        advance_payment_required: advancePayment,
+        advance_payment_percentage: advancePercentage,
+        advance_payment_message: advanceMessage.trim() || null,
+      })
+      .eq("id", selectedUser.id)
+      .eq("tenant_id", tenantId);
+
+    if (error) {
+      toast({ title: "Erro", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Configuração de pagamento antecipado salva" });
+      setSelectedUser({
+        ...selectedUser,
+        advance_payment_required: advancePayment,
+        advance_payment_percentage: advancePercentage,
+        advance_payment_message: advanceMessage.trim() || null,
+      });
+      fetchUsers();
+    }
+    setSavingAdvance(false);
+  };
+
+
 
   const toggleBlock = async (profile: ProfileUser) => {
     const newBlocked = !profile.blocked;
