@@ -176,9 +176,11 @@ export default function BookingPage() {
         if (data.advance_payment_required && data.advance_payment_message) {
           setAdvancePaymentMessage(data.advance_payment_message);
           setAdvancePaymentRequired(true);
+          setAdvancePaymentPercentage(data.advance_payment_percentage || 50);
         } else {
           setAdvancePaymentMessage(null);
           setAdvancePaymentRequired(false);
+          setAdvancePaymentPercentage(0);
         }
       }
     }
