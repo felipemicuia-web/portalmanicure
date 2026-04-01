@@ -179,6 +179,7 @@ export default function BookingPage() {
           setAdvancePaymentMessage(null);
           setAdvancePaymentRequired(false);
         }
+      }
     }
 
     loadProfile();
