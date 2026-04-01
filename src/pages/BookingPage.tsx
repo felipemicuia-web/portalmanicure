@@ -48,6 +48,7 @@ export default function BookingPage() {
   const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(null);
   const [couponLoading, setCouponLoading] = useState(false);
   const [couponError, setCouponError] = useState<string | null>(null);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
 
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -412,6 +413,7 @@ export default function BookingPage() {
           client_phone: phoneDigits,
           notes: notes.trim() || null,
           tenant_id: tenantId,
+          payment_method: selectedPaymentMethod || null,
           coupon_id: couponData?.coupon_id || null,
           coupon_code: couponData?.code || null,
           discount_type: couponData?.discount_type || null,
@@ -482,6 +484,7 @@ export default function BookingPage() {
       setNotes("");
       setAppliedCoupon(null);
       setCouponError(null);
+      setSelectedPaymentMethod("");
       setGlobalMessage({ text: "Agendamento confirmado com sucesso!", type: "ok" });
     } catch (error) {
       logger.error("Booking error:", error);
@@ -630,6 +633,8 @@ export default function BookingPage() {
                     onRemoveCoupon={handleRemoveCoupon}
                     couponLoading={couponLoading}
                     couponError={couponError}
+                    selectedPaymentMethod={selectedPaymentMethod}
+                    onPaymentMethodChange={setSelectedPaymentMethod}
                   />
                 )}
               </div>

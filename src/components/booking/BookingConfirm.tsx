@@ -41,6 +41,8 @@ interface BookingConfirmProps {
   onRemoveCoupon: () => void;
   couponLoading: boolean;
   couponError: string | null;
+  selectedPaymentMethod: string;
+  onPaymentMethodChange: (value: string) => void;
 }
 
 function formatPrice(value: number): string {
@@ -83,9 +85,10 @@ export function BookingConfirm({
   onRemoveCoupon,
   couponLoading,
   couponError,
+  selectedPaymentMethod,
+  onPaymentMethodChange,
 }: BookingConfirmProps) {
   const [couponCode, setCouponCode] = useState("");
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
 
   const handleNotesChange = (value: string) => {
     if (value.length <= MAX_NOTES_LENGTH) {
@@ -270,7 +273,7 @@ export function BookingConfirm({
       {!isConfirmed && (
         <PaymentMethodSelect
           selected={selectedPaymentMethod}
-          onChange={setSelectedPaymentMethod}
+          onChange={onPaymentMethodChange}
         />
       )}
 

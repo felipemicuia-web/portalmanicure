@@ -17,6 +17,7 @@ import {
   X,
   FileText,
   DollarSign,
+  CreditCard,
 } from "lucide-react";
 
 interface Booking {
@@ -29,6 +30,7 @@ interface Booking {
   client_name: string;
   client_phone: string;
   notes: string | null;
+  payment_method: string | null;
   services?: { name: string }[];
 }
 
@@ -56,7 +58,7 @@ export function ProfessionalAgenda({ professionalId }: Props) {
     try {
       const { data, error } = await supabase
         .from("bookings")
-        .select("id, booking_date, booking_time, duration_minutes, total_price, status, client_name, client_phone, notes")
+        .select("id, booking_date, booking_time, duration_minutes, total_price, status, client_name, client_phone, notes, payment_method")
         .eq("professional_id", professionalId)
         .eq("tenant_id", tenantId)
         .is("deleted_at", null)
@@ -197,6 +199,13 @@ export function ProfessionalAgenda({ professionalId }: Props) {
           <div className="flex items-start gap-2 text-sm text-muted-foreground pt-1">
             <FileText className="w-3.5 h-3.5 mt-0.5 shrink-0" />
             <span>{booking.notes}</span>
+          </div>
+        )}
+
+        {booking.payment_method && (
+          <div className="flex items-center gap-2 text-sm text-muted-foreground pt-1">
+            <CreditCard className="w-3.5 h-3.5 shrink-0" />
+            <span>{booking.payment_method}</span>
           </div>
         )}
       </div>

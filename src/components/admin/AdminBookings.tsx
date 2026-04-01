@@ -46,6 +46,7 @@ interface Booking {
   created_at: string;
   deleted_at: string | null;
   deleted_by: string | null;
+  payment_method: string | null;
 }
 
 interface Professional {
@@ -411,6 +412,11 @@ export function AdminBookings() {
             <User className="w-3 h-3" />
             {getProfessionalName(booking.professional_id)}
           </div>
+          {booking.payment_method && (
+            <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
+              💳 {booking.payment_method}
+            </div>
+          )}
           {isTrash && booking.deleted_at && (
             <div className="text-xs text-muted-foreground mt-1">
               Deletado em: {formatDateBR(booking.deleted_at.split("T")[0])}
