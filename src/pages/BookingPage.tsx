@@ -52,6 +52,7 @@ export default function BookingPage() {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
   const [advancePaymentMessage, setAdvancePaymentMessage] = useState<string | null>(null);
   const [advancePaymentRequired, setAdvancePaymentRequired] = useState(false);
+  const [advancePaymentPercentage, setAdvancePaymentPercentage] = useState(0);
   
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -175,9 +176,11 @@ export default function BookingPage() {
         if (data.advance_payment_required && data.advance_payment_message) {
           setAdvancePaymentMessage(data.advance_payment_message);
           setAdvancePaymentRequired(true);
+          setAdvancePaymentPercentage(data.advance_payment_percentage || 50);
         } else {
           setAdvancePaymentMessage(null);
           setAdvancePaymentRequired(false);
+          setAdvancePaymentPercentage(0);
         }
       }
     }
@@ -658,6 +661,7 @@ export default function BookingPage() {
                     selectedPaymentMethod={selectedPaymentMethod}
                     onPaymentMethodChange={setSelectedPaymentMethod}
                     advancePaymentMessage={advancePaymentMessage}
+                    advancePaymentPercentage={advancePaymentPercentage}
                   />
                 )}
               </div>
