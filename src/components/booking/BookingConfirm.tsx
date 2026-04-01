@@ -8,6 +8,7 @@ import { ArrowLeft, User, Briefcase, Calendar, Wallet, Phone, CheckCircle, Ticke
 import { cn } from "@/lib/utils";
 import { formatDateBR } from "@/lib/dateFormat";
 import { PaymentBlock } from "@/components/booking/PaymentBlock";
+import { PaymentMethodSelect } from "@/components/booking/PaymentMethodSelect";
 
 export interface AppliedCoupon {
   coupon_id: string;
@@ -84,6 +85,7 @@ export function BookingConfirm({
   couponError,
 }: BookingConfirmProps) {
   const [couponCode, setCouponCode] = useState("");
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
 
   const handleNotesChange = (value: string) => {
     if (value.length <= MAX_NOTES_LENGTH) {
@@ -263,6 +265,14 @@ export function BookingConfirm({
 
       {/* Payment Block */}
       {!isConfirmed && <PaymentBlock />}
+
+      {/* Payment Method Selection */}
+      {!isConfirmed && (
+        <PaymentMethodSelect
+          selected={selectedPaymentMethod}
+          onChange={setSelectedPaymentMethod}
+        />
+      )}
 
       {/* Form - Stack on mobile */}
       <div className="space-y-4 sm:space-y-5">

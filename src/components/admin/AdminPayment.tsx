@@ -1,17 +1,20 @@
 import { useState, useEffect } from "react";
 import { usePaymentSettings, isValidUrl, type PaymentSettings } from "@/hooks/usePaymentSettings";
+import { usePaymentMethods } from "@/hooks/usePaymentMethods";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Loader2, CreditCard, ExternalLink, AlertTriangle } from "lucide-react";
+import { Loader2, CreditCard, ExternalLink, AlertTriangle, Plus, Trash2 } from "lucide-react";
 
 export function AdminPayment() {
   const { settings, loading, saving, saveSettings } = usePaymentSettings();
+  const { methods, loading: methodsLoading, saving: methodsSaving, addMethod, toggleMethod, removeMethod } = usePaymentMethods();
   const [form, setForm] = useState<PaymentSettings>({ ...settings });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [newMethodName, setNewMethodName] = useState("");
 
   useEffect(() => {
     setForm({ ...settings });
@@ -52,7 +55,7 @@ export function AdminPayment() {
     await saveSettings(form);
   };
 
-  if (loading) {
+  if (loading || methodsLoading) {
     return (
       <div className="flex items-center justify-center py-12">
         <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
@@ -169,6 +172,79 @@ export function AdminPayment() {
             className="mt-1 resize-none"
           />
         </div>
+      </div>
+
+      {/* Payment Methods Section */}
+      <div className="border-t border-border/30 pt-6 space-y-4">
+        <div className="flex items-center gap-3">
+          <CreditCard className="w-4 h-4 text-primary" />
+          <div>
+            <h3 className="text-sm font-bold">Formas de Pagamento</h3>
+            <p className="text-xs text-muted-foreground">
+              Adicione as opções de pagamento que o cliente poderá escolher ao confirmar o agendamento.
+            </p>
+          </div>
+        </div>
+
+        {/* Add new method */}
+        <div className="flex gap-2">
+          <Input
+            value={newMethodName}
+            onChange={(e) => setNewMethodName(e.target.value)}
+            placeholder="Ex: Pix, Cartão, Dinheiro..."
+            maxLength={50}
+            className="flex-1"
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && newMethodName.trim()) {
+                addMethod(newMethodName.trim());
+                setNewMethodName("");
+              }
+            }}
+          />
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={methodsSaving || !newMethodName.trim()}
+            onClick={() => {
+              addMethod(newMethodName.trim());
+              setNewMethodName("");
+            }}
+            className="gap-1 h-10"
+          >
+            <Plus className="w-4 h-4" />
+            Adicionar
+          </Button>
+        </div>
+
+        {/* Methods list */}
+        {methods.length === 0 ? (
+          <p className="text-xs text-muted-foreground italic">Nenhuma forma de pagamento cadastrada.</p>
+        ) : (
+          <div className="space-y-2">
+            {methods.map((m) => (
+              <div
+                key={m.id}
+                className="flex items-center justify-between gap-3 border border-border/40 rounded-lg px-3 py-2.5 bg-card/50"
+              >
+                <span className="text-sm font-medium flex-1">{m.name}</span>
+                <div className="flex items-center gap-2">
+                  <Switch
+                    checked={m.enabled}
+                    onCheckedChange={(v) => toggleMethod(m.id, v)}
+                  />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-destructive hover:text-destructive"
+                    onClick={() => removeMethod(m.id)}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="flex justify-end pt-2">
