@@ -11,8 +11,10 @@ import { Loader2, CreditCard, ExternalLink, AlertTriangle, Plus, Trash2 } from "
 
 export function AdminPayment() {
   const { settings, loading, saving, saveSettings } = usePaymentSettings();
+  const { methods, loading: methodsLoading, saving: methodsSaving, addMethod, toggleMethod, removeMethod } = usePaymentMethods();
   const [form, setForm] = useState<PaymentSettings>({ ...settings });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [newMethodName, setNewMethodName] = useState("");
 
   useEffect(() => {
     setForm({ ...settings });
