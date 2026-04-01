@@ -87,7 +87,6 @@ export function BookingConfirm({
   couponError,
   selectedPaymentMethod,
   onPaymentMethodChange,
-  advancePaymentMessage,
 }: BookingConfirmProps) {
   const [couponCode, setCouponCode] = useState("");
 
