@@ -58,7 +58,7 @@ export function ProfessionalAgenda({ professionalId }: Props) {
     try {
       const { data, error } = await supabase
         .from("bookings")
-        .select("id, booking_date, booking_time, duration_minutes, total_price, status, client_name, client_phone, notes")
+        .select("id, booking_date, booking_time, duration_minutes, total_price, status, client_name, client_phone, notes, payment_method")
         .eq("professional_id", professionalId)
         .eq("tenant_id", tenantId)
         .is("deleted_at", null)
