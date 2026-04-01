@@ -618,6 +618,9 @@ export default function BookingPage() {
                     onToggle={toggleService}
                     onPrev={() => goToStep(1)}
                     onNext={() => goToStep(3)}
+                    creditsMap={Object.fromEntries(
+                      filteredServices.map(s => [s.id, getCreditsForService(s.id)])
+                    )}
                   />
                 )}
 
