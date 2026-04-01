@@ -8,6 +8,7 @@ import { ArrowLeft, User, Briefcase, Calendar, Wallet, Phone, CheckCircle, Ticke
 import { cn } from "@/lib/utils";
 import { formatDateBR } from "@/lib/dateFormat";
 import { PaymentBlock } from "@/components/booking/PaymentBlock";
+import { PaymentMethodSelect } from "@/components/booking/PaymentMethodSelect";
 
 export interface AppliedCoupon {
   coupon_id: string;
