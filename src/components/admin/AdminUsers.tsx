@@ -89,9 +89,25 @@ export function AdminUsers() {
 
     if (error) {
       toast({ title: "Erro ao carregar usuários", description: error.message, variant: "destructive" });
-    } else {
-      setUsers(data || []);
+      setLoading(false);
+      return;
     }
+
+    // Fetch emails via secure function
+    const { data: emailData } = await supabase.rpc("get_user_emails_for_tenant", { p_tenant_id: tenantId });
+    const emailMap = new Map<string, string>();
+    if (emailData) {
+      (emailData as any[]).forEach((e: { user_id: string; email: string }) => {
+        emailMap.set(e.user_id, e.email);
+      });
+    }
+
+    const usersWithEmail = (data || []).map((u) => ({
+      ...u,
+      email: emailMap.get(u.user_id) || null,
+    }));
+
+    setUsers(usersWithEmail);
     setLoading(false);
   };
 
