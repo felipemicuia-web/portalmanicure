@@ -249,7 +249,8 @@ export function AdminUsers() {
     return (
       (u.name || "").toLowerCase().includes(term) ||
       (u.phone || "").includes(term) ||
-      (u.notes || "").toLowerCase().includes(term)
+      (u.notes || "").toLowerCase().includes(term) ||
+      (u.email || "").toLowerCase().includes(term)
     );
   });
 
