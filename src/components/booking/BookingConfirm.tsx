@@ -284,13 +284,21 @@ export function BookingConfirm({
 
       {/* Advance Payment Warning */}
       {!isConfirmed && advancePaymentMessage && (
-        <div className="border-2 border-amber-500/50 bg-amber-500/10 rounded-xl p-3 sm:p-4 space-y-1">
+        <div className="border-2 border-amber-500/50 bg-amber-500/10 rounded-xl p-3 sm:p-4 space-y-2">
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-amber-500/20 flex items-center justify-center flex-shrink-0">
               <Wallet className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-500" />
             </div>
-            <p className="text-sm sm:text-base font-bold text-amber-400">⚠️ Pagamento Antecipado</p>
+            <p className="text-sm sm:text-base font-bold text-amber-400">⚠️ Pagamento Antecipado Obrigatório</p>
           </div>
+          {advancePaymentPercentage > 0 && displayTotal > 0 && (
+            <div className="ml-9 sm:ml-10 bg-amber-500/15 rounded-lg p-2 sm:p-3">
+              <p className="text-xs sm:text-sm font-semibold text-amber-300">
+                Valor antecipado: <span className="text-amber-200 text-sm sm:text-base">R$ {formatPrice(displayTotal * advancePaymentPercentage / 100)}</span>
+                <span className="text-amber-400/70 text-[10px] sm:text-xs ml-1">({advancePaymentPercentage}% do total)</span>
+              </p>
+            </div>
+          )}
           <p className="text-xs sm:text-sm text-amber-300/90 whitespace-pre-line pl-9 sm:pl-10">
             {advancePaymentMessage}
           </p>
