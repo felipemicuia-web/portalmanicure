@@ -143,9 +143,6 @@ export function AdminUsers() {
   const openUserDetail = (user: ProfileUser) => {
     setSelectedUser(user);
     setEditNotes(user.notes || "");
-    setAdvancePayment(user.advance_payment_required);
-    setAdvancePercentage(user.advance_payment_percentage);
-    setAdvanceMessage(user.advance_payment_message || "");
     fetchUserBookings(user.user_id);
   };
 
