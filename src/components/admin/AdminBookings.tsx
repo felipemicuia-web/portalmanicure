@@ -191,6 +191,33 @@ export function AdminBookings() {
     }
   };
 
+  const getPaymentStatusBadge = (paymentStatus: string) => {
+    switch (paymentStatus) {
+      case "pendente":
+        return <Badge className="bg-amber-500/20 text-amber-400 border-amber-500/30 text-xs">Pgto Pendente</Badge>;
+      case "pago":
+        return <Badge className="bg-green-500/20 text-green-400 border-green-500/30 text-xs">Pgto Pago</Badge>;
+      default:
+        return null;
+    }
+  };
+
+  const togglePaymentStatus = async (booking: Booking) => {
+    const newStatus = booking.payment_status === "pendente" ? "pago" : "pendente";
+    const { error } = await supabase
+      .from("bookings")
+      .update({ payment_status: newStatus })
+      .eq("id", booking.id);
+    if (error) {
+      toast.error("Erro ao atualizar status de pagamento");
+      return;
+    }
+    toast.success(newStatus === "pago" ? "Pagamento confirmado!" : "Status alterado para pendente");
+    setBookings((prev) =>
+      prev.map((b) => b.id === booking.id ? { ...b, payment_status: newStatus } : b)
+    );
+  };
+
   const applyFilters = (list: Booking[]) => {
     return list.filter((b) => {
       if (filterStatus !== "all" && b.status !== filterStatus) return false;
