@@ -46,6 +46,7 @@ interface Booking {
   created_at: string;
   deleted_at: string | null;
   deleted_by: string | null;
+  payment_method: string | null;
 }
 
 interface Professional {
