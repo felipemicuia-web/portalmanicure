@@ -30,6 +30,7 @@ interface Booking {
   client_name: string;
   client_phone: string;
   notes: string | null;
+  payment_method: string | null;
   services?: { name: string }[];
 }
 
