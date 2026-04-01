@@ -5,7 +5,7 @@ import { useTenant } from "@/contexts/TenantContext";
 import { formatPhone } from "@/lib/validation";
 import { formatDateBR } from "@/lib/dateFormat";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Calendar, Clock, User, Phone, CalendarDays, Pencil, Trash2, MessageCircle, RotateCcw, Archive, AlertTriangle, CheckCircle, Filter, X } from "lucide-react";
+import { Calendar, Clock, User, Phone, CalendarDays, Pencil, Trash2, MessageCircle, RotateCcw, Archive, AlertTriangle, CheckCircle, Filter, X, DollarSign } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
