@@ -411,6 +411,11 @@ export function AdminBookings() {
             <User className="w-3 h-3" />
             {getProfessionalName(booking.professional_id)}
           </div>
+          {(booking as any).payment_method && (
+            <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
+              💳 {(booking as any).payment_method}
+            </div>
+          )}
           {isTrash && booking.deleted_at && (
             <div className="text-xs text-muted-foreground mt-1">
               Deletado em: {formatDateBR(booking.deleted_at.split("T")[0])}
