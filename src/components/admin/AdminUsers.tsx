@@ -369,6 +369,13 @@ export function AdminUsers() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2 p-2 rounded-md bg-muted/50">
+                    <Mail className="w-4 h-4 text-muted-foreground shrink-0" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">Email</p>
+                      <p className="font-medium">{selectedUser.email || "Não informado"}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 p-2 rounded-md bg-muted/50">
                     <Calendar className="w-4 h-4 text-muted-foreground shrink-0" />
                     <div>
                       <p className="text-xs text-muted-foreground">Cadastrado em</p>
