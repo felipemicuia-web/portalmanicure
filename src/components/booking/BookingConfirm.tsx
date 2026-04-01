@@ -273,7 +273,7 @@ export function BookingConfirm({
       {!isConfirmed && (
         <PaymentMethodSelect
           selected={selectedPaymentMethod}
-          onChange={setSelectedPaymentMethod}
+          onChange={onPaymentMethodChange}
         />
       )}
 
