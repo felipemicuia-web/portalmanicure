@@ -62,6 +62,16 @@ export function ServiceList({
               )}
               onClick={() => onToggle(service.id)}
             >
+              {/* Credits badge - prominent at top */}
+              {remainingCredits > 0 && (
+                <div className="absolute -top-2 -right-2 z-10 flex items-center gap-1 bg-primary text-primary-foreground px-2.5 py-1 rounded-full shadow-lg shadow-primary/30 animate-pulse">
+                  <Package className="w-3.5 h-3.5" />
+                  <span className="text-xs font-bold">
+                    {remainingCredits} {remainingCredits === 1 ? "crédito" : "créditos"}
+                  </span>
+                </div>
+              )}
+
               {/* Image - smaller on mobile */}
               <div
                 className={cn(
@@ -87,10 +97,10 @@ export function ServiceList({
                     {service.description || "Serviço de beleza profissional"}
                   </p>
                   {remainingCredits > 0 && (
-                    <div className="flex items-center gap-1.5 mt-1">
+                    <div className="flex items-center gap-1.5 mt-1.5 bg-primary/10 border border-primary/20 rounded-lg px-2 py-1 w-fit">
                       <Package className="w-3.5 h-3.5 text-primary" />
-                      <span className="text-xs font-medium text-primary">
-                        Você tem {remainingCredits} {remainingCredits === 1 ? "crédito" : "créditos"} disponíve{remainingCredits === 1 ? "l" : "is"}
+                      <span className="text-xs font-semibold text-primary">
+                        Você tem {remainingCredits} {remainingCredits === 1 ? "crédito disponível" : "créditos disponíveis"}
                       </span>
                     </div>
                   )}
