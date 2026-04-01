@@ -82,6 +82,7 @@ const TAB_CONTENT: Record<string, React.ReactNode> = {
   schedules: <AdminProfessionalSchedule />,
   professionals: <AdminProfessionals />,
   services: <AdminServices />,
+  packages: <AdminPackages />,
   hero: <AdminHeroHeader />,
   theme: <AdminTheme />,
   coupons: <AdminCoupons />,
