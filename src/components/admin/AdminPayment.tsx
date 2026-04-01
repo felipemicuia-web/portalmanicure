@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { usePaymentSettings, isValidUrl, type PaymentSettings } from "@/hooks/usePaymentSettings";
+import { usePaymentMethods } from "@/hooks/usePaymentMethods";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Loader2, CreditCard, ExternalLink, AlertTriangle } from "lucide-react";
+import { Loader2, CreditCard, ExternalLink, AlertTriangle, Plus, Trash2 } from "lucide-react";
 
 export function AdminPayment() {
   const { settings, loading, saving, saveSettings } = usePaymentSettings();
