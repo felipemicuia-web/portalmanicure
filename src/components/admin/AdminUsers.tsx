@@ -316,6 +316,7 @@ export function AdminUsers() {
                     {user.email}
                   </p>
                 )}
+              </div>
               <div className="flex items-center gap-2 shrink-0">
                 {user.advance_payment_required && (
                   <Badge variant="outline" className="text-[10px] border-primary/50 text-primary">
