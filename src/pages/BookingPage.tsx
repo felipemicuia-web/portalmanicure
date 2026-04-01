@@ -336,16 +336,19 @@ export default function BookingPage() {
 
     if (!isValidName(name)) {
       setGlobalMessage({ text: "Informe um nome válido (mínimo 2 caracteres, sem números).", type: "bad" });
+      window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
 
     if (!isValidBrazilianPhone(phoneDigits)) {
       setGlobalMessage({ text: "WhatsApp inválido. Use formato: (11) 98765-4321", type: "bad" });
+      window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
 
     if (paymentMethods.length > 0 && !selectedPaymentMethod) {
       setGlobalMessage({ text: "Selecione uma forma de pagamento.", type: "bad" });
+      window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
 
