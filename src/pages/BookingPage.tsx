@@ -168,6 +168,13 @@ export default function BookingPage() {
           setClientPhone(formatPhone(data.phone));
         }
         if (data.notes && !notes) setNotes(data.notes);
+
+        // Check advance payment requirement
+        if (data.advance_payment_required && data.advance_payment_message) {
+          setAdvancePaymentMessage(data.advance_payment_message);
+        } else {
+          setAdvancePaymentMessage(null);
+        }
       }
     }
 
