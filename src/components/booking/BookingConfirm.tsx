@@ -41,6 +41,8 @@ interface BookingConfirmProps {
   onRemoveCoupon: () => void;
   couponLoading: boolean;
   couponError: string | null;
+  selectedPaymentMethod: string;
+  onPaymentMethodChange: (value: string) => void;
 }
 
 function formatPrice(value: number): string {
