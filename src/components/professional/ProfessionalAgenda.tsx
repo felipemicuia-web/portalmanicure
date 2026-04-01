@@ -169,20 +169,11 @@ export function ProfessionalAgenda({ professionalId }: Props) {
             <Clock className="w-3.5 h-3.5" />
             {formatTime(booking.booking_time)} ({booking.duration_minutes}min)
           </span>
-          <span className="flex items-center gap-1">
-            <DollarSign className="w-3.5 h-3.5" />
-            {formatCurrency(booking.total_price)}
-          </span>
         </div>
 
         <div className="flex items-center gap-2 text-sm">
           <User className="w-3.5 h-3.5 text-muted-foreground" />
           <span>{booking.client_name}</span>
-        </div>
-
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Phone className="w-3.5 h-3.5" />
-          <span>{booking.client_phone}</span>
         </div>
 
         {booking.services && booking.services.length > 0 && (
