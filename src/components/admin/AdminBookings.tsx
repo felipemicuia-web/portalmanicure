@@ -553,6 +553,24 @@ export function AdminBookings() {
       <TableCell>{getProfessionalName(booking.professional_id)}</TableCell>
       <TableCell className="text-right">{formatPrice(booking.total_price)}</TableCell>
       <TableCell className="text-center">{getStatusBadge(booking.status)}</TableCell>
+      <TableCell className="text-center">
+        {booking.payment_status !== "na" ? (
+          <div className="flex items-center justify-center gap-1">
+            {getPaymentStatusBadge(booking.payment_status)}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7"
+              onClick={() => togglePaymentStatus(booking)}
+              title={booking.payment_status === "pendente" ? "Confirmar pagamento" : "Marcar pendente"}
+            >
+              <DollarSign className="w-3.5 h-3.5" />
+            </Button>
+          </div>
+        ) : (
+          <span className="text-xs text-muted-foreground">—</span>
+        )}
+      </TableCell>
       <TableCell>
         <div className="flex items-center justify-center gap-1">
           {booking.status === "confirmed" && (
