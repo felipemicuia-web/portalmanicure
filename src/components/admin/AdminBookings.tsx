@@ -445,6 +445,20 @@ export function AdminBookings() {
               💳 {booking.payment_method}
             </div>
           )}
+          {booking.payment_status !== "na" && (
+            <div className="flex items-center gap-2 mt-1">
+              {getPaymentStatusBadge(booking.payment_status)}
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 px-2 text-xs"
+                onClick={(e) => { e.stopPropagation(); togglePaymentStatus(booking); }}
+              >
+                <DollarSign className="w-3 h-3 mr-1" />
+                {booking.payment_status === "pendente" ? "Confirmar pgto" : "Marcar pendente"}
+              </Button>
+            </div>
+          )}
           {isTrash && booking.deleted_at && (
             <div className="text-xs text-muted-foreground mt-1">
               Deletado em: {formatDateBR(booking.deleted_at.split("T")[0])}
