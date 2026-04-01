@@ -484,6 +484,7 @@ export default function BookingPage() {
       setNotes("");
       setAppliedCoupon(null);
       setCouponError(null);
+      setSelectedPaymentMethod("");
       setGlobalMessage({ text: "Agendamento confirmado com sucesso!", type: "ok" });
     } catch (error) {
       logger.error("Booking error:", error);
