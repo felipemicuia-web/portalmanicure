@@ -85,6 +85,7 @@ export function BookingConfirm({
   couponError,
 }: BookingConfirmProps) {
   const [couponCode, setCouponCode] = useState("");
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
 
   const handleNotesChange = (value: string) => {
     if (value.length <= MAX_NOTES_LENGTH) {
