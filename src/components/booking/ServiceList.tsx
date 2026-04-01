@@ -86,6 +86,14 @@ export function ServiceList({
                   <p className="text-muted-foreground text-xs sm:text-sm line-clamp-2">
                     {service.description || "Serviço de beleza profissional"}
                   </p>
+                  {remainingCredits > 0 && (
+                    <div className="flex items-center gap-1.5 mt-1">
+                      <Package className="w-3.5 h-3.5 text-primary" />
+                      <span className="text-xs font-medium text-primary">
+                        Você tem {remainingCredits} {remainingCredits === 1 ? "crédito" : "créditos"} disponíve{remainingCredits === 1 ? "l" : "is"}
+                      </span>
+                    </div>
+                  )}
                 </div>
                 
                 {/* Price and duration row */}
