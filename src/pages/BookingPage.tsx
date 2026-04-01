@@ -23,6 +23,7 @@ import { PopupTrigger } from "@/components/booking/PopupTrigger";
 import { LocationSection } from "@/components/booking/LocationSection";
 import { usePlatformSettings } from "@/hooks/usePlatformSettings";
 import { usePublicPaymentMethods } from "@/hooks/usePaymentMethods";
+import { useClientCredits } from "@/hooks/usePackages";
 
 function getTodayISO(): string {
   const d = new Date();
