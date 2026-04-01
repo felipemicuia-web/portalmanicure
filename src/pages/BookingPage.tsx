@@ -440,6 +440,7 @@ export default function BookingPage() {
           discount_type: couponData?.discount_type || null,
           discount_value: couponData?.discount_value || 0,
           discount_amount: couponData?.discount_amount || 0,
+          payment_status: advancePaymentRequired ? 'pendente' : 'na',
         })
         .select()
         .single();
