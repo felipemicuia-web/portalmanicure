@@ -42,7 +42,6 @@ interface ProfileUser {
   created_at: string;
   updated_at: string;
   notes: string | null;
-  notes: string | null;
   advance_payment_required: boolean;
   advance_payment_percentage: number;
   advance_payment_message: string | null;
