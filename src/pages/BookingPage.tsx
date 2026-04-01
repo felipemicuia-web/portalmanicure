@@ -413,6 +413,7 @@ export default function BookingPage() {
           client_phone: phoneDigits,
           notes: notes.trim() || null,
           tenant_id: tenantId,
+          payment_method: selectedPaymentMethod || null,
           coupon_id: couponData?.coupon_id || null,
           coupon_code: couponData?.code || null,
           discount_type: couponData?.discount_type || null,
