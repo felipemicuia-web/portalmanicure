@@ -185,8 +185,6 @@ export function AdminPackages() {
       toast({ title: "Selecione cliente e pacote", variant: "destructive" });
       return;
     }
-    const { createPurchase } = usePackagePurchases();
-    // Direct insert since we're in admin context
     const { error } = await supabase.from("client_package_purchases").insert({
       tenant_id: tenantId,
       client_id: assignClientId,

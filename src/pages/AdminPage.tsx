@@ -25,6 +25,7 @@ import { AdminAnnouncement } from "@/components/admin/AdminAnnouncement";
 
 import { AdminUsers } from "@/components/admin/AdminUsers";
 import { AdminCoupons } from "@/components/admin/AdminCoupons";
+import { AdminPackages } from "@/components/admin/AdminPackages";
 import {
   Users,
   Sparkles,
@@ -47,6 +48,7 @@ import {
   MapPin,
   Plug,
   MessageSquareText,
+  Package,
   type LucideIcon,
 } from "lucide-react";
 
