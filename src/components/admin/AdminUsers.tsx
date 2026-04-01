@@ -380,7 +380,56 @@ export function AdminUsers() {
                   </Button>
                 </div>
 
-                {/* Booking History */}
+                {/* Advance Payment */}
+                <div className="space-y-3 border border-border/60 rounded-lg p-3 bg-muted/30">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <DollarSign className="w-4 h-4 text-muted-foreground" />
+                      <p className="text-sm font-medium">Pagamento antecipado</p>
+                    </div>
+                    <Switch
+                      checked={advancePayment}
+                      onCheckedChange={setAdvancePayment}
+                    />
+                  </div>
+
+                  {advancePayment && (
+                    <div className="space-y-3">
+                      <div>
+                        <Label className="text-xs text-muted-foreground">
+                          Porcentagem exigida: {advancePercentage}%
+                        </Label>
+                        <Slider
+                          value={[advancePercentage]}
+                          onValueChange={(v) => setAdvancePercentage(v[0])}
+                          min={10}
+                          max={100}
+                          step={5}
+                          className="mt-2"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-xs text-muted-foreground">
+                          Mensagem para o cliente
+                        </Label>
+                        <Textarea
+                          placeholder="Ex: Devido ao histórico, solicitamos pagamento antecipado de 50% via Pix antes da confirmação."
+                          value={advanceMessage}
+                          onChange={(e) => setAdvanceMessage(e.target.value)}
+                          rows={3}
+                          className="mt-1"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  <Button size="sm" onClick={saveAdvancePayment} disabled={savingAdvance} className="gap-1">
+                    <Save className="w-3.5 h-3.5" />
+                    {savingAdvance ? "Salvando..." : "Salvar pagamento antecipado"}
+                  </Button>
+                </div>
+
+
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
                     <CalendarDays className="w-4 h-4 text-muted-foreground" />
