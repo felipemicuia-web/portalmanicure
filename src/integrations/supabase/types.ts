@@ -1110,6 +1110,9 @@ export type Database = {
       }
       profiles: {
         Row: {
+          advance_payment_message: string | null
+          advance_payment_percentage: number
+          advance_payment_required: boolean
           avatar_url: string | null
           blocked: boolean
           created_at: string
@@ -1122,6 +1125,9 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          advance_payment_message?: string | null
+          advance_payment_percentage?: number
+          advance_payment_required?: boolean
           avatar_url?: string | null
           blocked?: boolean
           created_at?: string
@@ -1134,6 +1140,9 @@ export type Database = {
           user_id: string
         }
         Update: {
+          advance_payment_message?: string | null
+          advance_payment_percentage?: number
+          advance_payment_required?: boolean
           avatar_url?: string | null
           blocked?: boolean
           created_at?: string
