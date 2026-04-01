@@ -44,6 +44,7 @@ interface BookingConfirmProps {
   selectedPaymentMethod: string;
   onPaymentMethodChange: (value: string) => void;
   advancePaymentMessage?: string | null;
+  advancePaymentPercentage?: number;
 }
 
 function formatPrice(value: number): string {

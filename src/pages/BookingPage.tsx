@@ -661,6 +661,7 @@ export default function BookingPage() {
                     selectedPaymentMethod={selectedPaymentMethod}
                     onPaymentMethodChange={setSelectedPaymentMethod}
                     advancePaymentMessage={advancePaymentMessage}
+                    advancePaymentPercentage={advancePaymentPercentage}
                   />
                 )}
               </div>
