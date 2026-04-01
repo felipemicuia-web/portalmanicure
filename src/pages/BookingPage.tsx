@@ -489,18 +489,7 @@ export default function BookingPage() {
 
       if (servicesError) throw servicesError;
 
-      // Consume package credits if available
-      for (const serviceId of selectedServiceIds) {
-        const bestCredit = getBestCreditForService(serviceId);
-        if (bestCredit) {
-          await supabase.rpc("consume_package_credit", {
-            p_purchase_id: bestCredit.purchase_id,
-            p_service_id: serviceId,
-            p_booking_id: booking.id,
-            p_tenant_id: tenantId,
-          });
-        }
-      }
+      // Package credits are consumed only when admin completes the booking
 
       // Update profile name and phone only (not notes - those are booking-specific)
       await supabase

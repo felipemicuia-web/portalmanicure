@@ -357,6 +357,55 @@ export function AdminBookings() {
       toast.error("Erro ao concluir agendamento");
       return;
     }
+
+    // Consume package credits on completion
+    if (tenantId) {
+      try {
+        // Get services for this booking
+        const { data: bookingServices } = await supabase
+          .from("booking_services")
+          .select("service_id")
+          .eq("booking_id", booking.id)
+          .eq("tenant_id", tenantId);
+
+        if (bookingServices?.length) {
+          // Get active purchases for this client
+          const { data: purchases } = await supabase
+            .from("client_package_purchases")
+            .select("id")
+            .eq("tenant_id", tenantId)
+            .eq("client_id", booking.user_id)
+            .eq("status", "active");
+
+          if (purchases?.length) {
+            const purchaseIds = purchases.map((p) => p.id);
+            const { data: credits } = await supabase
+              .from("client_package_credits")
+              .select("*")
+              .eq("tenant_id", tenantId)
+              .in("purchase_id", purchaseIds);
+
+            for (const bs of bookingServices) {
+              const available = (credits || [])
+                .filter((c) => c.service_id === bs.service_id && (c.credits_total - c.credits_used) > 0)
+                .sort((a, b) => (a.credits_total - a.credits_used) - (b.credits_total - b.credits_used));
+
+              if (available.length > 0) {
+                await supabase.rpc("consume_package_credit", {
+                  p_purchase_id: available[0].purchase_id,
+                  p_service_id: bs.service_id,
+                  p_booking_id: booking.id,
+                  p_tenant_id: tenantId,
+                });
+              }
+            }
+          }
+        }
+      } catch (err) {
+        logger.error("Error consuming package credits:", err);
+      }
+    }
+
     toast.success("Agendamento concluído!");
     setBookings((prev) => prev.map((b) => b.id === booking.id ? { ...b, status: "completed" } : b));
   };
