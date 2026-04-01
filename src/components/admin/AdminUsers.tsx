@@ -321,6 +321,12 @@ export function AdminUsers() {
                 )}
               </div>
               <div className="flex items-center gap-2 shrink-0">
+                {user.advance_payment_required && (
+                  <Badge variant="outline" className="text-[10px] border-primary/50 text-primary">
+                    <DollarSign className="w-2.5 h-2.5 mr-0.5" />
+                    Antecipado
+                  </Badge>
+                )}
                 {user.blocked ? (
                   <Badge variant="destructive" className="text-xs">Bloqueado</Badge>
                 ) : (
