@@ -28,7 +28,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import {
-  Search, Trash2, ShieldBan, ShieldCheck, User, Phone, Calendar,
+  Search, Trash2, ShieldBan, ShieldCheck, User, Phone, Calendar, Mail,
   Eye, StickyNote, Clock, CalendarDays, CreditCard, Sparkles, Save, DollarSign,
 } from "lucide-react";
 
@@ -45,6 +45,7 @@ interface ProfileUser {
   advance_payment_required: boolean;
   advance_payment_percentage: number;
   advance_payment_message: string | null;
+  email?: string | null;
 }
 
 interface UserBooking {
@@ -88,9 +89,25 @@ export function AdminUsers() {
 
     if (error) {
       toast({ title: "Erro ao carregar usuários", description: error.message, variant: "destructive" });
-    } else {
-      setUsers(data || []);
+      setLoading(false);
+      return;
     }
+
+    // Fetch emails via secure function
+    const { data: emailData } = await supabase.rpc("get_user_emails_for_tenant", { p_tenant_id: tenantId });
+    const emailMap = new Map<string, string>();
+    if (emailData) {
+      (emailData as any[]).forEach((e: { user_id: string; email: string }) => {
+        emailMap.set(e.user_id, e.email);
+      });
+    }
+
+    const usersWithEmail = (data || []).map((u) => ({
+      ...u,
+      email: emailMap.get(u.user_id) || null,
+    }));
+
+    setUsers(usersWithEmail);
     setLoading(false);
   };
 
@@ -232,7 +249,8 @@ export function AdminUsers() {
     return (
       (u.name || "").toLowerCase().includes(term) ||
       (u.phone || "").includes(term) ||
-      (u.notes || "").toLowerCase().includes(term)
+      (u.notes || "").toLowerCase().includes(term) ||
+      (u.email || "").toLowerCase().includes(term)
     );
   });
 
@@ -293,6 +311,12 @@ export function AdminUsers() {
                   <Phone className="w-3 h-3" />
                   {user.phone || "—"}
                 </p>
+                {user.email && (
+                  <p className="text-xs text-muted-foreground flex items-center gap-1">
+                    <Mail className="w-3 h-3" />
+                    {user.email}
+                  </p>
+                )}
               </div>
               <div className="flex items-center gap-2 shrink-0">
                 {user.advance_payment_required && (
@@ -343,6 +367,13 @@ export function AdminUsers() {
                     <div>
                       <p className="text-xs text-muted-foreground">Telefone</p>
                       <p className="font-medium">{selectedUser.phone || "Não informado"}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 p-2 rounded-md bg-muted/50">
+                    <Mail className="w-4 h-4 text-muted-foreground shrink-0" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">Email</p>
+                      <p className="font-medium">{selectedUser.email || "Não informado"}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2 p-2 rounded-md bg-muted/50">
