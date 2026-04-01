@@ -279,6 +279,21 @@ export function BookingConfirm({
         />
       )}
 
+      {/* Advance Payment Warning */}
+      {!isConfirmed && advancePaymentMessage && (
+        <div className="border-2 border-amber-500/50 bg-amber-500/10 rounded-xl p-3 sm:p-4 space-y-1">
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-amber-500/20 flex items-center justify-center flex-shrink-0">
+              <Wallet className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-500" />
+            </div>
+            <p className="text-sm sm:text-base font-bold text-amber-400">⚠️ Pagamento Antecipado Obrigatório</p>
+          </div>
+          <p className="text-xs sm:text-sm text-amber-300/90 whitespace-pre-line pl-9 sm:pl-10">
+            {advancePaymentMessage}
+          </p>
+        </div>
+      )}
+
       {/* Form - Stack on mobile */}
       <div className="space-y-4 sm:space-y-5">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">
