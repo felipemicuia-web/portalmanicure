@@ -65,6 +65,7 @@ export default function BookingPage() {
   const [draftRestored, setDraftRestored] = useState(false);
   const { methods: paymentMethods } = usePublicPaymentMethods();
   const [professionalServiceIds, setProfessionalServiceIds] = useState<string[]>([]);
+  const { getCreditsForService, getBestCreditForService, fetchCredits: refreshCredits } = useClientCredits(user?.id);
 
   // Fetch services linked to selected professional — scoped to tenant
   useEffect(() => {
