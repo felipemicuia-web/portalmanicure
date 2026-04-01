@@ -121,7 +121,7 @@ export function ServiceList({
                   <div className={cn(
                     "flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-medium transition-all",
                     isSelected
-                      ? "bg-green-500/20 text-green-400 border border-green-500/30"
+                      ? "bg-primary/20 text-primary border border-primary/30"
                       : "bg-muted/50 text-muted-foreground border border-border/50"
                   )}>
                     {isSelected ? (
