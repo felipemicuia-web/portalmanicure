@@ -24,9 +24,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Slider } from "@/components/ui/slider";
 import {
   Search, Trash2, ShieldBan, ShieldCheck, User, Phone, Calendar,
-  Eye, StickyNote, Clock, CalendarDays, CreditCard, Sparkles, Save,
+  Eye, StickyNote, Clock, CalendarDays, CreditCard, Sparkles, Save, DollarSign,
 } from "lucide-react";
 
 interface ProfileUser {
