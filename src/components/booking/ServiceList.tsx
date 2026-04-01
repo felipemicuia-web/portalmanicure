@@ -50,6 +50,7 @@ export function ServiceList({
       <div className="flex flex-col gap-3 mt-2 sm:mt-3">
         {services.map((service) => {
           const isSelected = selectedIds.includes(service.id);
+          const remainingCredits = creditsMap[service.id] || 0;
           return (
             <article
               key={service.id}
