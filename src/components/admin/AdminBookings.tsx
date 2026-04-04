@@ -504,7 +504,7 @@ export function AdminBookings() {
                 onClick={(e) => { e.stopPropagation(); togglePaymentStatus(booking); }}
               >
                 <DollarSign className="w-3 h-3 mr-1" />
-                {booking.payment_status === "pendente" ? "Confirmar pgto" : "Marcar pendente"}
+                {booking.payment_status === "pendente" ? "Confirmar pagamento" : "Marcar pendente"}
               </Button>
             </div>
           )}
