@@ -470,9 +470,9 @@ export function AdminBookings() {
             <span className="font-medium truncate">{booking.client_name}</span>
             {getStatusBadge(booking.status)}
           </div>
-          <div className="flex items-center gap-1 text-sm text-muted-foreground mt-1">
-            <Phone className="w-3 h-3" />
-            {formatPhone(booking.client_phone)}
+          <div className="flex items-center gap-1 text-sm text-muted-foreground mt-1 whitespace-nowrap">
+            <Phone className="w-3 h-3 shrink-0" />
+            <span className="whitespace-nowrap">{formatPhone(booking.client_phone)}</span>
           </div>
           <div className="flex items-center gap-3 mt-2 text-sm">
             <div className="flex items-center gap-1">
