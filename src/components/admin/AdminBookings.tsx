@@ -791,7 +791,7 @@ export function AdminBookings() {
                 <TableBody>
                   {filteredPending.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={7} className="text-center text-muted-foreground py-8">Nenhum agendamento ativo</TableCell>
+                      <TableCell colSpan={8} className="text-center text-muted-foreground py-8">Nenhum agendamento ativo</TableCell>
                     </TableRow>
                   ) : (
                     filteredPending.map((booking) => <BookingTableRow key={booking.id} booking={booking} />)
