@@ -580,10 +580,10 @@ export function AdminBookings() {
 
   const BookingTableRow = ({ booking }: { booking: Booking }) => (
     <TableRow>
-      <TableCell className="text-sm">{formatDateBR(booking.booking_date)}</TableCell>
-      <TableCell className="text-sm">{booking.booking_time.slice(0, 5)}</TableCell>
-      <TableCell>
-        <div className="flex items-center gap-2 min-w-0">
+      <TableCell className="px-2 py-2 text-sm whitespace-nowrap">{formatDateBR(booking.booking_date)}</TableCell>
+      <TableCell className="px-2 py-2 text-sm whitespace-nowrap">{booking.booking_time.slice(0, 5)}</TableCell>
+      <TableCell className="px-2 py-2">
+        <div className="flex items-center gap-1.5 min-w-0">
           <Avatar className="h-7 w-7 flex-shrink-0">
             <AvatarImage src={getClientAvatar(booking.user_id) || undefined} alt={booking.client_name} />
             <AvatarFallback className="text-xs bg-primary/10 text-primary">
@@ -599,27 +599,27 @@ export function AdminBookings() {
           </div>
         </div>
       </TableCell>
-      <TableCell className="text-sm truncate">{getProfessionalName(booking.professional_id)}</TableCell>
-      <TableCell className="text-right text-sm">{formatPrice(booking.total_price)}</TableCell>
-      <TableCell className="text-center">{getStatusBadge(booking.status)}</TableCell>
-      <TableCell className="text-center">
-        <div className="flex flex-col items-center gap-1">
+      <TableCell className="px-2 py-2 text-sm">{getProfessionalName(booking.professional_id)}</TableCell>
+      <TableCell className="px-2 py-2 text-right text-sm whitespace-nowrap">{formatPrice(booking.total_price)}</TableCell>
+      <TableCell className="px-2 py-2 text-center">{getStatusBadge(booking.status)}</TableCell>
+      <TableCell className="px-2 py-2 text-center">
+        <div className="flex flex-col items-center gap-0.5">
           {booking.payment_method ? (
             <span className="text-xs text-muted-foreground whitespace-nowrap">💳 {booking.payment_method}</span>
           ) : (
             <span className="text-xs text-muted-foreground">—</span>
           )}
           {booking.payment_status !== "na" && (
-            <div className="flex items-center justify-center gap-1">
+            <div className="flex items-center justify-center gap-0.5">
               {getPaymentStatusBadge(booking.payment_status)}
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-7 w-7"
+                className="h-6 w-6"
                 onClick={() => togglePaymentStatus(booking)}
                 title={booking.payment_status === "pendente" ? "Confirmar pagamento" : "Marcar pendente"}
               >
-                <DollarSign className="w-3.5 h-3.5" />
+                <DollarSign className="w-3 h-3" />
               </Button>
             </div>
           )}
