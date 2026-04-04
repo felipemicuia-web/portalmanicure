@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef, ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useTenant } from "@/contexts/TenantContext";
+import { TENANT_DEFAULT_ID } from "@/config/tenant";
 
 // Theme presets - single source of truth
 export interface ThemeColors {
