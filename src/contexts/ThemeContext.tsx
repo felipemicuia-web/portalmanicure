@@ -298,7 +298,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [animationId, setAnimationId] = useState("auto");
   const [loading, setLoading] = useState(true);
   const { tenantId, isSuperAdmin, loading: tenantLoading } = useTenant();
-  const canEditTheme = !!tenantId && !isSuperAdmin;
+  const canEditTheme = !!tenantId && (!isSuperAdmin || tenantId === TENANT_DEFAULT_ID);
   const currentThemeIdRef = useRef(currentThemeId);
 
   const resolvedAnimationId = animationId === "auto"
