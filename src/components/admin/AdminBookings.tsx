@@ -625,39 +625,39 @@ export function AdminBookings() {
           )}
         </div>
       </TableCell>
-      <TableCell>
-        <div className="flex items-center justify-center gap-1">
+      <TableCell className="px-2 py-2">
+        <div className="flex items-center justify-center gap-0.5">
           {booking.status === "confirmed" && (
             <Button
               variant="ghost"
               size="icon"
               onClick={() => handleQuickComplete(booking)}
-              className="h-8 w-8 text-blue-500 hover:text-blue-600"
+              className="h-7 w-7 text-blue-500 hover:text-blue-600"
               title="Concluir"
             >
-              <CheckCircle className="w-4 h-4" />
+              <CheckCircle className="w-3.5 h-3.5" />
             </Button>
           )}
           <a
             href={getWhatsAppUrl(booking)}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center h-8 w-8 rounded-md text-green-500 hover:text-green-600 hover:bg-accent"
+            className="inline-flex items-center justify-center h-7 w-7 rounded-md text-green-500 hover:text-green-600 hover:bg-accent"
             title="Enviar via WhatsApp"
           >
-            <MessageCircle className="w-4 h-4" />
+            <MessageCircle className="w-3.5 h-3.5" />
           </a>
-          <Button variant="ghost" size="icon" onClick={() => openEditDialog(booking)} className="h-8 w-8">
-            <Pencil className="w-4 h-4" />
+          <Button variant="ghost" size="icon" onClick={() => openEditDialog(booking)} className="h-7 w-7">
+            <Pencil className="w-3.5 h-3.5" />
           </Button>
           <Button
             variant="ghost"
             size="icon"
             onClick={() => setSoftDeletingBooking(booking)}
-            className="h-8 w-8 text-destructive hover:text-destructive"
+            className="h-7 w-7 text-destructive hover:text-destructive"
             title="Mover para lixeira"
           >
-            <Trash2 className="w-4 h-4" />
+            <Trash2 className="w-3.5 h-3.5" />
           </Button>
         </div>
       </TableCell>
