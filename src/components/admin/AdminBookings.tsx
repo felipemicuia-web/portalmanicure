@@ -855,17 +855,17 @@ export function AdminBookings() {
               )}
             </div>
           ) : (
-            <div className="glass-panel overflow-x-auto">
-              <Table>
+            <div className="glass-panel overflow-hidden">
+              <Table className="w-full table-fixed text-sm">
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Data</TableHead>
-                    <TableHead>Horário</TableHead>
-                    <TableHead>Cliente</TableHead>
-                    <TableHead>Profissional</TableHead>
-                    <TableHead className="text-center">Status</TableHead>
-                    <TableHead>Deletado em</TableHead>
-                    <TableHead className="text-center">Ações</TableHead>
+                    <TableHead className="px-2 py-2 w-[12%]">Data</TableHead>
+                    <TableHead className="px-2 py-2 w-[10%]">Horário</TableHead>
+                    <TableHead className="px-2 py-2 w-[22%]">Cliente</TableHead>
+                    <TableHead className="px-2 py-2 w-[16%]">Profissional</TableHead>
+                    <TableHead className="px-2 py-2 w-[12%] text-center">Status</TableHead>
+                    <TableHead className="px-2 py-2 w-[16%]">Deletado em</TableHead>
+                    <TableHead className="px-2 py-2 w-[12%] text-center">Ações</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
