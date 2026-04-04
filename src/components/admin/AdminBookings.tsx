@@ -580,10 +580,10 @@ export function AdminBookings() {
 
   const BookingTableRow = ({ booking }: { booking: Booking }) => (
     <TableRow>
-      <TableCell className="text-sm">{formatDateBR(booking.booking_date)}</TableCell>
-      <TableCell className="text-sm">{booking.booking_time.slice(0, 5)}</TableCell>
-      <TableCell>
-        <div className="flex items-center gap-2 min-w-0">
+      <TableCell className="px-2 py-2 text-sm whitespace-nowrap">{formatDateBR(booking.booking_date)}</TableCell>
+      <TableCell className="px-2 py-2 text-sm whitespace-nowrap">{booking.booking_time.slice(0, 5)}</TableCell>
+      <TableCell className="px-2 py-2">
+        <div className="flex items-center gap-1.5 min-w-0">
           <Avatar className="h-7 w-7 flex-shrink-0">
             <AvatarImage src={getClientAvatar(booking.user_id) || undefined} alt={booking.client_name} />
             <AvatarFallback className="text-xs bg-primary/10 text-primary">
@@ -599,65 +599,65 @@ export function AdminBookings() {
           </div>
         </div>
       </TableCell>
-      <TableCell className="text-sm truncate">{getProfessionalName(booking.professional_id)}</TableCell>
-      <TableCell className="text-right text-sm">{formatPrice(booking.total_price)}</TableCell>
-      <TableCell className="text-center">{getStatusBadge(booking.status)}</TableCell>
-      <TableCell className="text-center">
-        <div className="flex flex-col items-center gap-1">
+      <TableCell className="px-2 py-2 text-sm">{getProfessionalName(booking.professional_id)}</TableCell>
+      <TableCell className="px-2 py-2 text-right text-sm whitespace-nowrap">{formatPrice(booking.total_price)}</TableCell>
+      <TableCell className="px-2 py-2 text-center">{getStatusBadge(booking.status)}</TableCell>
+      <TableCell className="px-2 py-2 text-center">
+        <div className="flex flex-col items-center gap-0.5">
           {booking.payment_method ? (
             <span className="text-xs text-muted-foreground whitespace-nowrap">💳 {booking.payment_method}</span>
           ) : (
             <span className="text-xs text-muted-foreground">—</span>
           )}
           {booking.payment_status !== "na" && (
-            <div className="flex items-center justify-center gap-1">
+            <div className="flex items-center justify-center gap-0.5">
               {getPaymentStatusBadge(booking.payment_status)}
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-7 w-7"
+                className="h-6 w-6"
                 onClick={() => togglePaymentStatus(booking)}
                 title={booking.payment_status === "pendente" ? "Confirmar pagamento" : "Marcar pendente"}
               >
-                <DollarSign className="w-3.5 h-3.5" />
+                <DollarSign className="w-3 h-3" />
               </Button>
             </div>
           )}
         </div>
       </TableCell>
-      <TableCell>
-        <div className="flex items-center justify-center gap-1">
+      <TableCell className="px-2 py-2">
+        <div className="flex items-center justify-center gap-0.5">
           {booking.status === "confirmed" && (
             <Button
               variant="ghost"
               size="icon"
               onClick={() => handleQuickComplete(booking)}
-              className="h-8 w-8 text-blue-500 hover:text-blue-600"
+              className="h-7 w-7 text-blue-500 hover:text-blue-600"
               title="Concluir"
             >
-              <CheckCircle className="w-4 h-4" />
+              <CheckCircle className="w-3.5 h-3.5" />
             </Button>
           )}
           <a
             href={getWhatsAppUrl(booking)}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center h-8 w-8 rounded-md text-green-500 hover:text-green-600 hover:bg-accent"
+            className="inline-flex items-center justify-center h-7 w-7 rounded-md text-green-500 hover:text-green-600 hover:bg-accent"
             title="Enviar via WhatsApp"
           >
-            <MessageCircle className="w-4 h-4" />
+            <MessageCircle className="w-3.5 h-3.5" />
           </a>
-          <Button variant="ghost" size="icon" onClick={() => openEditDialog(booking)} className="h-8 w-8">
-            <Pencil className="w-4 h-4" />
+          <Button variant="ghost" size="icon" onClick={() => openEditDialog(booking)} className="h-7 w-7">
+            <Pencil className="w-3.5 h-3.5" />
           </Button>
           <Button
             variant="ghost"
             size="icon"
             onClick={() => setSoftDeletingBooking(booking)}
-            className="h-8 w-8 text-destructive hover:text-destructive"
+            className="h-7 w-7 text-destructive hover:text-destructive"
             title="Mover para lixeira"
           >
-            <Trash2 className="w-4 h-4" />
+            <Trash2 className="w-3.5 h-3.5" />
           </Button>
         </div>
       </TableCell>
@@ -775,23 +775,23 @@ export function AdminBookings() {
             </div>
           ) : (
             <div className="glass-panel overflow-hidden">
-              <Table className="table-fixed w-full">
+              <Table className="w-full text-sm">
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-[90px]"><div className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> Data</div></TableHead>
-                    <TableHead className="w-[70px]"><div className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> Hora</div></TableHead>
-                    <TableHead><div className="flex items-center gap-1"><User className="w-3.5 h-3.5" /> Cliente</div></TableHead>
-                    <TableHead className="w-[110px]">Profissional</TableHead>
-                    <TableHead className="w-[80px] text-right">Valor</TableHead>
-                    <TableHead className="w-[90px] text-center">Status</TableHead>
-                    <TableHead className="w-[140px] text-center">Pagamento</TableHead>
-                    <TableHead className="w-[130px] text-center">Ações</TableHead>
+                    <TableHead className="px-2 py-2 whitespace-nowrap"><div className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> Data</div></TableHead>
+                    <TableHead className="px-2 py-2 whitespace-nowrap"><div className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> Hora</div></TableHead>
+                    <TableHead className="px-2 py-2"><div className="flex items-center gap-1"><User className="w-3.5 h-3.5" /> Cliente</div></TableHead>
+                    <TableHead className="px-2 py-2">Profissional</TableHead>
+                    <TableHead className="px-2 py-2 text-right whitespace-nowrap">Valor</TableHead>
+                    <TableHead className="px-2 py-2 text-center">Status</TableHead>
+                    <TableHead className="px-2 py-2 text-center">Pagamento</TableHead>
+                    <TableHead className="px-2 py-2 text-center">Ações</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredPending.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={7} className="text-center text-muted-foreground py-8">Nenhum agendamento ativo</TableCell>
+                      <TableCell colSpan={8} className="text-center text-muted-foreground py-8">Nenhum agendamento ativo</TableCell>
                     </TableRow>
                   ) : (
                     filteredPending.map((booking) => <BookingTableRow key={booking.id} booking={booking} />)
@@ -814,23 +814,23 @@ export function AdminBookings() {
             </div>
           ) : (
             <div className="glass-panel overflow-hidden">
-              <Table className="table-fixed w-full">
+              <Table className="w-full text-sm">
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-[90px]"><div className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> Data</div></TableHead>
-                    <TableHead className="w-[70px]"><div className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> Hora</div></TableHead>
-                    <TableHead><div className="flex items-center gap-1"><User className="w-3.5 h-3.5" /> Cliente</div></TableHead>
-                    <TableHead className="w-[110px]">Profissional</TableHead>
-                    <TableHead className="w-[80px] text-right">Valor</TableHead>
-                    <TableHead className="w-[90px] text-center">Status</TableHead>
-                    <TableHead className="w-[140px] text-center">Pagamento</TableHead>
-                    <TableHead className="w-[130px] text-center">Ações</TableHead>
+                    <TableHead className="px-2 py-2 whitespace-nowrap"><div className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> Data</div></TableHead>
+                    <TableHead className="px-2 py-2 whitespace-nowrap"><div className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> Hora</div></TableHead>
+                    <TableHead className="px-2 py-2"><div className="flex items-center gap-1"><User className="w-3.5 h-3.5" /> Cliente</div></TableHead>
+                    <TableHead className="px-2 py-2">Profissional</TableHead>
+                    <TableHead className="px-2 py-2 text-right whitespace-nowrap">Valor</TableHead>
+                    <TableHead className="px-2 py-2 text-center">Status</TableHead>
+                    <TableHead className="px-2 py-2 text-center">Pagamento</TableHead>
+                    <TableHead className="px-2 py-2 text-center">Ações</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredFinished.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={7} className="text-center text-muted-foreground py-8">Nenhum agendamento finalizado</TableCell>
+                      <TableCell colSpan={8} className="text-center text-muted-foreground py-8">Nenhum agendamento finalizado</TableCell>
                     </TableRow>
                   ) : (
                     filteredFinished.map((booking) => <BookingTableRow key={booking.id} booking={booking} />)
