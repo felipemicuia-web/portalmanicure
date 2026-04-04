@@ -124,7 +124,7 @@ export function AdminTheme() {
             <div>
               <h2 className="text-xl font-bold">Escolha o Estilo do Site</h2>
               <p className="text-muted-foreground text-sm">
-                {isSuperAdmin
+                {isSuperAdmin && !canEditTheme
                   ? "Conta superadmin não pode alterar o tema dos tenants"
                   : "Escolha cores e animações para personalizar seu site"}
               </p>
