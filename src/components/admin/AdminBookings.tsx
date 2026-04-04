@@ -775,17 +775,17 @@ export function AdminBookings() {
             </div>
           ) : (
             <div className="glass-panel overflow-hidden">
-              <Table className="w-full text-sm">
+              <Table className="w-full table-fixed text-sm">
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="px-2 py-2 whitespace-nowrap"><div className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> Data</div></TableHead>
-                    <TableHead className="px-2 py-2 whitespace-nowrap"><div className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> Hora</div></TableHead>
-                    <TableHead className="px-2 py-2"><div className="flex items-center gap-1"><User className="w-3.5 h-3.5" /> Cliente</div></TableHead>
-                    <TableHead className="px-2 py-2">Profissional</TableHead>
-                    <TableHead className="px-2 py-2 text-right whitespace-nowrap">Valor</TableHead>
-                    <TableHead className="px-2 py-2 text-center">Status</TableHead>
-                    <TableHead className="px-2 py-2 text-center">Pagamento</TableHead>
-                    <TableHead className="px-2 py-2 text-center">Ações</TableHead>
+                    <TableHead className="px-2 py-2 w-[10%] whitespace-nowrap"><div className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> Data</div></TableHead>
+                    <TableHead className="px-2 py-2 w-[7%] whitespace-nowrap"><div className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> Hora</div></TableHead>
+                    <TableHead className="px-2 py-2 w-[22%]"><div className="flex items-center gap-1"><User className="w-3.5 h-3.5" /> Cliente</div></TableHead>
+                    <TableHead className="px-2 py-2 w-[15%]">Profissional</TableHead>
+                    <TableHead className="px-2 py-2 w-[10%] text-right whitespace-nowrap">Valor</TableHead>
+                    <TableHead className="px-2 py-2 w-[12%] text-center">Status</TableHead>
+                    <TableHead className="px-2 py-2 w-[12%] text-center">Pagamento</TableHead>
+                    <TableHead className="px-2 py-2 w-[12%] text-center">Ações</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
