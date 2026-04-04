@@ -603,22 +603,27 @@ export function AdminBookings() {
       <TableCell className="text-right">{formatPrice(booking.total_price)}</TableCell>
       <TableCell className="text-center">{getStatusBadge(booking.status)}</TableCell>
       <TableCell className="text-center">
-        {booking.payment_status !== "na" ? (
-          <div className="flex items-center justify-center gap-1">
-            {getPaymentStatusBadge(booking.payment_status)}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-7 w-7"
-              onClick={() => togglePaymentStatus(booking)}
-              title={booking.payment_status === "pendente" ? "Confirmar pagamento" : "Marcar pendente"}
-            >
-              <DollarSign className="w-3.5 h-3.5" />
-            </Button>
-          </div>
-        ) : (
-          <span className="text-xs text-muted-foreground">—</span>
-        )}
+        <div className="flex flex-col items-center gap-1">
+          {booking.payment_method ? (
+            <span className="text-xs text-muted-foreground whitespace-nowrap">💳 {booking.payment_method}</span>
+          ) : (
+            <span className="text-xs text-muted-foreground">—</span>
+          )}
+          {booking.payment_status !== "na" && (
+            <div className="flex items-center justify-center gap-1">
+              {getPaymentStatusBadge(booking.payment_status)}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7"
+                onClick={() => togglePaymentStatus(booking)}
+                title={booking.payment_status === "pendente" ? "Confirmar pagamento" : "Marcar pendente"}
+              >
+                <DollarSign className="w-3.5 h-3.5" />
+              </Button>
+            </div>
+          )}
+        </div>
       </TableCell>
       <TableCell>
         <div className="flex items-center justify-center gap-1">
