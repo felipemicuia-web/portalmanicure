@@ -491,7 +491,7 @@ export function AdminBookings() {
           </div>
           {booking.payment_method && (
             <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
-              💳 {booking.payment_method}
+              {booking.payment_method}
             </div>
           )}
           {booking.payment_status !== "na" && (
