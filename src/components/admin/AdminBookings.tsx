@@ -605,7 +605,7 @@ export function AdminBookings() {
       <TableCell className="px-2 py-2 text-center">
         <div className="flex flex-col items-center gap-0.5">
           {booking.payment_method ? (
-            <span className="text-xs text-muted-foreground whitespace-nowrap">💳 {booking.payment_method}</span>
+            <span className="text-xs text-muted-foreground whitespace-nowrap">{booking.payment_method}</span>
           ) : (
             <span className="text-xs text-muted-foreground">—</span>
           )}
