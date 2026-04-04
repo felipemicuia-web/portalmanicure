@@ -830,7 +830,7 @@ export function AdminBookings() {
                 <TableBody>
                   {filteredFinished.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={7} className="text-center text-muted-foreground py-8">Nenhum agendamento finalizado</TableCell>
+                      <TableCell colSpan={8} className="text-center text-muted-foreground py-8">Nenhum agendamento finalizado</TableCell>
                     </TableRow>
                   ) : (
                     filteredFinished.map((booking) => <BookingTableRow key={booking.id} booking={booking} />)
