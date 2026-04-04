@@ -580,27 +580,27 @@ export function AdminBookings() {
 
   const BookingTableRow = ({ booking }: { booking: Booking }) => (
     <TableRow>
-      <TableCell>{formatDateBR(booking.booking_date)}</TableCell>
-      <TableCell>{booking.booking_time.slice(0, 5)}</TableCell>
+      <TableCell className="text-sm">{formatDateBR(booking.booking_date)}</TableCell>
+      <TableCell className="text-sm">{booking.booking_time.slice(0, 5)}</TableCell>
       <TableCell>
-        <div className="flex items-center gap-2">
-          <Avatar className="h-8 w-8 flex-shrink-0">
+        <div className="flex items-center gap-2 min-w-0">
+          <Avatar className="h-7 w-7 flex-shrink-0">
             <AvatarImage src={getClientAvatar(booking.user_id) || undefined} alt={booking.client_name} />
             <AvatarFallback className="text-xs bg-primary/10 text-primary">
               {getClientInitials(booking.client_name)}
             </AvatarFallback>
           </Avatar>
-          <div>
-            <span>{booking.client_name}</span>
-            <p className="text-xs text-muted-foreground flex items-center gap-1 whitespace-nowrap">
+          <div className="min-w-0">
+            <span className="text-sm truncate block">{booking.client_name}</span>
+            <p className="text-xs text-muted-foreground flex items-center gap-1">
               <Phone className="w-3 h-3 shrink-0" />
-              <span className="whitespace-nowrap">{formatPhone(booking.client_phone)}</span>
+              <span className="truncate">{formatPhone(booking.client_phone)}</span>
             </p>
           </div>
         </div>
       </TableCell>
-      <TableCell>{getProfessionalName(booking.professional_id)}</TableCell>
-      <TableCell className="text-right">{formatPrice(booking.total_price)}</TableCell>
+      <TableCell className="text-sm truncate">{getProfessionalName(booking.professional_id)}</TableCell>
+      <TableCell className="text-right text-sm">{formatPrice(booking.total_price)}</TableCell>
       <TableCell className="text-center">{getStatusBadge(booking.status)}</TableCell>
       <TableCell className="text-center">
         <div className="flex flex-col items-center gap-1">
