@@ -194,9 +194,9 @@ export function AdminBookings() {
   const getPaymentStatusBadge = (paymentStatus: string) => {
     switch (paymentStatus) {
       case "pendente":
-        return <Badge className="bg-amber-500/20 text-amber-400 border-amber-500/30 text-xs">Pgto Pendente</Badge>;
+        return <Badge className="bg-amber-500/20 text-amber-400 border-amber-500/30 text-xs whitespace-nowrap">Pagamento Pendente</Badge>;
       case "pago":
-        return <Badge className="bg-green-500/20 text-green-400 border-green-500/30 text-xs">Pgto Pago</Badge>;
+        return <Badge className="bg-green-500/20 text-green-400 border-green-500/30 text-xs whitespace-nowrap">Pagamento Pago</Badge>;
       default:
         return null;
     }
@@ -470,9 +470,9 @@ export function AdminBookings() {
             <span className="font-medium truncate">{booking.client_name}</span>
             {getStatusBadge(booking.status)}
           </div>
-          <div className="flex items-center gap-1 text-sm text-muted-foreground mt-1">
-            <Phone className="w-3 h-3" />
-            {formatPhone(booking.client_phone)}
+          <div className="flex items-center gap-1 text-sm text-muted-foreground mt-1 whitespace-nowrap">
+            <Phone className="w-3 h-3 shrink-0" />
+            <span className="whitespace-nowrap">{formatPhone(booking.client_phone)}</span>
           </div>
           <div className="flex items-center gap-3 mt-2 text-sm">
             <div className="flex items-center gap-1">
@@ -504,7 +504,7 @@ export function AdminBookings() {
                 onClick={(e) => { e.stopPropagation(); togglePaymentStatus(booking); }}
               >
                 <DollarSign className="w-3 h-3 mr-1" />
-                {booking.payment_status === "pendente" ? "Confirmar pgto" : "Marcar pendente"}
+                {booking.payment_status === "pendente" ? "Confirmar pagamento" : "Marcar pendente"}
               </Button>
             </div>
           )}
@@ -592,9 +592,9 @@ export function AdminBookings() {
           </Avatar>
           <div>
             <span>{booking.client_name}</span>
-            <p className="text-xs text-muted-foreground flex items-center gap-1">
-              <Phone className="w-3 h-3" />
-              {formatPhone(booking.client_phone)}
+            <p className="text-xs text-muted-foreground flex items-center gap-1 whitespace-nowrap">
+              <Phone className="w-3 h-3 shrink-0" />
+              <span className="whitespace-nowrap">{formatPhone(booking.client_phone)}</span>
             </p>
           </div>
         </div>
@@ -779,7 +779,7 @@ export function AdminBookings() {
                     <TableHead>Profissional</TableHead>
                     <TableHead className="text-right">Valor</TableHead>
                     <TableHead className="text-center">Status</TableHead>
-                    <TableHead className="text-center">Pgto</TableHead>
+                     <TableHead className="text-center">Pagamento</TableHead>
                     <TableHead className="text-center">Ações</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -818,7 +818,7 @@ export function AdminBookings() {
                     <TableHead>Profissional</TableHead>
                     <TableHead className="text-right">Valor</TableHead>
                     <TableHead className="text-center">Status</TableHead>
-                    <TableHead className="text-center">Pgto</TableHead>
+                     <TableHead className="text-center">Pagamento</TableHead>
                     <TableHead className="text-center">Ações</TableHead>
                   </TableRow>
                 </TableHeader>
