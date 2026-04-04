@@ -599,7 +599,7 @@ export function AdminBookings() {
           </div>
         </div>
       </TableCell>
-      <TableCell className="px-2 py-2 text-sm">{getProfessionalName(booking.professional_id)}</TableCell>
+      <TableCell className="px-2 py-2 text-sm truncate overflow-hidden">{getProfessionalName(booking.professional_id)}</TableCell>
       <TableCell className="px-2 py-2 text-right text-sm whitespace-nowrap">{formatPrice(booking.total_price)}</TableCell>
       <TableCell className="px-2 py-2 text-center">{getStatusBadge(booking.status)}</TableCell>
       <TableCell className="px-2 py-2 text-center">
@@ -775,17 +775,17 @@ export function AdminBookings() {
             </div>
           ) : (
             <div className="glass-panel overflow-hidden">
-              <Table className="w-full text-sm">
+              <Table className="w-full table-fixed text-sm">
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="px-2 py-2 whitespace-nowrap"><div className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> Data</div></TableHead>
-                    <TableHead className="px-2 py-2 whitespace-nowrap"><div className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> Hora</div></TableHead>
-                    <TableHead className="px-2 py-2"><div className="flex items-center gap-1"><User className="w-3.5 h-3.5" /> Cliente</div></TableHead>
-                    <TableHead className="px-2 py-2">Profissional</TableHead>
-                    <TableHead className="px-2 py-2 text-right whitespace-nowrap">Valor</TableHead>
-                    <TableHead className="px-2 py-2 text-center">Status</TableHead>
-                    <TableHead className="px-2 py-2 text-center">Pagamento</TableHead>
-                    <TableHead className="px-2 py-2 text-center">Ações</TableHead>
+                    <TableHead className="px-2 py-2 w-[10%] whitespace-nowrap"><div className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> Data</div></TableHead>
+                    <TableHead className="px-2 py-2 w-[7%] whitespace-nowrap"><div className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> Hora</div></TableHead>
+                    <TableHead className="px-2 py-2 w-[22%]"><div className="flex items-center gap-1"><User className="w-3.5 h-3.5" /> Cliente</div></TableHead>
+                    <TableHead className="px-2 py-2 w-[15%]">Profissional</TableHead>
+                    <TableHead className="px-2 py-2 w-[10%] text-right whitespace-nowrap">Valor</TableHead>
+                    <TableHead className="px-2 py-2 w-[12%] text-center">Status</TableHead>
+                    <TableHead className="px-2 py-2 w-[12%] text-center">Pagamento</TableHead>
+                    <TableHead className="px-2 py-2 w-[12%] text-center">Ações</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -814,17 +814,17 @@ export function AdminBookings() {
             </div>
           ) : (
             <div className="glass-panel overflow-hidden">
-              <Table className="w-full text-sm">
+              <Table className="w-full table-fixed text-sm">
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="px-2 py-2 whitespace-nowrap"><div className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> Data</div></TableHead>
-                    <TableHead className="px-2 py-2 whitespace-nowrap"><div className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> Hora</div></TableHead>
-                    <TableHead className="px-2 py-2"><div className="flex items-center gap-1"><User className="w-3.5 h-3.5" /> Cliente</div></TableHead>
-                    <TableHead className="px-2 py-2">Profissional</TableHead>
-                    <TableHead className="px-2 py-2 text-right whitespace-nowrap">Valor</TableHead>
-                    <TableHead className="px-2 py-2 text-center">Status</TableHead>
-                    <TableHead className="px-2 py-2 text-center">Pagamento</TableHead>
-                    <TableHead className="px-2 py-2 text-center">Ações</TableHead>
+                    <TableHead className="px-2 py-2 w-[10%] whitespace-nowrap"><div className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> Data</div></TableHead>
+                    <TableHead className="px-2 py-2 w-[7%] whitespace-nowrap"><div className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> Hora</div></TableHead>
+                    <TableHead className="px-2 py-2 w-[22%]"><div className="flex items-center gap-1"><User className="w-3.5 h-3.5" /> Cliente</div></TableHead>
+                    <TableHead className="px-2 py-2 w-[15%]">Profissional</TableHead>
+                    <TableHead className="px-2 py-2 w-[10%] text-right whitespace-nowrap">Valor</TableHead>
+                    <TableHead className="px-2 py-2 w-[12%] text-center">Status</TableHead>
+                    <TableHead className="px-2 py-2 w-[12%] text-center">Pagamento</TableHead>
+                    <TableHead className="px-2 py-2 w-[12%] text-center">Ações</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -855,17 +855,17 @@ export function AdminBookings() {
               )}
             </div>
           ) : (
-            <div className="glass-panel overflow-x-auto">
-              <Table>
+            <div className="glass-panel overflow-hidden">
+              <Table className="w-full table-fixed text-sm">
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Data</TableHead>
-                    <TableHead>Horário</TableHead>
-                    <TableHead>Cliente</TableHead>
-                    <TableHead>Profissional</TableHead>
-                    <TableHead className="text-center">Status</TableHead>
-                    <TableHead>Deletado em</TableHead>
-                    <TableHead className="text-center">Ações</TableHead>
+                    <TableHead className="px-2 py-2 w-[12%]">Data</TableHead>
+                    <TableHead className="px-2 py-2 w-[10%]">Horário</TableHead>
+                    <TableHead className="px-2 py-2 w-[22%]">Cliente</TableHead>
+                    <TableHead className="px-2 py-2 w-[16%]">Profissional</TableHead>
+                    <TableHead className="px-2 py-2 w-[12%] text-center">Status</TableHead>
+                    <TableHead className="px-2 py-2 w-[16%]">Deletado em</TableHead>
+                    <TableHead className="px-2 py-2 w-[12%] text-center">Ações</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
