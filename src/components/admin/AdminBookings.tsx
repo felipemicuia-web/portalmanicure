@@ -818,7 +818,7 @@ export function AdminBookings() {
                     <TableHead>Profissional</TableHead>
                     <TableHead className="text-right">Valor</TableHead>
                     <TableHead className="text-center">Status</TableHead>
-                    <TableHead className="text-center">Pgto</TableHead>
+                     <TableHead className="text-center">Pagamento</TableHead>
                     <TableHead className="text-center">Ações</TableHead>
                   </TableRow>
                 </TableHeader>
