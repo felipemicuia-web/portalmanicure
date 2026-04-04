@@ -814,17 +814,17 @@ export function AdminBookings() {
             </div>
           ) : (
             <div className="glass-panel overflow-hidden">
-              <Table className="table-fixed w-full">
+              <Table className="w-full text-sm">
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-[90px]"><div className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> Data</div></TableHead>
-                    <TableHead className="w-[70px]"><div className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> Hora</div></TableHead>
-                    <TableHead><div className="flex items-center gap-1"><User className="w-3.5 h-3.5" /> Cliente</div></TableHead>
-                    <TableHead className="w-[110px]">Profissional</TableHead>
-                    <TableHead className="w-[80px] text-right">Valor</TableHead>
-                    <TableHead className="w-[90px] text-center">Status</TableHead>
-                    <TableHead className="w-[140px] text-center">Pagamento</TableHead>
-                    <TableHead className="w-[130px] text-center">Ações</TableHead>
+                    <TableHead className="px-2 py-2 whitespace-nowrap"><div className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> Data</div></TableHead>
+                    <TableHead className="px-2 py-2 whitespace-nowrap"><div className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> Hora</div></TableHead>
+                    <TableHead className="px-2 py-2"><div className="flex items-center gap-1"><User className="w-3.5 h-3.5" /> Cliente</div></TableHead>
+                    <TableHead className="px-2 py-2">Profissional</TableHead>
+                    <TableHead className="px-2 py-2 text-right whitespace-nowrap">Valor</TableHead>
+                    <TableHead className="px-2 py-2 text-center">Status</TableHead>
+                    <TableHead className="px-2 py-2 text-center">Pagamento</TableHead>
+                    <TableHead className="px-2 py-2 text-center">Ações</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
