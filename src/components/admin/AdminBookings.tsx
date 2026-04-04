@@ -194,9 +194,9 @@ export function AdminBookings() {
   const getPaymentStatusBadge = (paymentStatus: string) => {
     switch (paymentStatus) {
       case "pendente":
-        return <Badge className="bg-amber-500/20 text-amber-400 border-amber-500/30 text-xs">Pgto Pendente</Badge>;
+        return <Badge className="bg-amber-500/20 text-amber-400 border-amber-500/30 text-xs whitespace-nowrap">Pagamento Pendente</Badge>;
       case "pago":
-        return <Badge className="bg-green-500/20 text-green-400 border-green-500/30 text-xs">Pgto Pago</Badge>;
+        return <Badge className="bg-green-500/20 text-green-400 border-green-500/30 text-xs whitespace-nowrap">Pagamento Pago</Badge>;
       default:
         return null;
     }
