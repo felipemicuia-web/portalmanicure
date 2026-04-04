@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef, ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useTenant } from "@/contexts/TenantContext";
+import { TENANT_DEFAULT_ID } from "@/config/tenant";
 
 // Theme presets - single source of truth
 export interface ThemeColors {
@@ -297,7 +298,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [animationId, setAnimationId] = useState("auto");
   const [loading, setLoading] = useState(true);
   const { tenantId, isSuperAdmin, loading: tenantLoading } = useTenant();
-  const canEditTheme = !!tenantId && !isSuperAdmin;
+  const canEditTheme = !!tenantId && (!isSuperAdmin || tenantId === TENANT_DEFAULT_ID);
   const currentThemeIdRef = useRef(currentThemeId);
 
   const resolvedAnimationId = animationId === "auto"
@@ -402,7 +403,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   // Save theme to DB
   const setTheme = useCallback(
     async (themeId: string) => {
-      if (!tenantId || isSuperAdmin) return;
+      if (!tenantId || (isSuperAdmin && tenantId !== TENANT_DEFAULT_ID)) return;
       applyById(themeId, tenantId);
 
       await supabase
@@ -416,7 +417,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   // Save animation to DB
   const setAnimation = useCallback(
     async (newAnimationId: string) => {
-      if (!tenantId || isSuperAdmin) return;
+      if (!tenantId || (isSuperAdmin && tenantId !== TENANT_DEFAULT_ID)) return;
       setAnimationId(newAnimationId);
 
       await supabase
