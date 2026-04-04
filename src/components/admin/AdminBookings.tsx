@@ -599,7 +599,7 @@ export function AdminBookings() {
           </div>
         </div>
       </TableCell>
-      <TableCell className="px-2 py-2 text-sm">{getProfessionalName(booking.professional_id)}</TableCell>
+      <TableCell className="px-2 py-2 text-sm truncate overflow-hidden">{getProfessionalName(booking.professional_id)}</TableCell>
       <TableCell className="px-2 py-2 text-right text-sm whitespace-nowrap">{formatPrice(booking.total_price)}</TableCell>
       <TableCell className="px-2 py-2 text-center">{getStatusBadge(booking.status)}</TableCell>
       <TableCell className="px-2 py-2 text-center">
