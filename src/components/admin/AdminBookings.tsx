@@ -491,7 +491,7 @@ export function AdminBookings() {
           </div>
           {booking.payment_method && (
             <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
-              💳 {booking.payment_method}
+              {booking.payment_method}
             </div>
           )}
           {booking.payment_status !== "na" && (
@@ -605,7 +605,7 @@ export function AdminBookings() {
       <TableCell className="px-2 py-2 text-center">
         <div className="flex flex-col items-center gap-0.5">
           {booking.payment_method ? (
-            <span className="text-xs text-muted-foreground whitespace-nowrap">💳 {booking.payment_method}</span>
+            <span className="text-xs text-muted-foreground whitespace-nowrap">{booking.payment_method}</span>
           ) : (
             <span className="text-xs text-muted-foreground">—</span>
           )}
