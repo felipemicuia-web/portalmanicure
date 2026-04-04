@@ -403,7 +403,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   // Save theme to DB
   const setTheme = useCallback(
     async (themeId: string) => {
-      if (!tenantId || isSuperAdmin) return;
+      if (!tenantId || (isSuperAdmin && tenantId !== TENANT_DEFAULT_ID)) return;
       applyById(themeId, tenantId);
 
       await supabase
