@@ -774,18 +774,18 @@ export function AdminBookings() {
               )}
             </div>
           ) : (
-            <div className="glass-panel overflow-x-auto">
-              <Table>
+            <div className="glass-panel overflow-hidden">
+              <Table className="table-fixed w-full">
                 <TableHeader>
                   <TableRow>
-                    <TableHead><div className="flex items-center gap-1"><Calendar className="w-4 h-4" /> Data</div></TableHead>
-                    <TableHead><div className="flex items-center gap-1"><Clock className="w-4 h-4" /> Horário</div></TableHead>
-                    <TableHead><div className="flex items-center gap-1"><User className="w-4 h-4" /> Cliente</div></TableHead>
-                    <TableHead>Profissional</TableHead>
-                    <TableHead className="text-right">Valor</TableHead>
-                    <TableHead className="text-center">Status</TableHead>
-                     <TableHead className="text-center">Pagamento</TableHead>
-                    <TableHead className="text-center">Ações</TableHead>
+                    <TableHead className="w-[90px]"><div className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> Data</div></TableHead>
+                    <TableHead className="w-[70px]"><div className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> Hora</div></TableHead>
+                    <TableHead><div className="flex items-center gap-1"><User className="w-3.5 h-3.5" /> Cliente</div></TableHead>
+                    <TableHead className="w-[110px]">Profissional</TableHead>
+                    <TableHead className="w-[80px] text-right">Valor</TableHead>
+                    <TableHead className="w-[90px] text-center">Status</TableHead>
+                    <TableHead className="w-[140px] text-center">Pagamento</TableHead>
+                    <TableHead className="w-[130px] text-center">Ações</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
