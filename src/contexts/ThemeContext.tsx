@@ -417,7 +417,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   // Save animation to DB
   const setAnimation = useCallback(
     async (newAnimationId: string) => {
-      if (!tenantId || isSuperAdmin) return;
+      if (!tenantId || (isSuperAdmin && tenantId !== TENANT_DEFAULT_ID)) return;
       setAnimationId(newAnimationId);
 
       await supabase
